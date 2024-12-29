@@ -1,7 +1,17 @@
-//
-//  Untitled.swift
-//  Tracker
-//
-//  Created by Vitaly Wexler on 29.12.2024.
-//
 
+import Foundation
+import UIKit
+
+
+class StatiscticsViewController: UIViewController {
+    override func viewDidLoad() {
+        super.viewDidLoad()
+        
+        }
+    
+   
+    
+    
+    
+    
+}
