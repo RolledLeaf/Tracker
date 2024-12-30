@@ -23,7 +23,7 @@ class SceneDelegate: UIResponder, UIWindowSceneDelegate {
         window = UIWindow(windowScene: windowScene)
 
         // Устанавливаем initial view controller
-        let initialViewController = TrackerViewController() // Ваш контроллер
+        let initialViewController = TabBarController() // Ваш контроллер
         window?.rootViewController = initialViewController
 
         // Отображаем окно
