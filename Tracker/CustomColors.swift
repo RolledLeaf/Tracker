@@ -4,8 +4,12 @@ import UIKit
 enum CustomColors: String {
     case backgroundGray = "backgroundGray"
     case textColor = "textColor"
-    case collectionOrange = "collectionOrange"
     case dataGray = "dataGray"
+}
+
+enum CollectionColors: String  {
+    case collectionOrange = "collectionOrange"
+    
 }
 
 extension UIColor {

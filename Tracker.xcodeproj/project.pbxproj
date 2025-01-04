@@ -88,10 +88,10 @@
 		B086C0AB2D21642500855AFE = {
 			isa = PBXGroup;
 			children = (
+				B086C0B52D21642500855AFE /* Products */,
 				B086C0B62D21642500855AFE /* Tracker */,
 				B086C0CD2D21642600855AFE /* TrackerTests */,
 				B086C0D72D21642600855AFE /* TrackerUITests */,
-				B086C0B52D21642500855AFE /* Products */,
 			);
 			sourceTree = "<group>";
 		};

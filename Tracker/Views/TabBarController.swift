@@ -9,7 +9,7 @@ final class TabBarController: UITabBarController {
     
     
     private func setupTabBar() {
-        let trackerVC = TrackerViewController()
+        let trackerVC = TrackersViewController()
         let statisticsVC = StatisticsViewController()
         
         trackerVC.tabBarItem = UITabBarItem(title: "Tracker", image: UIImage(named: "tracker"), tag: 0)

@@ -2,7 +2,7 @@
 import Foundation
 import UIKit
 
-final class TrackerViewController: UIViewController {
+final class TrackersViewController: UIViewController {
     
     
     private let plusButton = UIButton()
@@ -11,6 +11,8 @@ final class TrackerViewController: UIViewController {
     private let emptyFieldLabel = UILabel()
     
     private var datePickerHeightConstraint: NSLayoutConstraint?
+    var categories: [TrackerCategory]?
+    var completedTrackers: [TrackerRecord]?
     
     private let searchBar: UISearchBar = {
         let searchBar = UISearchBar()
