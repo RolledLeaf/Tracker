@@ -3,7 +3,7 @@ import Foundation
 import UIKit
 
 final class TrackersViewController: UIViewController, UICollectionViewDataSource {
-   
+    
     
     
     
@@ -15,12 +15,12 @@ final class TrackersViewController: UIViewController, UICollectionViewDataSource
     private var datePickerHeightConstraint: NSLayoutConstraint?
     var categories: [TrackerCategory]?
     var completedTrackers: [TrackerRecord]?
-    var activeHabbits: [TrackerRecord]?
+   
     
     
     private let habbitsCollectionView: UICollectionView = {
         let layout = UICollectionViewFlowLayout()
-        layout.itemSize = CGSize(width: 130, height: 60)
+        layout.itemSize = CGSize(width: 167, height: 148)
         layout.scrollDirection = .vertical
         layout.minimumLineSpacing = 10
         layout.minimumInteritemSpacing = 10
@@ -89,12 +89,12 @@ final class TrackersViewController: UIViewController, UICollectionViewDataSource
         let selectedDate = formatter.string(from: sender.date)
         dateButton.setTitle(selectedDate, for: .normal)
         // После выбора скрываем календарь
-           UIView.animate(withDuration: 0.3, animations: {
-               self.datePickerHeightConstraint?.constant = 0 // Убираем высоту
-               self.view.layoutIfNeeded() // Перестраиваем интерфейс
-           }, completion: { _ in
-               self.datePicker.isHidden = true // Скрываем календарь
-           })
+        UIView.animate(withDuration: 0.3, animations: {
+            self.datePickerHeightConstraint?.constant = 0 // Убираем высоту
+            self.view.layoutIfNeeded() // Перестраиваем интерфейс
+        }, completion: { _ in
+            self.datePicker.isHidden = true // Скрываем календарь
+        })
     }
     
     
@@ -119,6 +119,16 @@ final class TrackersViewController: UIViewController, UICollectionViewDataSource
     }
     
     private func setupInitialUI() {
+      
+        if let completedTrackers = completedTrackers, completedTrackers.isEmpty {
+            emptyFieldLabel.isHidden = false
+            emptyFieldStarImage.isHidden = false
+            habbitsCollectionView.isHidden = true
+        } else {
+            emptyFieldStarImage.isHidden = true
+            emptyFieldLabel.isHidden = true
+            habbitsCollectionView.isHidden = false
+        }
         
         view.backgroundColor = UIColor(named: CustomColors.backgroundGray.rawValue)
         
@@ -137,7 +147,7 @@ final class TrackersViewController: UIViewController, UICollectionViewDataSource
         if let datePickerHeightConstraint = datePickerHeightConstraint {
             NSLayoutConstraint.activate([
                 // Остальные ограничения...
-
+                
                 datePicker.topAnchor.constraint(equalTo: dateButton.bottomAnchor, constant: 8),
                 datePicker.leadingAnchor.constraint(equalTo: view.safeAreaLayoutGuide.leadingAnchor, constant: 16),
                 datePicker.trailingAnchor.constraint(equalTo: view.safeAreaLayoutGuide.trailingAnchor, constant: -16),
@@ -146,7 +156,7 @@ final class TrackersViewController: UIViewController, UICollectionViewDataSource
         }
         
         NSLayoutConstraint.activate([
-          
+            
             habbitsCollectionView.leadingAnchor.constraint(equalTo: view.safeAreaLayoutGuide.leadingAnchor, constant: 16),
             habbitsCollectionView.trailingAnchor.constraint(equalTo: view.safeAreaLayoutGuide.trailingAnchor, constant: -16),
             habbitsCollectionView.topAnchor.constraint(equalTo: searchBar.bottomAnchor, constant: 24),
@@ -181,17 +191,38 @@ final class TrackersViewController: UIViewController, UICollectionViewDataSource
         
         habbitsCollectionView.dataSource = self
         
-        
+        habbitsCollectionView.register(TrackerCell.self, forCellWithReuseIdentifier: TrackerCell.reuseIdentifier)
         
     }
     
     func collectionView(_ collectionView: UICollectionView, numberOfItemsInSection section: Int) -> Int {
-        return activeHabbits?.count ?? 0
+        return completedTrackers?.count ?? 0
         
     }
     
     func collectionView(_ collectionView: UICollectionView, cellForItemAt indexPath: IndexPath) -> UICollectionViewCell {
-        <#code#>
+        guard let cell = collectionView.dequeueReusableCell(withReuseIdentifier: TrackerCell.reuseIdentifier, for: indexPath) as? TrackerCell else {
+            fatalError("Unable to dequeue TrackerCell")
+        }
+        
+        // Безопасно извлекаем массив completedTrackers
+        guard let completedTrackers = completedTrackers else {
+            print("Warning: completedTrackers is nil")
+               habbitsCollectionView.isHidden = true
+               return UICollectionViewCell()
+        }
+        
+        // Извлекаем трекер
+        let trackerRecord = completedTrackers[indexPath.row]
+        let tracker = trackerRecord.executedTracker
+        
+        // Считаем количество выполнений трекера
+        let completedCount = completedTrackers.filter { $0.executedTracker.id == tracker.id }.count
+        
+        // Конфигурируем ячейку
+        cell.configure(with: tracker, completedCount: completedCount)
+        
+        return cell
     }
     
 }

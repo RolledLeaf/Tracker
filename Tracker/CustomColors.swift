@@ -31,4 +31,9 @@ extension UIColor {
     static func custom(_ color: CustomColors) -> UIColor? {
         return UIColor(named: color.rawValue) ?? .clear
     }
-}
+    
+        static func fromCollectionColor(_ color: CollectionColors) -> UIColor? {
+            return UIColor(named: color.rawValue)
+        }
+    }
+
