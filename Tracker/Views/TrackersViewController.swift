@@ -2,7 +2,9 @@
 import Foundation
 import UIKit
 
-final class TrackersViewController: UIViewController {
+final class TrackersViewController: UIViewController, UICollectionViewDataSource {
+   
+    
     
     
     private let plusButton = UIButton()
@@ -13,6 +15,21 @@ final class TrackersViewController: UIViewController {
     private var datePickerHeightConstraint: NSLayoutConstraint?
     var categories: [TrackerCategory]?
     var completedTrackers: [TrackerRecord]?
+    var activeHabbits: [TrackerRecord]?
+    
+    
+    private let habbitsCollectionView: UICollectionView = {
+        let layout = UICollectionViewFlowLayout()
+        layout.itemSize = CGSize(width: 130, height: 60)
+        layout.scrollDirection = .vertical
+        layout.minimumLineSpacing = 10
+        layout.minimumInteritemSpacing = 10
+        
+        let collectionView = UICollectionView(frame: .zero, collectionViewLayout: layout)
+        collectionView.backgroundColor = .white
+        collectionView.translatesAutoresizingMaskIntoConstraints = false
+        return collectionView
+    }()
     
     private let searchBar: UISearchBar = {
         let searchBar = UISearchBar()
@@ -105,7 +122,7 @@ final class TrackersViewController: UIViewController {
         
         view.backgroundColor = UIColor(named: CustomColors.backgroundGray.rawValue)
         
-        let uiElements = [plusButton, dateButton, trackersLabel, searchBar, emptyFieldStarImage, emptyFieldLabel, datePicker]
+        let uiElements = [plusButton, dateButton, habbitsCollectionView, trackersLabel, searchBar, emptyFieldStarImage, emptyFieldLabel, datePicker]
         uiElements.forEach {$0.translatesAutoresizingMaskIntoConstraints = false
             view.addSubview($0)
         }
@@ -130,7 +147,9 @@ final class TrackersViewController: UIViewController {
         
         NSLayoutConstraint.activate([
           
-              
+            habbitsCollectionView.leadingAnchor.constraint(equalTo: view.safeAreaLayoutGuide.leadingAnchor, constant: 16),
+            habbitsCollectionView.trailingAnchor.constraint(equalTo: view.safeAreaLayoutGuide.trailingAnchor, constant: -16),
+            habbitsCollectionView.topAnchor.constraint(equalTo: searchBar.bottomAnchor, constant: 24),
             
             plusButton.heightAnchor.constraint(equalToConstant: 19),
             plusButton.widthAnchor.constraint(equalToConstant: 18),
@@ -160,6 +179,19 @@ final class TrackersViewController: UIViewController {
             
         ])
         
+        habbitsCollectionView.dataSource = self
+        
+        
+        
+    }
+    
+    func collectionView(_ collectionView: UICollectionView, numberOfItemsInSection section: Int) -> Int {
+        return activeHabbits?.count ?? 0
+        
+    }
+    
+    func collectionView(_ collectionView: UICollectionView, cellForItemAt indexPath: IndexPath) -> UICollectionViewCell {
+        <#code#>
     }
     
 }
