@@ -71,6 +71,7 @@ final class TrackersViewController: UIViewController, UICollectionViewDataSource
     
     override func viewDidLoad() {
         super.viewDidLoad()
+        print("Completed Trackers: \(String(describing: completedTrackers))")
         setupInitialUI()
         
     }
@@ -118,17 +119,21 @@ final class TrackersViewController: UIViewController, UICollectionViewDataSource
         label.textColor = UIColor(named: color.rawValue)
     }
     
-    private func setupInitialUI() {
-      
-        if let completedTrackers = completedTrackers, completedTrackers.isEmpty {
+    
+    private func updateUI() {
+        if completedTrackers == nil || completedTrackers?.isEmpty == true {
             emptyFieldLabel.isHidden = false
             emptyFieldStarImage.isHidden = false
             habbitsCollectionView.isHidden = true
         } else {
-            emptyFieldStarImage.isHidden = true
             emptyFieldLabel.isHidden = true
+            emptyFieldStarImage.isHidden = true
             habbitsCollectionView.isHidden = false
         }
+    }
+    
+    private func setupInitialUI() {
+        updateUI()
         
         view.backgroundColor = UIColor(named: CustomColors.backgroundGray.rawValue)
         
@@ -140,6 +145,7 @@ final class TrackersViewController: UIViewController, UICollectionViewDataSource
         configureLabel(trackersLabel, text: "Трекеры", fontSize: 34, weight: .bold, color: .textColor)
         configureLabel(emptyFieldLabel, text: "Что будем отслеживать?", fontSize: 12, weight: .regular, color: .textColor)
         plusButton.setImage(UIImage(named: "plusButton"), for: .normal)
+        plusButton.addTarget(self, action: #selector(plusButtonTapped), for: .touchUpInside)
         emptyFieldStarImage.image = UIImage(named: "dizzyStar")
         
         
@@ -223,6 +229,13 @@ final class TrackersViewController: UIViewController, UICollectionViewDataSource
         cell.configure(with: tracker, completedCount: completedCount)
         
         return cell
+    }
+    
+    @objc private func plusButtonTapped() {
+        let createHabitVC = CreateHabitTypeViewController()
+        let navigationController = UINavigationController(rootViewController: createHabitVC)
+        navigationController.modalPresentationStyle = .automatic
+        present(navigationController, animated: true)
     }
     
 }
