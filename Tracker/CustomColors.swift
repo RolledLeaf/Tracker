@@ -7,6 +7,7 @@ enum CustomColors: String {
     case dataGray = "dataGray"
     case createButtonColor = "createButtonColor"
     case createButtonTextColor = "createButtonTextColor"
+    case textFieldGray = "textFieldGray"
 }
 
 enum CollectionColors: String  {
@@ -14,6 +15,7 @@ enum CollectionColors: String  {
     case collectionOrange2 = "collectionOrange2"
     case collectionBlue3 = "collectionBlue3"
     case collectionPurple4 = "collectionPurple4"
+    case collectionLightGreen5 = "collectionLightGreen5"
     case collectionViolet6 = "collectionViolet6"
     case collectionBeige7 = "collectionBeige7"
     case collectionLightBlue8 = "collectionLightBlue8"
@@ -27,6 +29,10 @@ enum CollectionColors: String  {
     case collectionDarkViolet16 = "collectionDarkViolet16"
     case collectionPalePurple17 = "collectionPalePurple17"
     case collectionGreen18 = "collectionGreen18"
+    
+    var uiColor: UIColor? {
+            return UIColor(named: self.rawValue)
+        }
 }
 
 extension UIColor {
