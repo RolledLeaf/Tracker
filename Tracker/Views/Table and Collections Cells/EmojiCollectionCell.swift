@@ -8,7 +8,7 @@ class EmojiCollectionViewCell: UICollectionViewCell {
     
     // MARK: - UI Elements
     
-    private let emojiLabel: UILabel = {
+     let emojiLabel: UILabel = {
         let label = UILabel()
         label.font = .systemFont(ofSize: 32) // Размер шрифта соответствует размеру ячейки
         label.textAlignment = .center

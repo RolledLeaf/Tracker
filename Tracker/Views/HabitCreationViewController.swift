@@ -1,7 +1,7 @@
 import UIKit
 
-final class HabitCreationViewController: UIViewController, UITableViewDelegate, UITableViewDataSource, UICollectionViewDataSource {
-  
+final class HabitCreationViewController: UIViewController, UITableViewDelegate, UITableViewDataSource, UICollectionViewDataSource, UICollectionViewDelegateFlowLayout {
+    
     
     private let titleLabel: UILabel = {
         let label = UILabel()
@@ -21,27 +21,26 @@ final class HabitCreationViewController: UIViewController, UITableViewDelegate, 
         textField.backgroundColor = UIColor.custom(.backgroundGray)
         textField.textAlignment = .left
         let paddingView = UIView(frame: CGRect(x: 0, y: 0, width: 16, height: textField.frame.height))
-           textField.leftView = paddingView
-           textField.leftViewMode = .always
-
+        textField.leftView = paddingView
+        textField.leftViewMode = .always
+        
         return textField
     }()
     
     private let categoryAndScheduleTableView: UITableView = {
         let tableView = UITableView()
-        tableView.register(CategoryAndScheduleTableViewCell.self, forCellReuseIdentifier: CategoryAndScheduleTableViewCell.identifier) //регистрация по ячейке
         tableView.separatorStyle = .singleLine
         tableView.backgroundColor = .clear
-        tableView.rowHeight = UITableView.automaticDimension
+        tableView.rowHeight = 75
         return tableView
     }()
     
     private let emojiCollectionView: UICollectionView = {
         let layout = UICollectionViewFlowLayout()
-        layout.itemSize = CGSize(width: 32, height: 38)
-        layout.scrollDirection = .horizontal
-        layout.minimumLineSpacing = 0
-        layout.minimumInteritemSpacing = 5
+        layout.itemSize = CGSize(width: 40, height: 40)
+        layout.scrollDirection = .vertical
+        layout.minimumLineSpacing = 17
+        layout.minimumInteritemSpacing = 23
         let collectionView = UICollectionView(frame: .zero, collectionViewLayout: layout)
         collectionView.register(EmojiCollectionViewCell.self, forCellWithReuseIdentifier: EmojiCollectionViewCell.identifier)
         collectionView.backgroundColor = .clear
@@ -52,9 +51,9 @@ final class HabitCreationViewController: UIViewController, UITableViewDelegate, 
     private let colorsCollectionView: UICollectionView = {
         let layout = UICollectionViewFlowLayout()
         layout.itemSize = CGSize(width: 40, height: 40)
-        layout.scrollDirection = .horizontal
-        layout.minimumLineSpacing = 0
-        layout.minimumInteritemSpacing = 5
+        layout.scrollDirection = .vertical
+        layout.minimumLineSpacing = 17
+        layout.minimumInteritemSpacing = 23
         let collectionView = UICollectionView(frame: .zero, collectionViewLayout: layout)
         collectionView.register(ColorsCollectionViewCell.self, forCellWithReuseIdentifier: ColorsCollectionViewCell.identifier)
         collectionView.backgroundColor = .clear
@@ -80,12 +79,16 @@ final class HabitCreationViewController: UIViewController, UITableViewDelegate, 
         return button
     }()
     
-  
+    
     
     
     private let tableViewOptions = ["Категория", "Расписание"]
     private let emojis = ["🙂", "😻", "🌺", "🐶", "❤️", "😱", "😇", "😡", "🥶", "🤔", "🙌", "🍔", "🥦", "🏓", "🥇", "🎸", "🏝️", "😪"]
-    private let trackerCollectionColors: [CollectionColors] = [.collectionRed1, .collectionOrange2, .collectionPurple4, .collectionLightGreen5, .collectionViolet6, .collectionBeige7, .collectionLightBlue8, .collectionJadeGreen9, .collectionDarkPurple10, .collectionCarrotOrange11, .collectionPink12, .collectionLightBrick13, .collectionSemiblue14, .collectionLightPurple15, .collectionDarkViolet16, .collectionPalePurple17, .collectionGreen18]
+    private let trackerCollectionColors: [CollectionColors] = [.collectionRed1, .collectionOrange2, .collectionBlue3, .collectionPurple4, .collectionLightGreen5, .collectionViolet6, .collectionBeige7, .collectionLightBlue8, .collectionJadeGreen9, .collectionDarkPurple10, .collectionCarrotOrange11, .collectionPink12, .collectionLightBrick13, .collectionSemiblue14, .collectionLightPurple15, .collectionDarkViolet16, .collectionPalePurple17, .collectionGreen18]
+    
+    let scrollView = UIScrollView()
+    let contentView = UIView()
+    
     
     override func viewDidLoad() {
         super.viewDidLoad()
@@ -96,52 +99,132 @@ final class HabitCreationViewController: UIViewController, UITableViewDelegate, 
     
     private func setupViews() {
         
+        
         let buttonsStackView = UIStackView(arrangedSubviews: [ createTrackerButton, cancelButton])
         buttonsStackView.axis = .horizontal
         buttonsStackView.spacing = 8
         buttonsStackView.distribution = .fillEqually
         
+        let collectionsStackView = UIStackView(arrangedSubviews: [ emojiCollectionView, colorsCollectionView])
+        collectionsStackView.axis = .vertical
+        collectionsStackView.spacing = 34
+        collectionsStackView.distribution = .fillEqually
         
-        let UIelements = [titleLabel, trackerNameTextField, categoryAndScheduleTableView, emojiCollectionView, colorsCollectionView, buttonsStackView]
         
-        UIelements.forEach { view.addSubview($0) }
-        
+        let UIelements = [titleLabel, trackerNameTextField, categoryAndScheduleTableView, collectionsStackView, buttonsStackView]
         UIelements.forEach {
             $0.translatesAutoresizingMaskIntoConstraints = false
         }
         
+        view.addSubview(scrollView)
+        scrollView.addSubview(contentView)
+        UIelements.forEach { contentView.addSubview($0) }
+        
+        scrollView.translatesAutoresizingMaskIntoConstraints = false
+        contentView.translatesAutoresizingMaskIntoConstraints = false
+        
+        
+        
         NSLayoutConstraint.activate([
-            titleLabel.topAnchor.constraint(equalTo: view.safeAreaLayoutGuide.topAnchor, constant: -32),
-            titleLabel.centerXAnchor.constraint(equalTo: view.centerXAnchor),
             
-            trackerNameTextField.widthAnchor.constraint(equalToConstant: 343),
-            trackerNameTextField.heightAnchor.constraint(equalToConstant: 75),
-            trackerNameTextField.topAnchor.constraint(equalTo: titleLabel.bottomAnchor, constant: 38),
-            trackerNameTextField.centerXAnchor.constraint(equalTo: view.centerXAnchor),
+            scrollView.topAnchor.constraint(equalTo: view.safeAreaLayoutGuide.topAnchor),
+              scrollView.leadingAnchor.constraint(equalTo: view.leadingAnchor),
+              scrollView.trailingAnchor.constraint(equalTo: view.trailingAnchor),
+              scrollView.bottomAnchor.constraint(equalTo: view.bottomAnchor),
             
-            categoryAndScheduleTableView.topAnchor.constraint(equalTo: trackerNameTextField.bottomAnchor, constant: 24),
-            categoryAndScheduleTableView.centerXAnchor.constraint(equalTo: view.centerXAnchor),
+            contentView.topAnchor.constraint(equalTo: scrollView.topAnchor),
+            contentView.leadingAnchor.constraint(equalTo: scrollView.leadingAnchor),
+            contentView.trailingAnchor.constraint(equalTo: scrollView.trailingAnchor),
+            contentView.bottomAnchor.constraint(equalTo: scrollView.bottomAnchor),
+            contentView.widthAnchor.constraint(equalTo: scrollView.widthAnchor),
+            contentView.heightAnchor.constraint(equalToConstant: 900),
             
-            emojiCollectionView.topAnchor.constraint(equalTo: categoryAndScheduleTableView.bottomAnchor, constant: 32),
-            emojiCollectionView.centerXAnchor.constraint(equalTo: view.centerXAnchor),
-            emojiCollectionView.leadingAnchor.constraint(equalTo: view.leadingAnchor),
-            emojiCollectionView.trailingAnchor.constraint(equalTo: view.trailingAnchor),
-            emojiCollectionView.heightAnchor.constraint(equalToConstant: 204),
             
-            colorsCollectionView.topAnchor.constraint(equalTo: emojiCollectionView.bottomAnchor, constant: 34),
-            colorsCollectionView.centerXAnchor.constraint(equalTo: view.centerXAnchor),
-            colorsCollectionView.leadingAnchor.constraint(equalTo: view.leadingAnchor),
-            colorsCollectionView.trailingAnchor.constraint(equalTo: view.trailingAnchor),
-            colorsCollectionView.heightAnchor.constraint(equalToConstant: 204),
+            titleLabel.topAnchor.constraint(equalTo: contentView.topAnchor, constant: 25),
+               titleLabel.centerXAnchor.constraint(equalTo: contentView.centerXAnchor),
+               
+               trackerNameTextField.heightAnchor.constraint(equalToConstant: 75),
+               trackerNameTextField.topAnchor.constraint(equalTo: titleLabel.bottomAnchor, constant: 38),
+               trackerNameTextField.leadingAnchor.constraint(equalTo: contentView.leadingAnchor, constant: 16),
+               trackerNameTextField.trailingAnchor.constraint(equalTo: contentView.trailingAnchor, constant: -16),
+               
+               categoryAndScheduleTableView.topAnchor.constraint(equalTo: trackerNameTextField.bottomAnchor, constant: 24),
+               categoryAndScheduleTableView.leadingAnchor.constraint(equalTo: contentView.leadingAnchor, constant: 16),
+               categoryAndScheduleTableView.trailingAnchor.constraint(equalTo: contentView.trailingAnchor, constant: -16),
+               categoryAndScheduleTableView.heightAnchor.constraint(equalToConstant: 150),
+               
+               collectionsStackView.topAnchor.constraint(equalTo: categoryAndScheduleTableView.bottomAnchor, constant: 50),
+               collectionsStackView.heightAnchor.constraint(equalToConstant: 445),
+               collectionsStackView.leadingAnchor.constraint(equalTo: contentView.leadingAnchor, constant: 23),
+               collectionsStackView.trailingAnchor.constraint(equalTo: contentView.trailingAnchor, constant: -23),
+            
+            buttonsStackView.topAnchor.constraint(equalTo: collectionsStackView.bottomAnchor, constant: 24),
             
             buttonsStackView.heightAnchor.constraint(equalToConstant: 60),
-            buttonsStackView.centerXAnchor.constraint(equalTo: view.centerXAnchor),
-            buttonsStackView.bottomAnchor.constraint(equalTo: view.bottomAnchor, constant: -34),
-            buttonsStackView.leadingAnchor.constraint(equalTo: view.leadingAnchor, constant: 20),
-            buttonsStackView.trailingAnchor.constraint(equalTo: view.trailingAnchor, constant: -20)])
-            
-            
+            buttonsStackView.leadingAnchor.constraint(equalTo: contentView.leadingAnchor, constant: 20),
+            buttonsStackView.trailingAnchor.constraint(equalTo: contentView.trailingAnchor, constant: -20)])
+        
+        
+        emojiCollectionView.delegate = self
+        colorsCollectionView.delegate = self
+        
+        emojiCollectionView.dataSource = self
+        colorsCollectionView.dataSource = self
+        categoryAndScheduleTableView.dataSource = self
+        
+        emojiCollectionView.register(
+            CollectionHeaderView.self,
+            forSupplementaryViewOfKind: UICollectionView.elementKindSectionHeader,
+            withReuseIdentifier: CollectionHeaderView.identifier
+        )
+        
+        
+        colorsCollectionView.register(
+            CollectionHeaderView.self,
+            forSupplementaryViewOfKind: UICollectionView.elementKindSectionHeader,
+            withReuseIdentifier: CollectionHeaderView.identifier
+        )
+        
+        categoryAndScheduleTableView.register(CategoryAndScheduleTableViewCell.self, forCellReuseIdentifier: CategoryAndScheduleTableViewCell.identifier) //регистрация по ячейке
+        
+        
     }
+    
+    func collectionView(_ collectionView: UICollectionView, viewForSupplementaryElementOfKind kind: String, at indexPath: IndexPath) -> UICollectionReusableView {
+        print("Requested supplementary view for kind: \(kind), section: \(indexPath.section)")
+        
+        guard kind == UICollectionView.elementKindSectionHeader else {
+            print("Invalid kind requested")
+            return UICollectionReusableView()
+        }
+        
+        guard let header = collectionView.dequeueReusableSupplementaryView(
+            ofKind: UICollectionView.elementKindSectionHeader,
+            withReuseIdentifier: CollectionHeaderView.identifier,
+            for: indexPath
+        ) as? CollectionHeaderView else {
+            print("Failed to dequeue CollectionHeaderView")
+            return UICollectionReusableView()
+        }
+        
+        print("Successfully dequeued CollectionHeaderView for section \(indexPath.section)")
+        
+        // Configure header
+        if collectionView == emojiCollectionView {
+            header.configure(with: "Emoji")
+        } else if collectionView == colorsCollectionView {
+            header.configure(with: "Цвет")
+        }
+        
+        return header
+    }
+    
+    func collectionView(_ collectionView: UICollectionView, layout collectionViewLayout: UICollectionViewLayout, referenceSizeForHeaderInSection section: Int) -> CGSize {
+        let size = CGSize(width: 52, height: 18) // Или другой размер
+        print("Header size for section \(section): \(size)")
+        return size
+    }
+    
     
     func collectionView(_ collectionView: UICollectionView, numberOfItemsInSection section: Int) -> Int {
         if collectionView == emojiCollectionView {
@@ -152,9 +235,11 @@ final class HabitCreationViewController: UIViewController, UITableViewDelegate, 
         return 0
     }
     
+    //Настройка коллекций
     func collectionView(_ collectionView: UICollectionView, cellForItemAt indexPath: IndexPath) -> UICollectionViewCell {
         if collectionView == emojiCollectionView {
             guard let cell = collectionView.dequeueReusableCell(withReuseIdentifier: EmojiCollectionViewCell.identifier, for: indexPath) as? EmojiCollectionViewCell else {
+                print("Collection wasn't able to dequeue cell")
                 return UICollectionViewCell()
             }
             
@@ -162,17 +247,16 @@ final class HabitCreationViewController: UIViewController, UITableViewDelegate, 
             return cell
         } else if collectionView == colorsCollectionView {
             guard let cell = collectionView.dequeueReusableCell(withReuseIdentifier: ColorsCollectionViewCell.identifier, for: indexPath) as? ColorsCollectionViewCell else {
-                        return UICollectionViewCell()
-                    }
-            // Пробуем извлечь цвет, если не получается — используем дефолтный цвет
-               guard let color = trackerCollectionColors[indexPath.item].uiColor else {
-                   cell.configure(with: .gray)  // дефолтный цвет
-                   return cell
-               }
-                
-            // Настроим ячейку, передав цвет
-                cell.configure(with: color)
+                return UICollectionViewCell()
+            }
+            guard let color = trackerCollectionColors[indexPath.item].uiColor else {
+                cell.configure(with: .gray)  // дефолтный цвет
                 return cell
+            }
+            
+            // Настроим ячейку, передав цвет
+            cell.configure(with: color)
+            return cell
         }
         return UICollectionViewCell()
     }
@@ -185,7 +269,7 @@ final class HabitCreationViewController: UIViewController, UITableViewDelegate, 
         } else if collectionView == emojiCollectionView {
             let selectedEmoji = emojis[indexPath.item]
             print("Selected emoji: \(selectedEmoji)")
-            // Обработайте выбор цвета
+            // Обработайте выбор эмдзи
         }
     }
     
@@ -197,20 +281,20 @@ final class HabitCreationViewController: UIViewController, UITableViewDelegate, 
     
     func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
         guard let cell = tableView.dequeueReusableCell(withIdentifier: CategoryAndScheduleTableViewCell.identifier, for: indexPath) as? CategoryAndScheduleTableViewCell else {
-        return UITableViewCell()
-    }
-    
-    let titles = ["Категория", "Расписание"]
-    cell.configure(with: titles[indexPath.row])
-    return cell
+            return UITableViewCell()
+        }
+        
+        let titles = tableViewOptions
+        cell.configure(with: titles[indexPath.row])
+        return cell
     }
     
     func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
-            tableView.deselectRow(at: indexPath, animated: true)
-            if indexPath.row == 0 {
-                // Действие для "Категория"
-            } else if indexPath.row == 1 {
-                // Действие для "Расписание"
-            }
+        tableView.deselectRow(at: indexPath, animated: true)
+        if indexPath.row == 0 {
+            // Действие для "Категория"
+        } else if indexPath.row == 1 {
+            // Действие для "Расписание"
         }
+    }
 }

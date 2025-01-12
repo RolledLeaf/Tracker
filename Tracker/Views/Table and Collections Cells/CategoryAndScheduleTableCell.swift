@@ -10,6 +10,7 @@ class CategoryAndScheduleTableViewCell: UITableViewCell {
         let label = UILabel()
         label.font = .systemFont(ofSize: 16, weight: .regular)
         label.textColor = .label
+        label.backgroundColor = UIColor.custom(.backgroundGray)
         label.translatesAutoresizingMaskIntoConstraints = false
         return label
     }()
@@ -38,6 +39,9 @@ class CategoryAndScheduleTableViewCell: UITableViewCell {
     private func setupUI() {
         contentView.addSubview(titleLabel)
         contentView.addSubview(arrowImageView)
+        contentView.backgroundColor = UIColor.custom(.backgroundGray)
+        contentView.layer.cornerRadius = 16
+        
         
         NSLayoutConstraint.activate([
             // Расположение titleLabel

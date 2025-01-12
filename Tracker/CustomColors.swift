@@ -3,7 +3,7 @@ import UIKit
 
 enum CustomColors: String {
     case backgroundGray = "backgroundGray"
-    case textColor = "textColor"
+    case textColor = "TextColor"
     case dataGray = "dataGray"
     case createButtonColor = "createButtonColor"
     case createButtonTextColor = "createButtonTextColor"
