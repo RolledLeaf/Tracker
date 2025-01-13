@@ -5,8 +5,8 @@ final class CollectionHeaderView: UICollectionReusableView {
     
      let titleLabel: UILabel = {
         let label = UILabel()
-        label.font = .systemFont(ofSize: 16, weight: .semibold)
-         label.textColor = UIColor.custom(.textColor)
+         label.font = .systemFont(ofSize: 19, weight: .bold)
+        label.textColor = UIColor.custom(.textColor)
         label.textAlignment = .left
         return label
     }()
@@ -19,7 +19,7 @@ final class CollectionHeaderView: UICollectionReusableView {
         titleLabel.translatesAutoresizingMaskIntoConstraints = false
         
         NSLayoutConstraint.activate([
-            titleLabel.leadingAnchor.constraint(equalTo: leadingAnchor, constant: 16),
+            titleLabel.leadingAnchor.constraint(equalTo: leadingAnchor, constant: 3),
             titleLabel.centerYAnchor.constraint(equalTo: centerYAnchor)
         ])
     }

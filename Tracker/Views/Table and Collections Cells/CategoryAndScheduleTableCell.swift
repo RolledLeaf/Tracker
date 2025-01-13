@@ -8,7 +8,7 @@ class CategoryAndScheduleTableViewCell: UITableViewCell {
     
     private let titleLabel: UILabel = {
         let label = UILabel()
-        label.font = .systemFont(ofSize: 16, weight: .regular)
+        label.font = .systemFont(ofSize: 17, weight: .regular)
         label.textColor = .label
         label.backgroundColor = UIColor.custom(.backgroundGray)
         label.translatesAutoresizingMaskIntoConstraints = false
@@ -40,7 +40,7 @@ class CategoryAndScheduleTableViewCell: UITableViewCell {
         contentView.addSubview(titleLabel)
         contentView.addSubview(arrowImageView)
         contentView.backgroundColor = UIColor.custom(.backgroundGray)
-        contentView.layer.cornerRadius = 16
+        
         
         
         NSLayoutConstraint.activate([
@@ -51,8 +51,8 @@ class CategoryAndScheduleTableViewCell: UITableViewCell {
             // Расположение arrowImageView
             arrowImageView.trailingAnchor.constraint(equalTo: contentView.trailingAnchor, constant: -16),
             arrowImageView.centerYAnchor.constraint(equalTo: contentView.centerYAnchor),
-            arrowImageView.widthAnchor.constraint(equalToConstant: 24),
-            arrowImageView.heightAnchor.constraint(equalToConstant: 24)
+            arrowImageView.widthAnchor.constraint(equalToConstant: 10),
+            arrowImageView.heightAnchor.constraint(equalToConstant: 15)
         ])
     }
     

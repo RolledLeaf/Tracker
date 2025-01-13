@@ -20,7 +20,7 @@ class ColorsCollectionViewCell: UICollectionViewCell {
     // MARK: - UI Setup
     
     private func setupUI() {
-        contentView.layer.cornerRadius = 8 // Делает ячейку круглой
+        contentView.layer.cornerRadius = 8
         contentView.layer.masksToBounds = true
     }
     

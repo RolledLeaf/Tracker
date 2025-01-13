@@ -16,7 +16,7 @@ final class HabitCreationViewController: UIViewController, UITableViewDelegate, 
         let textField = UITextField()
         textField.placeholder = "Введите название трекера"
         textField.layer.cornerRadius = 16
-        textField.font = .systemFont(ofSize: 17, weight: .medium)
+        textField.font = .systemFont(ofSize: 17, weight: .regular)
         textField.textColor = UIColor.custom(.textFieldGray)
         textField.backgroundColor = UIColor.custom(.backgroundGray)
         textField.textAlignment = .left
@@ -30,6 +30,8 @@ final class HabitCreationViewController: UIViewController, UITableViewDelegate, 
     private let categoryAndScheduleTableView: UITableView = {
         let tableView = UITableView()
         tableView.separatorStyle = .singleLine
+        
+        tableView.isScrollEnabled = false
         tableView.backgroundColor = .clear
         tableView.rowHeight = 75
         return tableView
@@ -38,6 +40,7 @@ final class HabitCreationViewController: UIViewController, UITableViewDelegate, 
     private let emojiCollectionView: UICollectionView = {
         let layout = UICollectionViewFlowLayout()
         layout.itemSize = CGSize(width: 40, height: 40)
+        layout.sectionInset = UIEdgeInsets(top: 30, left: 0, bottom: 0, right: 0)
         layout.scrollDirection = .vertical
         layout.minimumLineSpacing = 17
         layout.minimumInteritemSpacing = 23
@@ -51,6 +54,7 @@ final class HabitCreationViewController: UIViewController, UITableViewDelegate, 
     private let colorsCollectionView: UICollectionView = {
         let layout = UICollectionViewFlowLayout()
         layout.itemSize = CGSize(width: 40, height: 40)
+        layout.sectionInset = UIEdgeInsets(top: 30, left: 0, bottom: 0, right: 0)
         layout.scrollDirection = .vertical
         layout.minimumLineSpacing = 17
         layout.minimumInteritemSpacing = 23
@@ -64,18 +68,22 @@ final class HabitCreationViewController: UIViewController, UITableViewDelegate, 
     private let createTrackerButton: UIButton = {
         let button = UIButton()
         button.setTitle("Создать", for: .normal)
+        button.titleLabel?.font = UIFont.systemFont(ofSize: 16, weight: .medium)
         button.setTitleColor(.white, for: .normal)
-        button.backgroundColor = .systemBlue
-        button.layer.cornerRadius = 10
+        button.backgroundColor = UIColor.custom(.textFieldGray)
+        button.layer.cornerRadius = 16
         return button
     }()
     
     private let cancelButton: UIButton = {
         let button = UIButton()
         button.setTitle("Отменить", for: .normal)
-        button.setTitleColor(.white, for: .normal)
-        button.backgroundColor = .systemRed
-        button.layer.cornerRadius = 10
+        button.titleLabel?.font = UIFont.systemFont(ofSize: 16, weight: .medium)
+        button.setTitleColor(UIColor.custom(.cancelButtonRed), for: .normal)
+        button.backgroundColor = .clear
+        button.layer.borderWidth = 1   // Толщина рамки
+        button.layer.borderColor = UIColor.custom(.cancelButtonRed)?.cgColor
+        button.layer.cornerRadius = 16
         return button
     }()
     
@@ -100,7 +108,7 @@ final class HabitCreationViewController: UIViewController, UITableViewDelegate, 
     private func setupViews() {
         
         
-        let buttonsStackView = UIStackView(arrangedSubviews: [ createTrackerButton, cancelButton])
+        let buttonsStackView = UIStackView(arrangedSubviews: [ cancelButton, createTrackerButton])
         buttonsStackView.axis = .horizontal
         buttonsStackView.spacing = 8
         buttonsStackView.distribution = .fillEqually
@@ -127,10 +135,10 @@ final class HabitCreationViewController: UIViewController, UITableViewDelegate, 
         
         NSLayoutConstraint.activate([
             
-            scrollView.topAnchor.constraint(equalTo: view.safeAreaLayoutGuide.topAnchor),
-              scrollView.leadingAnchor.constraint(equalTo: view.leadingAnchor),
-              scrollView.trailingAnchor.constraint(equalTo: view.trailingAnchor),
-              scrollView.bottomAnchor.constraint(equalTo: view.bottomAnchor),
+            scrollView.topAnchor.constraint(equalTo: view.topAnchor),
+            scrollView.leadingAnchor.constraint(equalTo: view.leadingAnchor),
+            scrollView.trailingAnchor.constraint(equalTo: view.trailingAnchor),
+            scrollView.bottomAnchor.constraint(equalTo: view.bottomAnchor),
             
             contentView.topAnchor.constraint(equalTo: scrollView.topAnchor),
             contentView.leadingAnchor.constraint(equalTo: scrollView.leadingAnchor),
@@ -140,25 +148,25 @@ final class HabitCreationViewController: UIViewController, UITableViewDelegate, 
             contentView.heightAnchor.constraint(equalToConstant: 900),
             
             
-            titleLabel.topAnchor.constraint(equalTo: contentView.topAnchor, constant: 25),
-               titleLabel.centerXAnchor.constraint(equalTo: contentView.centerXAnchor),
-               
-               trackerNameTextField.heightAnchor.constraint(equalToConstant: 75),
-               trackerNameTextField.topAnchor.constraint(equalTo: titleLabel.bottomAnchor, constant: 38),
-               trackerNameTextField.leadingAnchor.constraint(equalTo: contentView.leadingAnchor, constant: 16),
-               trackerNameTextField.trailingAnchor.constraint(equalTo: contentView.trailingAnchor, constant: -16),
-               
-               categoryAndScheduleTableView.topAnchor.constraint(equalTo: trackerNameTextField.bottomAnchor, constant: 24),
-               categoryAndScheduleTableView.leadingAnchor.constraint(equalTo: contentView.leadingAnchor, constant: 16),
-               categoryAndScheduleTableView.trailingAnchor.constraint(equalTo: contentView.trailingAnchor, constant: -16),
-               categoryAndScheduleTableView.heightAnchor.constraint(equalToConstant: 150),
-               
-               collectionsStackView.topAnchor.constraint(equalTo: categoryAndScheduleTableView.bottomAnchor, constant: 50),
-               collectionsStackView.heightAnchor.constraint(equalToConstant: 445),
-               collectionsStackView.leadingAnchor.constraint(equalTo: contentView.leadingAnchor, constant: 23),
-               collectionsStackView.trailingAnchor.constraint(equalTo: contentView.trailingAnchor, constant: -23),
+            titleLabel.topAnchor.constraint(equalTo: contentView.topAnchor),
+            titleLabel.centerXAnchor.constraint(equalTo: contentView.centerXAnchor),
             
-            buttonsStackView.topAnchor.constraint(equalTo: collectionsStackView.bottomAnchor, constant: 24),
+            trackerNameTextField.heightAnchor.constraint(equalToConstant: 75),
+            trackerNameTextField.topAnchor.constraint(equalTo: titleLabel.bottomAnchor, constant: 38),
+            trackerNameTextField.leadingAnchor.constraint(equalTo: contentView.leadingAnchor, constant: 16),
+            trackerNameTextField.trailingAnchor.constraint(equalTo: contentView.trailingAnchor, constant: -16),
+            
+            categoryAndScheduleTableView.topAnchor.constraint(equalTo: trackerNameTextField.bottomAnchor, constant: 24),
+            categoryAndScheduleTableView.leadingAnchor.constraint(equalTo: contentView.leadingAnchor, constant: 16),
+            categoryAndScheduleTableView.trailingAnchor.constraint(equalTo: contentView.trailingAnchor, constant: -16),
+            categoryAndScheduleTableView.heightAnchor.constraint(equalToConstant: 150),
+            
+            collectionsStackView.topAnchor.constraint(equalTo: categoryAndScheduleTableView.bottomAnchor, constant: 50),
+            collectionsStackView.heightAnchor.constraint(equalToConstant: 445),
+            collectionsStackView.leadingAnchor.constraint(equalTo: contentView.leadingAnchor, constant: 23),
+            collectionsStackView.trailingAnchor.constraint(equalTo: contentView.trailingAnchor, constant: -23),
+            
+            buttonsStackView.topAnchor.constraint(equalTo: collectionsStackView.bottomAnchor, constant: 46),
             
             buttonsStackView.heightAnchor.constraint(equalToConstant: 60),
             buttonsStackView.leadingAnchor.constraint(equalTo: contentView.leadingAnchor, constant: 20),
@@ -167,6 +175,7 @@ final class HabitCreationViewController: UIViewController, UITableViewDelegate, 
         
         emojiCollectionView.delegate = self
         colorsCollectionView.delegate = self
+        categoryAndScheduleTableView.delegate = self
         
         emojiCollectionView.dataSource = self
         colorsCollectionView.dataSource = self
@@ -295,6 +304,30 @@ final class HabitCreationViewController: UIViewController, UITableViewDelegate, 
             // Действие для "Категория"
         } else if indexPath.row == 1 {
             // Действие для "Расписание"
+        }
+    }
+    
+    func tableView(_ tableView: UITableView, willDisplay cell: UITableViewCell, forRowAt indexPath: IndexPath) {
+        let cornerRadius: CGFloat = 16
+
+        // Сброс настроек для всех ячеек
+        cell.layer.cornerRadius = 0
+        cell.layer.maskedCorners = []
+        cell.clipsToBounds = true
+        cell.separatorInset = UIEdgeInsets(top: 0, left: 16, bottom: 0, right: 16) // Обычные отступы для разделителя
+
+        // Скругление первой ячейки
+        if indexPath.row == 0 {
+            cell.layer.cornerRadius = cornerRadius
+            cell.layer.maskedCorners = [.layerMinXMinYCorner, .layerMaxXMinYCorner]
+            cell.separatorInset = UIEdgeInsets(top: 0, left: 16, bottom: 0, right: 16) // Разделитель остается видимым
+        }
+
+        // Скругление последней ячейки
+        if indexPath.row == tableView.numberOfRows(inSection: indexPath.section) - 1 {
+            cell.layer.cornerRadius = cornerRadius
+            cell.layer.maskedCorners = [.layerMinXMaxYCorner, .layerMaxXMaxYCorner]
+            cell.separatorInset = UIEdgeInsets(top: 0, left: 0, bottom: 0, right: UIScreen.main.bounds.width)
         }
     }
 }
