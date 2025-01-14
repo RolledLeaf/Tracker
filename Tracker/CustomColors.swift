@@ -9,6 +9,7 @@ enum CustomColors: String {
     case createButtonTextColor = "createButtonTextColor"
     case textFieldGray = "textFieldGray"
     case cancelButtonRed = "cancelButtonRed"
+    case toggleSwitchBlue = "toggleSwitchBlue"
 }
 
 enum CollectionColors: String  {

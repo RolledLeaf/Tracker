@@ -3,9 +3,6 @@ import UIKit
 
 final class CategoriesListViewController: UIViewController, UITableViewDataSource, UITableViewDelegate {
     
-    
-    
-    
     private let titleLabel: UILabel = {
         let label = UILabel()
         label.textColor = UIColor.custom(.textColor)

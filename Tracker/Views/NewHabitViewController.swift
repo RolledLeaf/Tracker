@@ -305,7 +305,10 @@ final class NewHabitViewController: UIViewController, UITableViewDelegate, UITab
             navigationController.modalPresentationStyle = .automatic
             present(navigationController, animated: true)
         } else if indexPath.row == 1 {
-            // Действие для "Расписание"
+           let scheduleVC = ScheduleViewController()
+            let navigationController = UINavigationController(rootViewController: scheduleVC)
+            navigationController.modalPresentationStyle = .automatic
+            present(navigationController, animated: true)
         }
     }
     
