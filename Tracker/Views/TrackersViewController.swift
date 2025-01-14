@@ -53,6 +53,7 @@ final class TrackersViewController: UIViewController, UICollectionViewDataSource
         button.clipsToBounds = true
         return button
     }()
+    
     private lazy var datePicker: UIDatePicker = {
         let picker = UIDatePicker()
         picker.datePickerMode = .date

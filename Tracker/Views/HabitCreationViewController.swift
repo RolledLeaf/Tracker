@@ -30,7 +30,6 @@ final class HabitCreationViewController: UIViewController, UITableViewDelegate, 
     private let categoryAndScheduleTableView: UITableView = {
         let tableView = UITableView()
         tableView.separatorStyle = .singleLine
-        
         tableView.isScrollEnabled = false
         tableView.backgroundColor = .clear
         tableView.rowHeight = 75
@@ -301,7 +300,10 @@ final class HabitCreationViewController: UIViewController, UITableViewDelegate, 
     func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
         tableView.deselectRow(at: indexPath, animated: true)
         if indexPath.row == 0 {
-            // Действие для "Категория"
+            let categoryListVC = CategoriesListViewController()
+            let navigationController = UINavigationController(rootViewController: categoryListVC)
+            navigationController.modalPresentationStyle = .automatic
+            present(navigationController, animated: true)
         } else if indexPath.row == 1 {
             // Действие для "Расписание"
         }
