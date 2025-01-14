@@ -1,6 +1,6 @@
 import UIKit
 
-final class HabitCreationViewController: UIViewController, UITableViewDelegate, UITableViewDataSource, UICollectionViewDataSource, UICollectionViewDelegateFlowLayout {
+final class NewHabitViewController: UIViewController, UITableViewDelegate, UITableViewDataSource, UICollectionViewDataSource, UICollectionViewDelegateFlowLayout {
     
     
     private let titleLabel: UILabel = {
@@ -17,7 +17,7 @@ final class HabitCreationViewController: UIViewController, UITableViewDelegate, 
         textField.placeholder = "Введите название трекера"
         textField.layer.cornerRadius = 16
         textField.font = .systemFont(ofSize: 17, weight: .regular)
-        textField.textColor = UIColor.custom(.textFieldGray)
+        textField.textColor = UIColor.custom(.createButtonColor)
         textField.backgroundColor = UIColor.custom(.backgroundGray)
         textField.textAlignment = .left
         let paddingView = UIView(frame: CGRect(x: 0, y: 0, width: 16, height: textField.frame.height))

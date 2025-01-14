@@ -9,7 +9,7 @@ class CategoryAndScheduleTableViewCell: UITableViewCell {
     private let titleLabel: UILabel = {
         let label = UILabel()
         label.font = .systemFont(ofSize: 17, weight: .regular)
-        label.textColor = .label
+        label.textColor = UIColor.custom(.createButtonColor)
         label.backgroundColor = UIColor.custom(.backgroundGray)
         label.translatesAutoresizingMaskIntoConstraints = false
         return label

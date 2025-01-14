@@ -46,7 +46,7 @@ final class CategoriesListViewController: UIViewController, UITableViewDataSourc
         button.setTitleColor(UIColor.custom(.createButtonTextColor), for: .normal)
         button.backgroundColor = UIColor.custom(.createButtonColor)
         button.layer.cornerRadius = 16
-        //button.addTarget(self, action: #selector(habitButtonTapped), for: .touchUpInside)
+        button.addTarget(self, action: #selector(addCategoryButtonTapped), for: .touchUpInside)
         button.clipsToBounds = true
         return button
     }()
@@ -128,6 +128,12 @@ final class CategoriesListViewController: UIViewController, UITableViewDataSourc
         
     }
     
+   @objc private func addCategoryButtonTapped() {
+        let newCategoryVC = NewCategoryViewController()
+        let navigationController = UINavigationController(rootViewController: newCategoryVC)
+        navigationController.modalPresentationStyle = .automatic
+        present(navigationController, animated: true)
+    }
     
     func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
         let sections = categoriesList?.count

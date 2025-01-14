@@ -50,7 +50,7 @@ final class CreateHabitTypeViewController: UIViewController {
     
     
         @objc private func habitButtonTapped() {
-               let habitCreationVC = HabitCreationViewController()
+               let habitCreationVC = NewHabitViewController()
             let navigationController = UINavigationController(rootViewController: habitCreationVC)
             navigationController.modalPresentationStyle = .automatic
             present(navigationController, animated: true)
