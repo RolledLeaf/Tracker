@@ -89,7 +89,10 @@ final class NewHabitViewController: UIViewController, UITableViewDelegate, UITab
     
     
     
-    private let tableViewOptions = ["Категория", "Расписание"]
+    var tableViewOptions: [(title: String, subtitle: String?)] = [
+        (title: "Категория", subtitle: nil),
+        (title: "Расписание", subtitle: nil)
+    ]
     private let emojis = ["🙂", "😻", "🌺", "🐶", "❤️", "😱", "😇", "😡", "🥶", "🤔", "🙌", "🍔", "🥦", "🏓", "🥇", "🎸", "🏝️", "😪"]
     private let trackerCollectionColors: [CollectionColors] = [.collectionRed1, .collectionOrange2, .collectionBlue3, .collectionPurple4, .collectionLightGreen5, .collectionViolet6, .collectionBeige7, .collectionLightBlue8, .collectionJadeGreen9, .collectionDarkPurple10, .collectionCarrotOrange11, .collectionPink12, .collectionLightBrick13, .collectionSemiblue14, .collectionLightPurple15, .collectionDarkViolet16, .collectionPalePurple17, .collectionGreen18]
     
@@ -144,7 +147,7 @@ final class NewHabitViewController: UIViewController, UITableViewDelegate, UITab
             contentView.trailingAnchor.constraint(equalTo: scrollView.trailingAnchor),
             contentView.bottomAnchor.constraint(equalTo: scrollView.bottomAnchor),
             contentView.widthAnchor.constraint(equalTo: scrollView.widthAnchor),
-            contentView.heightAnchor.constraint(equalToConstant: 900),
+            contentView.heightAnchor.constraint(equalToConstant: 1000),
             
             
             titleLabel.topAnchor.constraint(equalTo: contentView.topAnchor),
@@ -288,13 +291,13 @@ final class NewHabitViewController: UIViewController, UITableViewDelegate, UITab
     }
     
     func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
+        // Создаём ячейку с подзаголовком
         guard let cell = tableView.dequeueReusableCell(withIdentifier: CategoryAndScheduleTableViewCell.identifier, for: indexPath) as? CategoryAndScheduleTableViewCell else {
-            return UITableViewCell()
+            fatalError("Unable to dequeue CategoryAndScheduleTableViewCell")
         }
-        
-        let titles = tableViewOptions
-        cell.configure(with: titles[indexPath.row])
+        cell.configure(with: tableViewOptions[indexPath.row])
         return cell
+       
     }
     
     func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
@@ -306,9 +309,8 @@ final class NewHabitViewController: UIViewController, UITableViewDelegate, UITab
             present(navigationController, animated: true)
         } else if indexPath.row == 1 {
            let scheduleVC = ScheduleViewController()
-            let navigationController = UINavigationController(rootViewController: scheduleVC)
-            navigationController.modalPresentationStyle = .automatic
-            present(navigationController, animated: true)
+            scheduleVC.delegate = self
+            navigationController?.pushViewController(scheduleVC, animated: true)
         }
     }
     
@@ -335,4 +337,15 @@ final class NewHabitViewController: UIViewController, UITableViewDelegate, UITab
             cell.separatorInset = UIEdgeInsets(top: 0, left: 0, bottom: 0, right: UIScreen.main.bounds.width)
         }
     }
+}
+
+extension NewHabitViewController: ScheduleViewControllerDelegate {
+    func updateSubtitle(for title: String, with subtitle: String?) {
+        if let index = tableViewOptions.firstIndex(where: { $0.title == title }) {
+               tableViewOptions[index].subtitle = subtitle
+            categoryAndScheduleTableView.reloadData()
+           }
+    }
+    
+   
 }

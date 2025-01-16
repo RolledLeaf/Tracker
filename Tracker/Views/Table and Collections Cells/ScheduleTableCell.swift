@@ -1,10 +1,14 @@
 import UIKit
 
+protocol ScheduleTableCellDelegate: AnyObject {
+    func didChangeSwitchState(isOn: Bool, forDay day: String)
+}
+
 class ScheduleTableCell: UITableViewCell {
     
     // MARK: - UI Elements
     
-    static let identifier = "ScheduleTableCell" //
+    static let identifier = "ScheduleTableCell"
     
     private let titleLabel: UILabel = {
         let label = UILabel()
@@ -17,18 +21,25 @@ class ScheduleTableCell: UITableViewCell {
     }()
     
     private let toggleSwitch: UISwitch = {
-           let toggle = UISwitch()
-        toggle.onTintColor = UIColor.custom(.toggleSwitchBlue) 
-           toggle.thumbTintColor = .white // Цвет кружка
-           toggle.translatesAutoresizingMaskIntoConstraints = false
-           return toggle
-       }()
+        let toggle = UISwitch()
+        toggle.onTintColor = UIColor.custom(.toggleSwitchBlue)
+        toggle.thumbTintColor = .white // Цвет кружка
+        toggle.translatesAutoresizingMaskIntoConstraints = false
+        return toggle
+    }()
+    
+    // MARK: - Properties
+    weak var delegate: ScheduleTableCellDelegate?
+    
+    // Обработчик изменения состояния переключателя
+    var onToggle: ((Bool) -> Void)?
     
     // MARK: - Init
     
     override init(style: UITableViewCell.CellStyle, reuseIdentifier: String?) {
         super.init(style: style, reuseIdentifier: reuseIdentifier)
         setupUI()
+        toggleSwitch.addTarget(self, action: #selector(toggleSwitchChanged), for: .valueChanged)
     }
     
     required init?(coder: NSCoder) {
@@ -41,8 +52,6 @@ class ScheduleTableCell: UITableViewCell {
         contentView.addSubview(titleLabel)
         contentView.addSubview(toggleSwitch)
         contentView.backgroundColor = UIColor.custom(.backgroundGray)
-        
-        
         
         NSLayoutConstraint.activate([
             // Расположение titleLabel
@@ -59,15 +68,16 @@ class ScheduleTableCell: UITableViewCell {
     
     // MARK: - Configuration Method
     
+    // Этот метод вызывается при изменении состояния переключателя
     @objc private func toggleSwitchChanged() {
-           if toggleSwitch.isOn {
-               print("Switch включён")
-           } else {
-               print("Switch выключен")
-           }
-       }
+        onToggle?(toggleSwitch.isOn)
+        delegate?.didChangeSwitchState(isOn: toggleSwitch.isOn, forDay: titleLabel.text ?? "")
+        print("Toggle switch changed")
+    }
     
-    func configure(with title: String) {
+    // Метод для конфигурации ячейки
+    func configure(with title: String, isOn: Bool) {
         titleLabel.text = title
+        toggleSwitch.isOn = isOn
     }
 }

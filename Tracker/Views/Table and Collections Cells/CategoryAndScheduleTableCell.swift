@@ -15,9 +15,18 @@ class CategoryAndScheduleTableViewCell: UITableViewCell {
         return label
     }()
     
+     let detailedTextLabel: UILabel = {
+        let label = UILabel()
+        label.font = .systemFont(ofSize: 17, weight: .regular)
+        label.textColor = UIColor.custom(.textFieldGray)
+        label.backgroundColor = UIColor.custom(.backgroundGray)
+        label.translatesAutoresizingMaskIntoConstraints = false
+        return label
+    }()
+    
     private let arrowImageView: UIImageView = {
         let imageView = UIImageView()
-        imageView.image = UIImage(systemName: "chevron.right") // Стрелка ">"
+        imageView.image = UIImage(systemName: "chevron.right")
         imageView.tintColor = .gray
         imageView.translatesAutoresizingMaskIntoConstraints = false
         return imageView
@@ -39,6 +48,7 @@ class CategoryAndScheduleTableViewCell: UITableViewCell {
     private func setupUI() {
         contentView.addSubview(titleLabel)
         contentView.addSubview(arrowImageView)
+        contentView.addSubview(detailedTextLabel)
         contentView.backgroundColor = UIColor.custom(.backgroundGray)
         
         
@@ -46,7 +56,12 @@ class CategoryAndScheduleTableViewCell: UITableViewCell {
         NSLayoutConstraint.activate([
             // Расположение titleLabel
             titleLabel.leadingAnchor.constraint(equalTo: contentView.leadingAnchor, constant: 16),
-            titleLabel.centerYAnchor.constraint(equalTo: contentView.centerYAnchor),
+            titleLabel.topAnchor.constraint(equalTo: contentView.topAnchor, constant: 15),
+            
+            detailedTextLabel.leadingAnchor.constraint(equalTo: contentView.leadingAnchor, constant: 16),
+            detailedTextLabel.topAnchor.constraint(equalTo: titleLabel.bottomAnchor, constant: 2),
+            detailedTextLabel.widthAnchor.constraint(equalToConstant: 271),
+            detailedTextLabel.heightAnchor.constraint(equalToConstant: 22),
             
             // Расположение arrowImageView
             arrowImageView.trailingAnchor.constraint(equalTo: contentView.trailingAnchor, constant: -16),
@@ -58,7 +73,8 @@ class CategoryAndScheduleTableViewCell: UITableViewCell {
     
     // MARK: - Configuration Method
     
-    func configure(with title: String) {
-        titleLabel.text = title
+    func configure(with option: (title: String, subtitle: String?)) {
+        titleLabel.text = option.title
+        detailedTextLabel.text = option.subtitle
     }
 }

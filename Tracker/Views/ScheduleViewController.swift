@@ -1,8 +1,14 @@
 import UIKit
 
-final class ScheduleViewController: UIViewController, UITableViewDelegate, UITableViewDataSource {
-   
+protocol ScheduleViewControllerDelegate: AnyObject {
     
+    func updateSubtitle (for title: String, with subtitle: String?)
+}
+
+final class ScheduleViewController: UIViewController, UITableViewDelegate, UITableViewDataSource, ScheduleTableCellDelegate {
+   
+  
+    weak var delegate: ScheduleViewControllerDelegate?
     
     private let titleLabel: UILabel = {
         let label = UILabel()
@@ -28,18 +34,38 @@ final class ScheduleViewController: UIViewController, UITableViewDelegate, UITab
         button.setTitleColor(UIColor.custom(.createButtonTextColor), for: .normal)
         button.backgroundColor = UIColor.custom(.createButtonColor)
         button.layer.cornerRadius = 16
-        //button.addTarget(self, action: #selector(habitButtonTapped), for: .touchUpInside)
+        button.addTarget(self, action: #selector(doneButtonTapped), for: .touchUpInside)
         button.clipsToBounds = true
         return button
     }()
     
     private let weekDays: [String] = ["Понедельник", "Вторник", "Среда", "Четверг", "Пятница", "Суббота", "Воскресенье"]
     
+    private let weekDayOrder = ["Пн", "Вт", "Ср", "Чт", "Пт", "Сб", "Вск"]
+    
+    private let weekDayAbbreviations: [String: String] = [
+        "Понедельник": "Пн",
+        "Вторник": "Вт",
+        "Среда": "Ср",
+        "Четверг": "Чт",
+        "Пятница": "Пт",
+        "Суббота": "Сб",
+        "Воскресенье": "Вск"
+    ]
+    
+    private var selectedWeekDays: [String] = []
+    
     override func viewDidLoad() {
         super.viewDidLoad()
         view.backgroundColor = .white
         setupViews()
+        if let savedDays = UserDefaults.standard.array(forKey: "selectedWeekDays") as? [String] {
+                   selectedWeekDays = savedDays
+               }
+               
+        weekDaysTable.reloadData()
     }
+    
     
     private func setupViews() {
         
@@ -81,27 +107,31 @@ final class ScheduleViewController: UIViewController, UITableViewDelegate, UITab
         guard let cell = tableView.dequeueReusableCell(withIdentifier: ScheduleTableCell.identifier) as? ScheduleTableCell else {
             return UITableViewCell()
         }
-        let titles = weekDays
-        cell.configure(with: titles[indexPath.row])
-        return cell
+        
+        
+        let day = weekDays[indexPath.row]
+                let isOn = selectedWeekDays.contains(day)  // Проверяем, выбран ли день
+                cell.configure(with: day, isOn: isOn)
+                cell.delegate = self
+                return cell
     }
     
     func tableView(_ tableView: UITableView, willDisplay cell: UITableViewCell, forRowAt indexPath: IndexPath) {
         let cornerRadius: CGFloat = 16
-
+        
         // Сброс настроек для всех ячеек
         cell.layer.cornerRadius = 0
         cell.layer.maskedCorners = []
         cell.clipsToBounds = true
         cell.separatorInset = UIEdgeInsets(top: 0, left: 16, bottom: 0, right: 16) // Обычные отступы для разделителя
-
+        
         // Скругление первой ячейки
         if indexPath.row == 0 {
             cell.layer.cornerRadius = cornerRadius
             cell.layer.maskedCorners = [.layerMinXMinYCorner, .layerMaxXMinYCorner]
             cell.separatorInset = UIEdgeInsets(top: 0, left: 16, bottom: 0, right: 16) // Разделитель остается видимым
         }
-
+        
         // Скругление последней ячейки
         if indexPath.row == tableView.numberOfRows(inSection: indexPath.section) - 1 {
             cell.layer.cornerRadius = cornerRadius
@@ -109,4 +139,48 @@ final class ScheduleViewController: UIViewController, UITableViewDelegate, UITab
             cell.separatorInset = UIEdgeInsets(top: 0, left: 0, bottom: 0, right: UIScreen.main.bounds.width)
         }
     }
+    
+    @objc private func doneButtonTapped() {
+        print("Schedule done button ")
+        print("Завершено. Переданные дни недели: \(selectedWeekDays)")
+        
+        let sortedWeekDaysString = getSortedSelectedWeekDays()
+        
+        delegate?.updateSubtitle(for: "Расписание", with: sortedWeekDaysString)
+        navigationController?.popViewController(animated: true)
+    }
+    
+    func didChangeSwitchState(isOn: Bool, forDay day: String) {
+            if isOn {
+                // Добавляем день в массив, если он выбран
+                if !selectedWeekDays.contains(day) {
+                    selectedWeekDays.append(day)
+                }
+            } else {
+                // Убираем день из массива, если он не выбран
+                if let index = selectedWeekDays.firstIndex(of: day) {
+                    selectedWeekDays.remove(at: index)
+                }
+            }
+            
+            // Сохраняем выбранные дни недели в UserDefaults
+            UserDefaults.standard.set(selectedWeekDays, forKey: "selectedWeekDays")
+        }
+    
+   
+    
+    func getSortedSelectedWeekDays() -> String {
+        if selectedWeekDays.count == weekDays.count {
+            return "Ежедневно"
+        } else {
+            let sortedAbbreviations = selectedWeekDays.sorted {
+                let index1 = weekDayOrder.firstIndex(of: weekDayAbbreviations[$0] ?? "") ?? 0
+                let index2 = weekDayOrder.firstIndex(of: weekDayAbbreviations[$1] ?? "") ?? 0
+                return index1 < index2
+            }.compactMap { weekDayAbbreviations[$0] }
+            
+            return sortedAbbreviations.joined(separator: ", ")
+        }
+    }
+    
 }
