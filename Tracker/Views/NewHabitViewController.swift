@@ -310,7 +310,9 @@ final class NewHabitViewController: UIViewController, UITableViewDelegate, UITab
         } else if indexPath.row == 1 {
            let scheduleVC = ScheduleViewController()
             scheduleVC.delegate = self
-            navigationController?.pushViewController(scheduleVC, animated: true)
+            let navigationController = UINavigationController(rootViewController: scheduleVC)
+            navigationController.modalPresentationStyle = .popover
+            present(navigationController, animated: true)
         }
     }
     

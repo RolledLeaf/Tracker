@@ -54,6 +54,7 @@ final class ScheduleViewController: UIViewController, UITableViewDelegate, UITab
     ]
     
     private var selectedWeekDays: [String] = []
+    private var tempSelectedWeekDays: [String] = []
     
     override func viewDidLoad() {
         super.viewDidLoad()
@@ -61,6 +62,7 @@ final class ScheduleViewController: UIViewController, UITableViewDelegate, UITab
         setupViews()
         if let savedDays = UserDefaults.standard.array(forKey: "selectedWeekDays") as? [String] {
                    selectedWeekDays = savedDays
+            tempSelectedWeekDays = savedDays
                }
                
         weekDaysTable.reloadData()
@@ -142,29 +144,33 @@ final class ScheduleViewController: UIViewController, UITableViewDelegate, UITab
     
     @objc private func doneButtonTapped() {
         print("Schedule done button ")
-        print("Завершено. Переданные дни недели: \(selectedWeekDays)")
-        
+        print("Завершено. Переданные дни недели: \(tempSelectedWeekDays)")
+        selectedWeekDays = tempSelectedWeekDays
+        UserDefaults.standard.set(selectedWeekDays, forKey: "selectedWeekDays")
         let sortedWeekDaysString = getSortedSelectedWeekDays()
-        
         delegate?.updateSubtitle(for: "Расписание", with: sortedWeekDaysString)
-        navigationController?.popViewController(animated: true)
+        if navigationController?.viewControllers.first == self {
+               dismiss(animated: true, completion: nil) // Для модального представления
+           } else {
+               navigationController?.popViewController(animated: true) // Для пуш-навигации
+           }
     }
     
     func didChangeSwitchState(isOn: Bool, forDay day: String) {
             if isOn {
                 // Добавляем день в массив, если он выбран
-                if !selectedWeekDays.contains(day) {
-                    selectedWeekDays.append(day)
+                if !tempSelectedWeekDays.contains(day) {
+                    tempSelectedWeekDays.append(day)
                 }
             } else {
                 // Убираем день из массива, если он не выбран
-                if let index = selectedWeekDays.firstIndex(of: day) {
-                    selectedWeekDays.remove(at: index)
+                if let index = tempSelectedWeekDays.firstIndex(of: day) {
+                    tempSelectedWeekDays.remove(at: index)
                 }
             }
             
             // Сохраняем выбранные дни недели в UserDefaults
-            UserDefaults.standard.set(selectedWeekDays, forKey: "selectedWeekDays")
+            
         }
     
    
