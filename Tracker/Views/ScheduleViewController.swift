@@ -64,7 +64,6 @@ final class ScheduleViewController: UIViewController, UITableViewDelegate, UITab
                    selectedWeekDays = savedDays
             tempSelectedWeekDays = savedDays
                }
-               
         weekDaysTable.reloadData()
     }
     
