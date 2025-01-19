@@ -167,9 +167,6 @@ final class ScheduleViewController: UIViewController, UITableViewDelegate, UITab
                     tempSelectedWeekDays.remove(at: index)
                 }
             }
-            
-            // Сохраняем выбранные дни недели в UserDefaults
-            
         }
     
    

@@ -6,10 +6,10 @@ class CategoriesListTableCell: UITableViewCell {
     
     static let identifier = "CategoriesListTableCell" //
     
-    private let titleLabel: UILabel = {
+     let categoryNameLabel: UILabel = {
         let label = UILabel()
         label.font = .systemFont(ofSize: 17, weight: .regular)
-        label.textColor = .black
+        label.textColor = UIColor.custom(.createButtonColor)
         label.backgroundColor = UIColor.custom(.backgroundGray)
         label.textAlignment = .left
         label.translatesAutoresizingMaskIntoConstraints = false
@@ -18,8 +18,8 @@ class CategoriesListTableCell: UITableViewCell {
     
     private let checkMark: UIImageView = {
         let imageView = UIImageView()
-        imageView.image = UIImage(systemName: "checkmark") // Стрелка ">"
-        imageView.tintColor = .gray
+        imageView.image = UIImage(systemName: "checkmark")
+        imageView.tintColor = UIColor.custom(.backgroundGray)
         imageView.translatesAutoresizingMaskIntoConstraints = false
         return imageView
     }()
@@ -38,16 +38,14 @@ class CategoriesListTableCell: UITableViewCell {
     // MARK: - UI Setup
     
     private func setupUI() {
-        contentView.addSubview(titleLabel)
+        contentView.addSubview(categoryNameLabel)
         contentView.addSubview(checkMark)
         contentView.backgroundColor = UIColor.custom(.backgroundGray)
         
-        
-        
         NSLayoutConstraint.activate([
             // Расположение titleLabel
-            titleLabel.leadingAnchor.constraint(equalTo: contentView.leadingAnchor, constant: 16),
-            titleLabel.centerYAnchor.constraint(equalTo: contentView.centerYAnchor),
+            categoryNameLabel.leadingAnchor.constraint(equalTo: contentView.leadingAnchor, constant: 16),
+            categoryNameLabel.centerYAnchor.constraint(equalTo: contentView.centerYAnchor),
             
             // Расположение arrowImageView
             checkMark.trailingAnchor.constraint(equalTo: contentView.trailingAnchor, constant: -16),
@@ -57,7 +55,18 @@ class CategoriesListTableCell: UITableViewCell {
         ])
     }
     
-    // MARK: - Configuration Method
+    override func setSelected(_ selected: Bool, animated: Bool) {
+           super.setSelected(selected, animated: animated)
+        contentView.backgroundColor = selected ? UIColor.custom(.backgroundGray) : UIColor.custom(.backgroundGray)
+           if selected {
+               checkMark.tintColor = UIColor.custom(.toggleSwitchBlue) // Цвет при выделении
+           } else {
+               checkMark.tintColor = UIColor.custom(.backgroundGray) // Цвет при отмене выделения
+           }
+       }
     
-   
+    // MARK: - Configuration Method
+    func configure(with title: String){
+        categoryNameLabel.text = title
+    }
 }

@@ -33,7 +33,7 @@ final class TrackersViewController: UIViewController, UICollectionViewDataSource
     
     private let searchBar: UISearchBar = {
         let searchBar = UISearchBar()
-        searchBar.placeholder = "Что будем искать?"
+        searchBar.placeholder = "Поиск?"
         searchBar.backgroundColor = UIColor.custom(.backgroundGray)
         searchBar.searchBarStyle = .minimal
         searchBar.setImage(UIImage(systemName: "magnifyingglass"), for: .search, state: .normal)

@@ -121,14 +121,14 @@ final class NewHabitViewController: UIViewController, UITableViewDelegate, UITab
         collectionsStackView.distribution = .fillEqually
         
         
-        let UIelements = [titleLabel, trackerNameTextField, categoryAndScheduleTableView, collectionsStackView, buttonsStackView]
-        UIelements.forEach {
+        let uiElements = [titleLabel, trackerNameTextField, categoryAndScheduleTableView, collectionsStackView, buttonsStackView]
+        uiElements.forEach {
             $0.translatesAutoresizingMaskIntoConstraints = false
         }
         
         view.addSubview(scrollView)
         scrollView.addSubview(contentView)
-        UIelements.forEach { contentView.addSubview($0) }
+        uiElements.forEach { contentView.addSubview($0) }
         
         scrollView.translatesAutoresizingMaskIntoConstraints = false
         contentView.translatesAutoresizingMaskIntoConstraints = false
