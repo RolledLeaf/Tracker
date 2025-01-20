@@ -38,11 +38,11 @@ final class NewHabitViewController: UIViewController, UITableViewDelegate, UITab
     
     private let emojiCollectionView: UICollectionView = {
         let layout = UICollectionViewFlowLayout()
-        layout.itemSize = CGSize(width: 40, height: 40)
+        layout.itemSize = CGSize(width: 52, height: 52)
         layout.sectionInset = UIEdgeInsets(top: 30, left: 0, bottom: 0, right: 0)
         layout.scrollDirection = .vertical
-        layout.minimumLineSpacing = 17
-        layout.minimumInteritemSpacing = 23
+        layout.minimumLineSpacing = 10
+        layout.minimumInteritemSpacing = 10
         let collectionView = UICollectionView(frame: .zero, collectionViewLayout: layout)
         collectionView.register(EmojiCollectionViewCell.self, forCellWithReuseIdentifier: EmojiCollectionViewCell.identifier)
         collectionView.backgroundColor = .clear
@@ -164,7 +164,7 @@ final class NewHabitViewController: UIViewController, UITableViewDelegate, UITab
             categoryAndScheduleTableView.heightAnchor.constraint(equalToConstant: 150),
             
             collectionsStackView.topAnchor.constraint(equalTo: categoryAndScheduleTableView.bottomAnchor, constant: 50),
-            collectionsStackView.heightAnchor.constraint(equalToConstant: 445),
+            collectionsStackView.heightAnchor.constraint(equalToConstant: 510),
             collectionsStackView.leadingAnchor.constraint(equalTo: contentView.leadingAnchor, constant: 23),
             collectionsStackView.trailingAnchor.constraint(equalTo: contentView.trailingAnchor, constant: -23),
             
@@ -277,15 +277,19 @@ final class NewHabitViewController: UIViewController, UITableViewDelegate, UITab
             let selectedColor = trackerCollectionColors[indexPath.item]
             print("Selected color: \(selectedColor)")
             // Обработайте выбор цвета
+            
+            
         } else if collectionView == emojiCollectionView {
             let selectedEmoji = emojis[indexPath.item]
             print("Selected emoji: \(selectedEmoji)")
-            // Обработайте выбор эмдзи
+            
+           
+            
+            
         }
     }
     
     
-    //Настройки таблицы
     func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
         return tableViewOptions.count
     }

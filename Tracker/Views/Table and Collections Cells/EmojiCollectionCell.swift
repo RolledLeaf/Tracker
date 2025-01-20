@@ -16,6 +16,14 @@ class EmojiCollectionViewCell: UICollectionViewCell {
         return label
     }()
     
+    private var selectionBackgroundView: UIView?
+    
+    override var isSelected: Bool {
+            didSet {
+                updateSelectionState()
+            }
+        }
+    
     // MARK: - Init
     
     override init(frame: CGRect) {
@@ -36,7 +44,46 @@ class EmojiCollectionViewCell: UICollectionViewCell {
             emojiLabel.centerXAnchor.constraint(equalTo: contentView.centerXAnchor),
             emojiLabel.centerYAnchor.constraint(equalTo: contentView.centerYAnchor),
         ])
+        contentView.layer.cornerRadius = 16
+       
+        contentView.layer.masksToBounds = true
+               contentView.layer.borderWidth = 0
     }
+    
+    func updateSelectionState() {
+        if isSelected {
+            addSelectionBackgroundView()
+        } else {
+            removeSelectionBackgroundView()
+        }
+    }
+    
+    private func addSelectionBackgroundView() {
+           // Если фон уже добавлен, не добавляем снова
+           if selectionBackgroundView != nil { return }
+           
+        
+           let backgroundView = UIView()
+        backgroundView.backgroundColor = UIColor.custom(CustomColors.backgroundGray)
+           backgroundView.layer.cornerRadius = 16
+           backgroundView.translatesAutoresizingMaskIntoConstraints = false
+           contentView.insertSubview(backgroundView, at: 0)
+           
+           NSLayoutConstraint.activate([
+            backgroundView.centerXAnchor.constraint(equalTo: contentView.centerXAnchor),
+            backgroundView.centerYAnchor.constraint(equalTo: contentView.centerYAnchor),
+               backgroundView.heightAnchor.constraint(equalToConstant: 52),
+               backgroundView.widthAnchor.constraint(equalToConstant: 52)
+           ])
+           
+           selectionBackgroundView = backgroundView
+       }
+       
+       private func removeSelectionBackgroundView() {
+           selectionBackgroundView?.removeFromSuperview()
+           selectionBackgroundView = nil
+       }
+    
     
     // MARK: - Configuration Method
     
