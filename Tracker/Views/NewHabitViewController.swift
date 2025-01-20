@@ -52,11 +52,11 @@ final class NewHabitViewController: UIViewController, UITableViewDelegate, UITab
     
     private let colorsCollectionView: UICollectionView = {
         let layout = UICollectionViewFlowLayout()
-        layout.itemSize = CGSize(width: 40, height: 40)
+        layout.itemSize = CGSize(width: 52, height: 52)
         layout.sectionInset = UIEdgeInsets(top: 30, left: 0, bottom: 0, right: 0)
         layout.scrollDirection = .vertical
-        layout.minimumLineSpacing = 17
-        layout.minimumInteritemSpacing = 23
+        layout.minimumLineSpacing = 0
+        layout.minimumInteritemSpacing = 5
         let collectionView = UICollectionView(frame: .zero, collectionViewLayout: layout)
         collectionView.register(ColorsCollectionViewCell.self, forCellWithReuseIdentifier: ColorsCollectionViewCell.identifier)
         collectionView.backgroundColor = .clear
@@ -260,15 +260,10 @@ final class NewHabitViewController: UIViewController, UITableViewDelegate, UITab
             guard let cell = collectionView.dequeueReusableCell(withReuseIdentifier: ColorsCollectionViewCell.identifier, for: indexPath) as? ColorsCollectionViewCell else {
                 return UICollectionViewCell()
             }
-            guard let color = trackerCollectionColors[indexPath.item].uiColor else {
-                cell.configure(with: .gray)  // дефолтный цвет
-                return cell
-            }
-            
-            // Настроим ячейку, передав цвет
-            cell.configure(with: color)
-            return cell
-        }
+            let color = trackerCollectionColors[indexPath.item]
+                    cell.configure(with: color)
+                    return cell
+                }
         return UICollectionViewCell()
     }
     
@@ -282,10 +277,6 @@ final class NewHabitViewController: UIViewController, UITableViewDelegate, UITab
         } else if collectionView == emojiCollectionView {
             let selectedEmoji = emojis[indexPath.item]
             print("Selected emoji: \(selectedEmoji)")
-            
-           
-            
-            
         }
     }
     

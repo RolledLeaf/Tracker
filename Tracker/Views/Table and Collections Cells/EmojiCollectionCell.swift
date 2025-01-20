@@ -10,12 +10,13 @@ class EmojiCollectionViewCell: UICollectionViewCell {
     
      let emojiLabel: UILabel = {
         let label = UILabel()
-        label.font = .systemFont(ofSize: 32) // Размер шрифта соответствует размеру ячейки
+        label.font = .systemFont(ofSize: 32)
         label.textAlignment = .center
         label.translatesAutoresizingMaskIntoConstraints = false
         return label
     }()
     
+   
     private var selectionBackgroundView: UIView?
     
     override var isSelected: Bool {
@@ -59,7 +60,6 @@ class EmojiCollectionViewCell: UICollectionViewCell {
     }
     
     private func addSelectionBackgroundView() {
-           // Если фон уже добавлен, не добавляем снова
            if selectionBackgroundView != nil { return }
            
         
