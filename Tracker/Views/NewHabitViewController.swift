@@ -291,7 +291,6 @@ final class NewHabitViewController: UIViewController, UITableViewDelegate, UITab
     }
     
     func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
-        // Создаём ячейку с подзаголовком
         guard let cell = tableView.dequeueReusableCell(withIdentifier: CategoryAndScheduleTableViewCell.identifier, for: indexPath) as? CategoryAndScheduleTableViewCell else {
             fatalError("Unable to dequeue CategoryAndScheduleTableViewCell")
         }
@@ -304,6 +303,7 @@ final class NewHabitViewController: UIViewController, UITableViewDelegate, UITab
         tableView.deselectRow(at: indexPath, animated: true)
         if indexPath.row == 0 {
             let categoryListVC = CategoriesListViewController()
+            categoryListVC.delegate = self
             let navigationController = UINavigationController(rootViewController: categoryListVC)
             navigationController.modalPresentationStyle = .automatic
             present(navigationController, animated: true)
@@ -351,3 +351,16 @@ extension NewHabitViewController: ScheduleViewControllerDelegate {
     
    
 }
+
+extension NewHabitViewController: CategoriesListViewControllerDelegate {
+    func updateCategory(with category: String) {
+        // Обновляем subtitle для категории
+        if let index = tableViewOptions.firstIndex(where: { $0.title == "Категория" }) {
+            tableViewOptions[index].subtitle = category
+        }
+        
+        // Обновляем таблицу
+        categoryAndScheduleTableView.reloadData()
+    }
+}
+

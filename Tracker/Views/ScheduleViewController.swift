@@ -148,11 +148,7 @@ final class ScheduleViewController: UIViewController, UITableViewDelegate, UITab
         UserDefaults.standard.set(selectedWeekDays, forKey: "selectedWeekDays")
         let sortedWeekDaysString = getSortedSelectedWeekDays()
         delegate?.updateSubtitle(for: "Расписание", with: sortedWeekDaysString)
-        if navigationController?.viewControllers.first == self {
-               dismiss(animated: true, completion: nil) // Для модального представления
-           } else {
-               navigationController?.popViewController(animated: true) // Для пуш-навигации
-           }
+               dismiss(animated: true, completion: nil) // Для модального
     }
     
     func didChangeSwitchState(isOn: Bool, forDay day: String) {

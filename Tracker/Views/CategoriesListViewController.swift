@@ -1,7 +1,13 @@
 
 import UIKit
 
+protocol CategoriesListViewControllerDelegate: AnyObject {
+    func updateCategory(with category: String)
+}
+
 final class CategoriesListViewController: UIViewController, UITableViewDataSource, UITableViewDelegate, NewCategoryDelegate {
+    
+    weak var delegate: CategoriesListViewControllerDelegate?
     
     private let titleLabel: UILabel = {
         let label = UILabel()
@@ -66,10 +72,11 @@ final class CategoriesListViewController: UIViewController, UITableViewDataSourc
         return stackView
     }()
     
+    private let categoriesKey = "categoriesListKey"
+    
     private var tableHeightConstraint: NSLayoutConstraint?
     
     var categoriesList: [String] = []
-    
     var tableHeight: CGFloat {
         return 75
     }
@@ -77,22 +84,19 @@ final class CategoriesListViewController: UIViewController, UITableViewDataSourc
     override func viewDidLoad() {
         super.viewDidLoad()
         setupUI()
+        loadCategoriesFromUserDefaults()
         updateUI()
+        
     }
     
     
     
     private func updateUI() {
+        let isEmpty = categoriesList.isEmpty
+        emptyFieldLabel.isHidden = !isEmpty
+        emptyFieldStarImage.isHidden = !isEmpty
+        categoriesListTableView.isHidden = isEmpty
         updateTableHeight()
-        if  categoriesList.isEmpty == true {
-            emptyFieldLabel.isHidden = false
-            emptyFieldStarImage.isHidden = false
-            categoriesListTableView.isHidden = true
-        } else {
-            emptyFieldLabel.isHidden = true
-            emptyFieldStarImage.isHidden = true
-            categoriesListTableView.isHidden = false
-        }
     }
     
     
@@ -150,7 +154,7 @@ final class CategoriesListViewController: UIViewController, UITableViewDataSourc
             categoriesListTableView.leadingAnchor.constraint(equalTo: contentStackView.leadingAnchor, constant: 16),
             categoriesListTableView.topAnchor.constraint(equalTo: titleLabel.bottomAnchor, constant: 24),
             categoriesListTableView.widthAnchor.constraint(equalToConstant: 343),
-            tableHeightConstraint, // Убедитесь, что этот constraint корректный
+            tableHeightConstraint,
 
             // Настройка emptyFieldStarImage
             emptyFieldStarImage.centerXAnchor.constraint(equalTo: contentStackView.centerXAnchor),
@@ -197,6 +201,8 @@ final class CategoriesListViewController: UIViewController, UITableViewDataSourc
         print("Вызван метод didAddCategory")
         categoriesList.append(category)
         print("Добавлена новая категория \(category)")
+        print("Массив категорий categoriesList теперь содержит: \(categoriesList)")
+        saveCategoriesToUserDefaults()
         categoriesListTableView.reloadData() // Обновляем таблицу после добавления
         updateUI()
         
@@ -219,20 +225,11 @@ final class CategoriesListViewController: UIViewController, UITableViewDataSourc
     }
     
     func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
-        print("Вы выбрали ячейку: \(categoriesList[indexPath.row])")
-        if let cell = tableView.cellForRow(at: indexPath) as? CategoriesListTableCell {
-            
-            cell.selectionStyle = .none
-        }
+        tableView.deselectRow(at: indexPath, animated: true)
+        let category = categoriesList[indexPath.row]
+        delegate?.updateCategory(with: category)
+        dismiss(animated: true)
     }
-    
-    func tableView(_ tableView: UITableView, didDeselectRowAt indexPath: IndexPath) {
-            
-            if let cell = tableView.cellForRow(at: indexPath) as? CategoriesListTableCell {
-                cell.setSelected(false, animated: true)
-            }
-        }
-    
    
     func tableView(_ tableView: UITableView, contextMenuConfigurationForRowAt indexPath: IndexPath, point: CGPoint) -> UIContextMenuConfiguration? {
         
@@ -243,6 +240,16 @@ final class CategoriesListViewController: UIViewController, UITableViewDataSourc
                   return self.createContextMenu(for: indexPath)
               }
               return configuration
+    }
+    
+    private func saveCategoriesToUserDefaults() {
+        UserDefaults.standard.set(categoriesList, forKey: categoriesKey)
+    }
+    
+    private func loadCategoriesFromUserDefaults() {
+        if let savedCategories = UserDefaults.standard.array(forKey: categoriesKey) as? [String] {
+            categoriesList = savedCategories
+        }
     }
     
     private func createContextMenu(for indexPath: IndexPath) -> UIMenu {
@@ -281,6 +288,8 @@ final class CategoriesListViewController: UIViewController, UITableViewDataSourc
                     
                     // Если текст привязан к данным, обновляем и их
                     self?.categoriesList[indexPath.row] = newText
+                    self?.saveCategoriesToUserDefaults()
+                    self?.categoriesListTableView.reloadData()
                 }
                 let cancelAction = UIAlertAction(title: "Отменить", style: .cancel, handler: nil)
                 
@@ -296,7 +305,9 @@ final class CategoriesListViewController: UIViewController, UITableViewDataSourc
             categoriesList.remove(at: indexPath.row)
             categoriesListTableView.deleteRows(at: [indexPath], with: .automatic)
             self.updateTableHeight()
+            self.saveCategoriesToUserDefaults()
             self.categoriesListTableView.reloadData()
+            updateUI()
         }
     
     

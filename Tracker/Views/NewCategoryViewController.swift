@@ -87,7 +87,7 @@ final class NewCategoryViewController: UIViewController {
         guard let categoryName = categoryNameTextField.text, !categoryName.isEmpty else { return }
         delegate?.didAddCategory(categoryName)
         dismiss(animated: true, completion: nil)
-        print("Добавлено \(categoryName) в категории")
+        
     }
     
     
