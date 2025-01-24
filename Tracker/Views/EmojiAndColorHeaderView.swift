@@ -1,6 +1,6 @@
 import UIKit
 
-final class CollectionHeaderView: UICollectionReusableView {
+final class EmojiAndColorCollectionHeaderView: UICollectionReusableView {
     static let identifier = "CollectionHeaderView"
     
      let titleLabel: UILabel = {

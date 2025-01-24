@@ -1,17 +1,20 @@
+
+
 import UIKit
 
-final class TrackerCell: UICollectionViewCell {
+final class TrackerCollectionCell: UICollectionViewCell {
     static let reuseIdentifier = "TrackerCell"
     
     let habbitLabel: UILabel = {
         let label = UILabel()
         label.font = .systemFont(ofSize: 14, weight: .regular)
-        label.textColor = UIColor.custom(.textColor)
+        label.textColor = UIColor.custom(.createButtonTextColor)
         label.numberOfLines = 2
         label.textAlignment = .left
         label.translatesAutoresizingMaskIntoConstraints = false
         return label
     }()
+    
     
     let doneButton = UIButton ()
     
@@ -29,11 +32,11 @@ final class TrackerCell: UICollectionViewCell {
         label.translatesAutoresizingMaskIntoConstraints = false
         return label
     }()
-
-    let daysTextLabel: UILabel = {
+    
+    let daysCountLabel: UILabel = {
         let label = UILabel()
         label.font = .systemFont(ofSize: 12, weight: .regular)
-        label.textColor = .gray
+        label.textColor = .black
         label.translatesAutoresizingMaskIntoConstraints = false
         return label
     }()
@@ -57,27 +60,25 @@ final class TrackerCell: UICollectionViewCell {
     }
     
     private func setupUI() {
-        contentView.addSubview(backgroundContainer)
-        contentView.addSubview(emojiLabel)
-        contentView.addSubview(habbitLabel)
-        contentView.addSubview(doneButton)
-        contentView.addSubview(daysNumberLabel)
-        contentView.addSubview(daysTextLabel)
         
+        let uiElements: [UIView] = [backgroundContainer, emojiLabel, habbitLabel, doneButton, daysNumberLabel, daysCountLabel, ]
+        uiElements.forEach { $0.translatesAutoresizingMaskIntoConstraints = false }
+        uiElements.forEach { contentView.addSubview($0) }
         
         doneButton.setImage(UIImage(systemName: "plus"), for: .normal)
         doneButton.setImage(UIImage(systemName: "checkmark"), for: .highlighted)
         doneButton.tintColor = .systemBlue
-        doneButton.translatesAutoresizingMaskIntoConstraints = false
         
-        // Установим ограничения для backgroundContainer
+        
         NSLayoutConstraint.activate([
             
             daysNumberLabel.leadingAnchor.constraint(equalTo: contentView.leadingAnchor, constant: 12),
             daysNumberLabel.bottomAnchor.constraint(equalTo: contentView.bottomAnchor, constant: -24),
             
-            daysTextLabel.leadingAnchor.constraint(equalTo: daysNumberLabel.trailingAnchor, constant: 5),
-            daysTextLabel.bottomAnchor.constraint(equalTo: contentView.bottomAnchor, constant: -24),
+            daysCountLabel.leadingAnchor.constraint(equalTo: daysNumberLabel.trailingAnchor, constant: 5),
+            daysCountLabel.bottomAnchor.constraint(equalTo: contentView.bottomAnchor, constant: -24),
+            daysCountLabel.heightAnchor.constraint(equalToConstant: 18),
+            daysCountLabel.widthAnchor.constraint(equalToConstant: 101),
             
             doneButton.trailingAnchor.constraint(equalTo: contentView.trailingAnchor, constant: -12),
             doneButton.bottomAnchor.constraint(equalTo: contentView.bottomAnchor, constant: -8),
@@ -85,12 +86,12 @@ final class TrackerCell: UICollectionViewCell {
             backgroundContainer.topAnchor.constraint(equalTo: contentView.topAnchor),
             backgroundContainer.leadingAnchor.constraint(equalTo: contentView.leadingAnchor),
             backgroundContainer.trailingAnchor.constraint(equalTo: contentView.trailingAnchor),
-            backgroundContainer.bottomAnchor.constraint(equalTo: contentView.bottomAnchor, constant: -90),
+            backgroundContainer.heightAnchor.constraint(equalToConstant: 90),
             
             emojiLabel.topAnchor.constraint(equalTo: backgroundContainer.topAnchor, constant: 8),
             emojiLabel.leadingAnchor.constraint(equalTo: backgroundContainer.leadingAnchor, constant: 8),
             
-            habbitLabel.topAnchor.constraint(equalTo: emojiLabel.bottomAnchor, constant: 44),
+            habbitLabel.topAnchor.constraint(equalTo: backgroundContainer.topAnchor, constant: 44),
             habbitLabel.leadingAnchor.constraint(equalTo: backgroundContainer.leadingAnchor, constant: 12),
             habbitLabel.trailingAnchor.constraint(equalTo: backgroundContainer.trailingAnchor, constant: -12)
         ])
@@ -99,7 +100,7 @@ final class TrackerCell: UICollectionViewCell {
     private func getDayWord(for count: Int) -> String {
         let remainder10 = count % 10
         let remainder100 = count % 100
-
+        
         if remainder10 == 1 && remainder100 != 11 {
             return "день"
         } else if remainder10 >= 2 && remainder10 <= 4 && (remainder100 < 10 || remainder100 >= 20) {
@@ -109,13 +110,14 @@ final class TrackerCell: UICollectionViewCell {
         }
     }
     
-    func configure(with tracker: Tracker, completedCount: Int) {
-        emojiLabel.text = tracker.emoji // Присваиваем эмоджи из модели
-        habbitLabel.text = tracker.name // Присваиваем название привычки
-        backgroundContainer.backgroundColor = UIColor.fromCollectionColor(tracker.color) ?? .clear // Применяем цвет из модели
+    //Конфигурация ячейки привычки, которая находится внутри ячейки категории
+    func configure(with tracker: Tracker) {
+        emojiLabel.text = tracker.emoji
+        habbitLabel.text = tracker.name
+        backgroundContainer.backgroundColor = UIColor.fromCollectionColor(tracker.color) ?? .clear
         
-        let daysCount = tracker.schedule.daysCount
-          daysNumberLabel.text = "\(daysCount)"
-          daysTextLabel.text = getDayWord(for: daysCount)
+        let daysCount = tracker.daysCount
+        daysNumberLabel.text = "\(daysCount)"
+        daysCountLabel.text = getDayWord(for: daysCount)
     }
 }

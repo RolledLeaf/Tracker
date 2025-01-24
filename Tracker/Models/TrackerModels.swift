@@ -1,23 +1,19 @@
 import Foundation
 
 struct Tracker {
-    let id: String
+    let id: Int
     let name: String
     let color: CollectionColors
     let emoji: String
-    let schedule: TrackerSchedule
-    
-    
-    struct TrackerSchedule {
-        let daysCount: Int
-        let dayDays: String
-    }
+    let daysCount: Int
+    let weekDays: [String]
 }
+
 
 
 struct TrackerCategory {
     let title: String
-    let trackers: [Tracker]
+    let tracker: [Tracker]
 }
 
 struct TrackerRecord {

@@ -3,6 +3,8 @@ import UIKit
 
 final class CreateHabitTypeViewController: UIViewController {
     
+    weak var delegate: NewHabitViewControllerDelegate?
+    
     private let habitButton: UIButton = {
         let button = UIButton(type: .system)
         button.setTitle("Привычка", for: .normal)
@@ -51,13 +53,14 @@ final class CreateHabitTypeViewController: UIViewController {
     
         @objc private func habitButtonTapped() {
                let habitCreationVC = NewHabitViewController()
+            habitCreationVC.delegate = delegate
             let navigationController = UINavigationController(rootViewController: habitCreationVC)
             navigationController.modalPresentationStyle = .automatic
             present(navigationController, animated: true)
            }
 
            @objc private func irregularEventButtonTapped() {
-               let eventSettingsVC = EventSettingsViewController() // или другой VC
+               let eventSettingsVC = EventSettingsViewController()
                
     }
     

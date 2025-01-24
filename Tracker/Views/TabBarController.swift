@@ -13,10 +13,12 @@ final class TabBarController: UITabBarController {
         let statisticsVC = StatisticsViewController()
         
         trackerVC.tabBarItem = UITabBarItem(title: "Tracker", image: UIImage(named: "tracker"), tag: 0)
-                statisticsVC.tabBarItem = UITabBarItem(title: "Statistics", image: UIImage(named: "statistics"), tag: 1)
-
+        statisticsVC.tabBarItem = UITabBarItem(title: "Statistics", image: UIImage(named: "statistics"), tag: 1)
+        
         viewControllers = [UINavigationController(rootViewController: trackerVC),
-                                  UINavigationController(rootViewController: statisticsVC)]
+                           UINavigationController(rootViewController: statisticsVC)]
+        
+        tabBar.backgroundColor = UIColor.custom(.createButtonTextColor)
         
     }
 }
