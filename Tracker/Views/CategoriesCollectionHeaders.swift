@@ -6,7 +6,7 @@ final class CategoriesCollectionHeaderView: UICollectionReusableView {
      let titleLabel: UILabel = {
         let label = UILabel()
          label.font = .systemFont(ofSize: 19, weight: .bold)
-         label.textColor = .black
+         label.textColor = UIColor.custom(.textColor)
         label.textAlignment = .left
         return label
     }()
@@ -26,7 +26,7 @@ final class CategoriesCollectionHeaderView: UICollectionReusableView {
         titleLabel.translatesAutoresizingMaskIntoConstraints = false
         
         NSLayoutConstraint.activate([
-                    titleLabel.leadingAnchor.constraint(equalTo: leadingAnchor, constant: 16),
+                    titleLabel.leadingAnchor.constraint(equalTo: leadingAnchor, constant: 12),
                     titleLabel.centerYAnchor.constraint(equalTo: centerYAnchor)
                 ])
     }

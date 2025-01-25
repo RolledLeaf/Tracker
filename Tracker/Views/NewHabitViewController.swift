@@ -245,7 +245,7 @@ final class NewHabitViewController: UIViewController, UITableViewDelegate, UITab
     }
     
     func collectionView(_ collectionView: UICollectionView, layout collectionViewLayout: UICollectionViewLayout, referenceSizeForHeaderInSection section: Int) -> CGSize {
-        let size = CGSize(width: 52, height: 18) // Или другой размер
+        let size = CGSize(width: 52, height: 18) 
         print("Header size for section \(section): \(size)")
         return size
     }

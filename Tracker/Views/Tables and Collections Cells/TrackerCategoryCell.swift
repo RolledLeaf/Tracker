@@ -11,8 +11,8 @@ final class TrackerCategoryCell: UICollectionViewCell, UICollectionViewDataSourc
         let layout = UICollectionViewFlowLayout()
         layout.itemSize = CGSize(width: 167, height: 148)
         layout.scrollDirection = .vertical
-        layout.minimumLineSpacing = 9
-        layout.minimumInteritemSpacing = 8
+        layout.minimumLineSpacing = 0
+        layout.minimumInteritemSpacing = 0
         let collectionView = UICollectionView(frame: .zero, collectionViewLayout: layout)
         collectionView.backgroundColor = .clear
         return collectionView
@@ -37,7 +37,7 @@ final class TrackerCategoryCell: UICollectionViewCell, UICollectionViewDataSourc
             trackersCollectionView.leadingAnchor.constraint(equalTo: contentView.leadingAnchor),
             trackersCollectionView.trailingAnchor.constraint(equalTo: contentView.trailingAnchor),
             trackersCollectionView.topAnchor.constraint(equalTo: contentView.topAnchor),
-            trackersCollectionView.bottomAnchor.constraint(equalTo: contentView.bottomAnchor) //Высота должна быть динамической
+            trackersCollectionView.bottomAnchor.constraint(equalTo: contentView.bottomAnchor) 
         ])
         
         trackersCollectionView.dataSource = self
@@ -62,8 +62,8 @@ final class TrackerCategoryCell: UICollectionViewCell, UICollectionViewDataSourc
         
     }
     
-    func configure(with category: TrackerCategory) {
-        self.trackers = category.tracker
+    func configure(with tracker: [Tracker]) {
+        self.trackers = tracker
             trackersCollectionView.reloadData()
         }
     

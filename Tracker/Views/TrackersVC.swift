@@ -1,5 +1,5 @@
 
-import Foundation
+
 import UIKit
 
 final class TrackersViewController: UIViewController, UICollectionViewDataSource, UICollectionViewDelegateFlowLayout, NewHabitViewControllerDelegate {
@@ -21,9 +21,9 @@ final class TrackersViewController: UIViewController, UICollectionViewDataSource
     
     private let categoriesCollectionView: UICollectionView = {
         let layout = UICollectionViewFlowLayout()
-        layout.itemSize = CGSize(width: 343, height: 400)  //Высота ячейки должна быть динамичской
+        layout.itemSize = CGSize(width: 180, height: 148)
         layout.scrollDirection = .vertical
-        layout.minimumLineSpacing = 40
+        layout.minimumLineSpacing = 0
         layout.minimumInteritemSpacing = 0
         let collectionView = UICollectionView(frame: .zero, collectionViewLayout: layout)
         collectionView.backgroundColor = .clear
@@ -87,8 +87,8 @@ final class TrackersViewController: UIViewController, UICollectionViewDataSource
             let defaultTracker5 = Tracker(id: 5, name: "Подготовка лыжам", color: .collectionOrange2, emoji: "🥶", daysCount: 2, weekDays: ["Вт", "Пт", "Сб"])
             let defaultTracker6 = Tracker(id: 6, name: "Работа в саду", color: .collectionGreen18, emoji: "🌺", daysCount: 2, weekDays: ["Вт", "Ср", "Чт", "Пт", "Сб"])
             
-            let defaultCategory = TrackerCategory(title: "Default", tracker: [defaultTracker1, defaultTracker2, defaultTracker3])
-            let newCategory = TrackerCategory(title: "New Category", tracker: [defaultTraker4, defaultTracker5, defaultTracker6])
+            let defaultCategory = TrackerCategory(title: "Стандартная", tracker: [defaultTracker1, defaultTracker2, defaultTracker3])
+            let newCategory = TrackerCategory(title: "Новая категория", tracker: [defaultTraker4, defaultTracker5, defaultTracker6])
             
             categories.append(defaultCategory)
             categories.append(newCategory)
@@ -182,9 +182,9 @@ final class TrackersViewController: UIViewController, UICollectionViewDataSource
             
             categoriesCollectionView.leadingAnchor.constraint(equalTo: view.safeAreaLayoutGuide.leadingAnchor, constant: 16),
             categoriesCollectionView.trailingAnchor.constraint(equalTo: view.safeAreaLayoutGuide.trailingAnchor, constant: -16),
-            categoriesCollectionView.topAnchor.constraint(equalTo: searchBar.bottomAnchor, constant: 64),
+            categoriesCollectionView.topAnchor.constraint(equalTo: searchBar.bottomAnchor, constant: 34),
             categoriesCollectionView.bottomAnchor.constraint(equalTo: view.bottomAnchor),
-            categoriesCollectionView.heightAnchor.constraint(equalToConstant: 1200), //поменять на динамический
+        
             
             plusButton.heightAnchor.constraint(equalToConstant: 19),
             plusButton.widthAnchor.constraint(equalToConstant: 18),
@@ -221,29 +221,37 @@ final class TrackersViewController: UIViewController, UICollectionViewDataSource
         
         categoriesCollectionView.register(TrackerCategoryCell.self, forCellWithReuseIdentifier: TrackerCategoryCell.reuseIdentifier)
         
+        categoriesCollectionView.delegate = self
     }
     
     func numberOfSections(in collectionView: UICollectionView) -> Int {
         print("Number of sections: \(categories.count)")
-       return 1
+       return categories.count
     }
     
     func collectionView(_ collectionView: UICollectionView, numberOfItemsInSection section: Int) -> Int {
         
-        return categories.count
+        return  categories[section].tracker.count
     }
     
-    
+    func collectionView(_ collectionView: UICollectionView, layout collectionViewLayout: UICollectionViewLayout, insetForSectionAt section: Int) -> UIEdgeInsets {
+        if section == 0 {
+            // Для первой секции
+            return UIEdgeInsets(top: 12, left: 0, bottom: 0, right: 0)
+        } else {
+            // Для всех остальных секций
+            return UIEdgeInsets(top: 16, left: 0, bottom: 0, right: 0)
+        }
+    }
     
     func collectionView(_ collectionView: UICollectionView, cellForItemAt indexPath: IndexPath) -> UICollectionViewCell {
           guard let cell = categoriesCollectionView.dequeueReusableCell(withReuseIdentifier: TrackerCategoryCell.reuseIdentifier, for: indexPath) as? TrackerCategoryCell else {
             print("Не удалось создать ячейку")
               return UICollectionViewCell()
         }
-           let category = categories[indexPath.item]
-                    cell.configure(with: category)
-           
-        return cell
+        let tracker = categories[indexPath.section].tracker[indexPath.item]
+            cell.configure(with: [tracker])
+            return cell
        }
     
 
