@@ -1,21 +1,56 @@
 import UIKit
 
-final class TrackerCategoryCell: UICollectionViewCell, UICollectionViewDataSource, UICollectionViewDelegate {
+final class TrackerCategoryCell: UICollectionViewCell {
 
     
     static let reuseIdentifier = "TrackerCategoryCell"
     
-    private var trackers: [Tracker] = []
+
  
-    private var trackersCollectionView: UICollectionView = {
-        let layout = UICollectionViewFlowLayout()
-        layout.itemSize = CGSize(width: 167, height: 148)
-        layout.scrollDirection = .vertical
-        layout.minimumLineSpacing = 0
-        layout.minimumInteritemSpacing = 0
-        let collectionView = UICollectionView(frame: .zero, collectionViewLayout: layout)
-        collectionView.backgroundColor = .clear
-        return collectionView
+   
+    let habbitLabel: UILabel = {
+        let label = UILabel()
+        label.font = .systemFont(ofSize: 14, weight: .regular)
+        label.textColor = UIColor.custom(.createButtonTextColor)
+        label.numberOfLines = 2
+        label.textAlignment = .left
+        label.translatesAutoresizingMaskIntoConstraints = false
+        return label
+    }()
+    
+    
+    let doneButton = UIButton ()
+    
+    private let emojiLabel: UILabel = {
+        let label = UILabel()
+        label.font = UIFont.systemFont(ofSize: 24)
+        label.textAlignment = .center
+        return label
+    }()
+    
+    let daysNumberLabel: UILabel = {
+        let label = UILabel()
+        label.font = .systemFont(ofSize: 14, weight: .bold)
+        label.textColor = .black
+        label.translatesAutoresizingMaskIntoConstraints = false
+        return label
+    }()
+    
+    let daysCountLabel: UILabel = {
+        let label = UILabel()
+        label.font = .systemFont(ofSize: 12, weight: .regular)
+        label.textColor = .black
+        label.translatesAutoresizingMaskIntoConstraints = false
+        return label
+    }()
+    
+    
+    private let backgroundContainer: UIView = {
+        let view = UIView()
+        view.layer.cornerRadius = 16
+        view.layer.masksToBounds = true
+        view.backgroundColor = UIColor.systemGray5
+        return view
     }()
     
     override init(frame: CGRect) {
@@ -29,42 +64,61 @@ final class TrackerCategoryCell: UICollectionViewCell, UICollectionViewDataSourc
     
     private func setupUI() {
         
-        trackersCollectionView.translatesAutoresizingMaskIntoConstraints = false
-        contentView.addSubview(trackersCollectionView)
-        trackersCollectionView.isPrefetchingEnabled = true
-     
+        let uiElements: [UIView] = [backgroundContainer, emojiLabel, habbitLabel, doneButton, daysNumberLabel, daysCountLabel, ]
+        uiElements.forEach { $0.translatesAutoresizingMaskIntoConstraints = false }
+        uiElements.forEach { contentView.addSubview($0) }
+        
+        doneButton.setImage(UIImage(systemName: "plus"), for: .normal)
+        doneButton.setImage(UIImage(systemName: "checkmark"), for: .highlighted)
+        doneButton.tintColor = .systemBlue
+        
         NSLayoutConstraint.activate([
-            trackersCollectionView.leadingAnchor.constraint(equalTo: contentView.leadingAnchor),
-            trackersCollectionView.trailingAnchor.constraint(equalTo: contentView.trailingAnchor),
-            trackersCollectionView.topAnchor.constraint(equalTo: contentView.topAnchor),
-            trackersCollectionView.bottomAnchor.constraint(equalTo: contentView.bottomAnchor) 
-        ])
-        
-        trackersCollectionView.dataSource = self
-        trackersCollectionView.delegate = self
-        
-        trackersCollectionView.register(TrackerCollectionCell.self, forCellWithReuseIdentifier: TrackerCollectionCell.reuseIdentifier)
+            daysNumberLabel.leadingAnchor.constraint(equalTo: contentView.leadingAnchor, constant: 12),
+            daysNumberLabel.bottomAnchor.constraint(equalTo: contentView.bottomAnchor, constant: -24),
+            
+            daysCountLabel.leadingAnchor.constraint(equalTo: daysNumberLabel.trailingAnchor, constant: 5),
+            daysCountLabel.bottomAnchor.constraint(equalTo: contentView.bottomAnchor, constant: -24),
+            daysCountLabel.heightAnchor.constraint(equalToConstant: 18),
+            daysCountLabel.widthAnchor.constraint(equalToConstant: 101),
+            
+            doneButton.trailingAnchor.constraint(equalTo: contentView.trailingAnchor, constant: -12),
+            doneButton.bottomAnchor.constraint(equalTo: contentView.bottomAnchor, constant: -8),
+            
+            backgroundContainer.topAnchor.constraint(equalTo: contentView.topAnchor),
+            backgroundContainer.leadingAnchor.constraint(equalTo: contentView.leadingAnchor),
+            backgroundContainer.trailingAnchor.constraint(equalTo: contentView.trailingAnchor),
+            backgroundContainer.heightAnchor.constraint(equalToConstant: 90),
+            
+            emojiLabel.topAnchor.constraint(equalTo: backgroundContainer.topAnchor, constant: 8),
+            emojiLabel.leadingAnchor.constraint(equalTo: backgroundContainer.leadingAnchor, constant: 8),
+            
+            habbitLabel.topAnchor.constraint(equalTo: backgroundContainer.topAnchor, constant: 44),
+            habbitLabel.leadingAnchor.constraint(equalTo: backgroundContainer.leadingAnchor, constant: 12),
+            habbitLabel.trailingAnchor.constraint(equalTo: backgroundContainer.trailingAnchor, constant: -12)
+            ])
     }
     
-    
-    func collectionView(_ collectionView: UICollectionView, numberOfItemsInSection section: Int) -> Int {
-        return trackers.count
-    }
-    
-    func collectionView(_ collectionView: UICollectionView, cellForItemAt indexPath: IndexPath) -> UICollectionViewCell {
-        guard let cell = trackersCollectionView.dequeueReusableCell(withReuseIdentifier: TrackerCollectionCell.reuseIdentifier, for: indexPath) as? TrackerCollectionCell else {
-            return UICollectionViewCell()
-        }
-        let tracker = trackers[indexPath.item]
+            private func getDayWord(for count: Int) -> String {
+                let remainder10 = count % 10
+                let remainder100 = count % 100
+                
+                if remainder10 == 1 && remainder100 != 11 {
+                    return "день"
+                } else if remainder10 >= 2 && remainder10 <= 4 && (remainder100 < 10 || remainder100 >= 20) {
+                    return "дня"
+                } else {
+                    return "дней"
+                }
+            }
+            
+    func configure(with tracker: Tracker) {
+        emojiLabel.text = tracker.emoji
+        habbitLabel.text = tracker.name
+        backgroundContainer.backgroundColor = UIColor.fromCollectionColor(tracker.color) ?? .clear
         
-        cell.configure(with: tracker)
-               return cell
-        
+        let daysCount = tracker.daysCount
+        daysNumberLabel.text = "\(daysCount)"
+        daysCountLabel.text = getDayWord(for: daysCount)
     }
-    
-    func configure(with tracker: [Tracker]) {
-        self.trackers = tracker
-            trackersCollectionView.reloadData()
-        }
     
 }
