@@ -11,17 +11,17 @@ final class TrackersViewController: UIViewController, UICollectionViewDataSource
     private let emptyFieldStarImage = UIImageView()
     private let emptyFieldLabel = UILabel()
     
+    var flatTrackers: [Tracker] = []
     private var datePickerHeightConstraint: NSLayoutConstraint?
     var categories: [TrackerCategory] = []
     var trackers: [Tracker] = []
     var completedTrackers: [TrackerRecord]?
     var currentDate: Date = Date()
-    
+    var currentSelectedTracker: Tracker?
     
     
     private let categoriesCollectionView: UICollectionView = {
         let layout = UICollectionViewFlowLayout()
-        
         layout.scrollDirection = .vertical
         layout.minimumLineSpacing = 0
         layout.minimumInteritemSpacing = 9
@@ -74,7 +74,7 @@ final class TrackersViewController: UIViewController, UICollectionViewDataSource
         setupInitialUI()
     
         setupDefaultCategories()
-        
+        flatTrackers = categories.flatMap { $0.tracker }
         reloadCategoryData()
         updateUI()
     }
@@ -253,6 +253,20 @@ extension TrackersViewController {
     func collectionView(_ collectionView: UICollectionView, numberOfItemsInSection section: Int) -> Int {
         let category = categories[section]
         return  category.tracker.count
+    }
+    
+    func collectionView(_ collectionView: UICollectionView, didSelectItemAt indexPath: IndexPath) {
+        let section = indexPath.section
+        let row = indexPath.row
+        
+        // Определяем выбранный трекер из секции
+        let selectedTracker = categories[section].tracker[row]
+        
+        // Сохраняем его в переменную
+        currentSelectedTracker = selectedTracker
+        
+        print("Выбран трекер: \(selectedTracker.name)")
+        
     }
     
     func collectionView(_ collectionView: UICollectionView, layout collectionViewLayout: UICollectionViewLayout, insetForSectionAt section: Int) -> UIEdgeInsets {

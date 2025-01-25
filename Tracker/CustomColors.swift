@@ -37,6 +37,36 @@ enum CollectionColors: String  {
         }
 }
 
+ func adjustAlpha(_ color: UIColor, to alpha: CGFloat) -> UIColor {
+        return color.withAlphaComponent(alpha)
+    }
+
+
+
+func lightenColor(_ color: UIColor, by percentage: CGFloat) -> UIColor {
+    // Ограничиваем процент в пределах от 0 до 1
+    let percentage = max(0, min(percentage, 1))
+    
+    // Получаем компоненты цвета (red, green, blue, alpha)
+    var red: CGFloat = 0
+    var green: CGFloat = 0
+    var blue: CGFloat = 0
+    var alpha: CGFloat = 0
+    
+    // Убедимся, что цвет может быть представлен в RGB
+    guard color.getRed(&red, green: &green, blue: &blue, alpha: &alpha) else {
+        return color // Возвращаем исходный цвет, если не удалось извлечь компоненты
+    }
+    
+    // Увеличиваем компоненты на указанный процент
+    red = min(red + (1 - red) * percentage, 1)
+    green = min(green + (1 - green) * percentage, 1)
+    blue = min(blue + (1 - blue) * percentage, 1)
+    
+    // Возвращаем новый цвет
+    return UIColor(red: red, green: green, blue: blue, alpha: alpha)
+}
+
 extension UIColor {
     static func custom(_ color: CustomColors) -> UIColor? {
         return UIColor(named: color.rawValue) ?? .clear

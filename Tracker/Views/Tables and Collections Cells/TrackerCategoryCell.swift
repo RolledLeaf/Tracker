@@ -2,12 +2,12 @@ import UIKit
 
 final class TrackerCategoryCell: UICollectionViewCell {
 
-    
     static let reuseIdentifier = "TrackerCategoryCell"
     
-
- 
+    var currentSelectedTracker: Tracker?
    
+    var currentDate: Date = Date()
+    
     let habbitLabel: UILabel = {
         let label = UILabel()
         label.font = .systemFont(ofSize: 14, weight: .regular)
@@ -18,17 +18,16 @@ final class TrackerCategoryCell: UICollectionViewCell {
         return label
     }()
     
-    
     let doneButton = UIButton ()
     
     private let emojiLabel: UILabel = {
         let label = UILabel()
-        label.font = UIFont.systemFont(ofSize: 24)
+        label.font = UIFont.systemFont(ofSize: 16)
         label.textAlignment = .center
         return label
     }()
     
-    let daysNumberLabel: UILabel = {
+    var daysNumberLabel: UILabel = {
         let label = UILabel()
         label.font = .systemFont(ofSize: 14, weight: .bold)
         label.textColor = .black
@@ -44,6 +43,19 @@ final class TrackerCategoryCell: UICollectionViewCell {
         return label
     }()
     
+    private let emojiContainer: UIView = {
+        let view = UIView()
+        view.layer.cornerRadius = 12
+        view.layer.masksToBounds = true
+        return view
+    }()
+    
+    private let doneButtonContainer: UIView = {
+        let view = UIView()
+        view.layer.cornerRadius = 17
+        view.layer.masksToBounds = true
+        return view
+    }()
     
     private let backgroundContainer: UIView = {
         let view = UIView()
@@ -64,13 +76,14 @@ final class TrackerCategoryCell: UICollectionViewCell {
     
     private func setupUI() {
         
-        let uiElements: [UIView] = [backgroundContainer, emojiLabel, habbitLabel, doneButton, daysNumberLabel, daysCountLabel, ]
+        let uiElements: [UIView] = [backgroundContainer,  habbitLabel, daysNumberLabel, daysCountLabel, emojiContainer, emojiLabel, doneButtonContainer, doneButton ]
         uiElements.forEach { $0.translatesAutoresizingMaskIntoConstraints = false }
         uiElements.forEach { contentView.addSubview($0) }
         
         doneButton.setImage(UIImage(systemName: "plus"), for: .normal)
-        doneButton.setImage(UIImage(systemName: "checkmark"), for: .highlighted)
-        doneButton.tintColor = .systemBlue
+        
+        doneButton.tintColor = UIColor.custom(.createButtonTextColor)
+        doneButton.addTarget(self, action: #selector(doneButtonTapped), for: .touchUpInside)
         
         NSLayoutConstraint.activate([
             daysNumberLabel.leadingAnchor.constraint(equalTo: contentView.leadingAnchor, constant: 12),
@@ -82,7 +95,12 @@ final class TrackerCategoryCell: UICollectionViewCell {
             daysCountLabel.widthAnchor.constraint(equalToConstant: 101),
             
             doneButton.trailingAnchor.constraint(equalTo: contentView.trailingAnchor, constant: -12),
-            doneButton.bottomAnchor.constraint(equalTo: contentView.bottomAnchor, constant: -8),
+            doneButton.bottomAnchor.constraint(equalTo: contentView.bottomAnchor, constant: -24),
+            
+            doneButtonContainer.centerXAnchor.constraint(equalTo: doneButton.centerXAnchor),
+            doneButtonContainer.centerYAnchor.constraint(equalTo: doneButton.centerYAnchor),
+            doneButtonContainer.heightAnchor.constraint(equalToConstant: 34),
+            doneButtonContainer.widthAnchor.constraint(equalToConstant: 34),
             
             backgroundContainer.topAnchor.constraint(equalTo: contentView.topAnchor),
             backgroundContainer.leadingAnchor.constraint(equalTo: contentView.leadingAnchor),
@@ -91,6 +109,11 @@ final class TrackerCategoryCell: UICollectionViewCell {
             
             emojiLabel.topAnchor.constraint(equalTo: backgroundContainer.topAnchor, constant: 8),
             emojiLabel.leadingAnchor.constraint(equalTo: backgroundContainer.leadingAnchor, constant: 8),
+            
+            emojiContainer.centerXAnchor.constraint(equalTo: emojiLabel.centerXAnchor),
+            emojiContainer.centerYAnchor.constraint(equalTo: emojiLabel.centerYAnchor),
+            emojiContainer.heightAnchor.constraint(equalToConstant: 24),
+            emojiContainer.widthAnchor.constraint(equalToConstant: 24),
             
             habbitLabel.topAnchor.constraint(equalTo: backgroundContainer.topAnchor, constant: 44),
             habbitLabel.leadingAnchor.constraint(equalTo: backgroundContainer.leadingAnchor, constant: 12),
@@ -111,14 +134,46 @@ final class TrackerCategoryCell: UICollectionViewCell {
                 }
             }
             
+    
+    
     func configure(with tracker: Tracker) {
         emojiLabel.text = tracker.emoji
         habbitLabel.text = tracker.name
         backgroundContainer.backgroundColor = UIColor.fromCollectionColor(tracker.color) ?? .clear
+        doneButtonContainer.backgroundColor = UIColor.fromCollectionColor(tracker.color) ?? .clear
+        emojiContainer.backgroundColor = lightenColor(UIColor.fromCollectionColor(tracker.color) ?? .clear, by: 0.3)
         
         let daysCount = tracker.daysCount
         daysNumberLabel.text = "\(daysCount)"
         daysCountLabel.text = getDayWord(for: daysCount)
     }
-    
+    func executeHabit(_ tracker: Tracker) {
+        // Создаём обновлённый трекер
+        let updatedTracker = Tracker(
+            id: tracker.id,
+            name: tracker.name,
+            color: tracker.color,
+            emoji: tracker.emoji,
+            daysCount: tracker.daysCount + 1,
+            weekDays: tracker.weekDays
+        )
+        
+        // Создаём запись выполненного трекера
+        let completedTrackerRecord = TrackerRecord(executedTracker: updatedTracker, date: currentDate)
+        
+        // Добавляем запись в массив
+        completedTrackers.append(completedTrackerRecord)
+        
+        // Обновляем интерфейс
+        daysNumberLabel.text = "\(updatedTracker.daysCount)"
+       
+    }
+        
+    @objc func doneButtonTapped() {
+        print("done button tapped")
+        doneButton.setImage(UIImage(systemName: "checkmark"), for: .normal)
+        if let tracker = currentSelectedTracker {
+            executeHabit(tracker)
+        }
+    }
 }
