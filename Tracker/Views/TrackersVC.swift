@@ -14,9 +14,11 @@ final class TrackersViewController: UIViewController, UICollectionViewDataSource
     
     private var datePickerHeightConstraint: NSLayoutConstraint?
     var categories: [TrackerCategory] = []
+    var filteredCategories: [TrackerCategory] = []
     var trackerRecords: [TrackerRecord] = []
     var currentDate: Date = Date()
     var currentSelectedTracker: Tracker?
+    
     
     
     private let categoriesCollectionView: UICollectionView = {
@@ -75,15 +77,17 @@ final class TrackersViewController: UIViewController, UICollectionViewDataSource
         setupDefaultCategories()
         reloadCategoryData()
         updateUI()
+       
+        updateVisibleTrackers(for: datePicker.date)
     }
     
     private func setupDefaultCategories() {
-        let defaultTracker1 = Tracker(id: 1, name: "Уборка", color: .collectionBlue3, emoji: "🙂", daysCount: 1, weekDays: ["Вт", "Ср", "Чт", "СБ"])
-        let defaultTracker2 = Tracker(id: 2, name: "Стирка", color: .collectionPink12, emoji: "😻", daysCount: 3, weekDays: ["Пт"])
-        let defaultTracker3 = Tracker(id: 3, name: "Зарядка", color: .collectionDarkPurple10, emoji: "❤️", daysCount: 4, weekDays: ["Сб"])
-        let defaultTraker4 = Tracker(id: 4, name: "Подготовка к сноуборду", color: .collectionViolet6, emoji: "😈", daysCount: 5, weekDays: ["Вт", "Ср", "Чт", "Пт", "Сб"])
-        let defaultTracker5 = Tracker(id: 5, name: "Подготовка лыжам", color: .collectionOrange2, emoji: "🥶", daysCount: 2, weekDays: ["Вт", "Пт", "Сб"])
-        let defaultTracker6 = Tracker(id: 6, name: "Работа в саду", color: .collectionGreen18, emoji: "🌺", daysCount: 2, weekDays: ["Вт", "Ср", "Чт", "Пт", "Сб"])
+        let defaultTracker1 = Tracker(id: 1, name: "Уборка", color: .collectionBlue3, emoji: "🙂", daysCount: 1, weekDays: [ "Mon", "Wed"])
+        let defaultTracker2 = Tracker(id: 2, name: "Стирка", color: .collectionPink12, emoji: "😻", daysCount: 3, weekDays: ["Fri"])
+        let defaultTracker3 = Tracker(id: 3, name: "Зарядка", color: .collectionDarkPurple10, emoji: "❤️", daysCount: 4, weekDays: ["Sat"])
+        let defaultTraker4 = Tracker(id: 4, name: "Подготовка к сноуборду", color: .collectionViolet6, emoji: "😈", daysCount: 5, weekDays: ["Tue", "Wed", "Thu", "Fri", "Sat"])
+        let defaultTracker5 = Tracker(id: 5, name: "Подготовка лыжам", color: .collectionOrange2, emoji: "🥶", daysCount: 2, weekDays: ["Tue", "Fri", "Sat"])
+        let defaultTracker6 = Tracker(id: 6, name: "Работа в саду", color: .collectionGreen18, emoji: "🌺", daysCount: 2, weekDays: ["Tue", "Wed", "Thu", "Fri", "Sun"])
         
         let defaultCategory = TrackerCategory(title: "Стандартная", tracker: [defaultTracker1, defaultTracker2, defaultTracker3])
         let newCategory = TrackerCategory(title: "Новая категория", tracker: [defaultTraker4, defaultTracker5, defaultTracker6])
@@ -93,7 +97,6 @@ final class TrackersViewController: UIViewController, UICollectionViewDataSource
     }
     
     func reloadCategoryData() {
-        // Ваш код для обновления UI, например, перезагрузка таблицы
         categoriesCollectionView.reloadData()
         
     }
@@ -102,6 +105,24 @@ final class TrackersViewController: UIViewController, UICollectionViewDataSource
         let formatter = DateFormatter()
         formatter.dateFormat = "dd.MM.yy"
         return formatter.string(from: Date())
+    }
+    
+    private func updateVisibleTrackers(for selectedDate: Date) {
+        let calendar = Calendar.current
+        let weekdaySymbols = calendar.shortWeekdaySymbols
+        let selectedWeekdayIndex = calendar.component(.weekday, from: selectedDate) - 1
+        let selectedWeekday = weekdaySymbols[selectedWeekdayIndex]
+
+        filteredCategories = categories.map { category in
+            let filteredTrackers = category.tracker.filter { $0.weekDays.contains(selectedWeekday) }
+            return TrackerCategory(title: category.title, tracker: filteredTrackers)
+        }.filter { !$0.tracker.isEmpty } // Убираем пустые категории
+
+        categoriesCollectionView.reloadData()
+    }
+    
+    @objc private func datePickerValueChanged(_ sender: UIDatePicker) {
+        updateVisibleTrackers(for: sender.date)
     }
     
     private func getDayWord(for count: Int) -> String {
@@ -177,7 +198,7 @@ final class TrackersViewController: UIViewController, UICollectionViewDataSource
         plusButton.addTarget(self, action: #selector(plusButtonTapped), for: .touchUpInside)
         emptyFieldStarImage.image = UIImage(named: "dizzyStar")
         
-        
+        datePicker.addTarget(self, action: #selector(datePickerValueChanged), for: .valueChanged)
         datePickerHeightConstraint = datePicker.heightAnchor.constraint(equalToConstant: 0)
         if let datePickerHeightConstraint = datePickerHeightConstraint {
             NSLayoutConstraint.activate([
@@ -346,11 +367,11 @@ extension TrackersViewController {
     
     func numberOfSections(in collectionView: UICollectionView) -> Int {
         
-        return categories.count
+        return filteredCategories.count
     }
     
     func collectionView(_ collectionView: UICollectionView, numberOfItemsInSection section: Int) -> Int {
-        let category = categories[section]
+        let category = filteredCategories[section]
         return  category.tracker.count
     }
     
@@ -384,7 +405,7 @@ extension TrackersViewController {
             return UICollectionViewCell()
         }
         
-        let category = categories[indexPath.section]  // Получаем категорию для текущей секции
+        let category = filteredCategories[indexPath.section]  // Получаем категорию для текущей секции
         let tracker = category.tracker[indexPath.item]  // Получаем трекер из этой категории
         
         // Получаем записи для данного трекера
