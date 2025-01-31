@@ -1,11 +1,16 @@
 import UIKit
 
-final class TrackerCategoryCell: UICollectionViewCell {
+    protocol TrackerCellDelegate: AnyObject {
+        func trackerCell(_ cell: TrackerCategoryCell, didTapDoneButtonFor trackerID: Int)
+    }
 
+final class TrackerCategoryCell: UICollectionViewCell {
+    weak var delegate: TrackerCellDelegate?
+    
     static let reuseIdentifier = "TrackerCategoryCell"
     
     var currentSelectedTracker: Tracker?
-   
+    var trackerID: Int?
     var currentDate: Date = Date()
     
     let habbitLabel: UILabel = {
@@ -18,7 +23,17 @@ final class TrackerCategoryCell: UICollectionViewCell {
         return label
     }()
     
-    let doneButton = UIButton ()
+     let doneButton: UIButton = {
+        let button = UIButton(type: .custom)
+        button.setImage(UIImage(systemName: "plus"), for: .normal)
+        button.tintColor = .black
+        button.imageView?.contentMode = .scaleAspectFit
+        button.tintColor = UIColor.custom(.createButtonTextColor)
+        button.addTarget(self, action: #selector(doneButtonTapped), for: .touchUpInside)
+        return button
+    }()
+    
+    private var isChecked = false
     
     private let emojiLabel: UILabel = {
         let label = UILabel()
@@ -50,7 +65,7 @@ final class TrackerCategoryCell: UICollectionViewCell {
         return view
     }()
     
-    private let doneButtonContainer: UIView = {
+     let doneButtonContainer: UIView = {
         let view = UIView()
         view.layer.cornerRadius = 17
         view.layer.masksToBounds = true
@@ -80,10 +95,7 @@ final class TrackerCategoryCell: UICollectionViewCell {
         uiElements.forEach { $0.translatesAutoresizingMaskIntoConstraints = false }
         uiElements.forEach { contentView.addSubview($0) }
         
-        doneButton.setImage(UIImage(systemName: "plus"), for: .normal)
         
-        doneButton.tintColor = UIColor.custom(.createButtonTextColor)
-        doneButton.addTarget(self, action: #selector(doneButtonTapped), for: .touchUpInside)
         
         NSLayoutConstraint.activate([
             daysNumberLabel.leadingAnchor.constraint(equalTo: contentView.leadingAnchor, constant: 12),
@@ -118,62 +130,76 @@ final class TrackerCategoryCell: UICollectionViewCell {
             habbitLabel.topAnchor.constraint(equalTo: backgroundContainer.topAnchor, constant: 44),
             habbitLabel.leadingAnchor.constraint(equalTo: backgroundContainer.leadingAnchor, constant: 12),
             habbitLabel.trailingAnchor.constraint(equalTo: backgroundContainer.trailingAnchor, constant: -12)
-            ])
+        ])
     }
     
-            private func getDayWord(for count: Int) -> String {
-                let remainder10 = count % 10
-                let remainder100 = count % 100
-                
-                if remainder10 == 1 && remainder100 != 11 {
-                    return "день"
-                } else if remainder10 >= 2 && remainder10 <= 4 && (remainder100 < 10 || remainder100 >= 20) {
-                    return "дня"
-                } else {
-                    return "дней"
-                }
-            }
-            
+    private func getDayWord(for count: Int) -> String {
+        let remainder10 = count % 10
+        let remainder100 = count % 100
+        
+        if remainder10 == 1 && remainder100 != 11 {
+            return "день"
+        } else if remainder10 >= 2 && remainder10 <= 4 && (remainder100 < 10 || remainder100 >= 20) {
+            return "дня"
+        } else {
+            return "дней"
+        }
+    }
     
     
-    func configure(with tracker: Tracker) {
+    
+    func configure(with tracker: Tracker, trackerRecords: [TrackerRecord]) {
+        
+        currentSelectedTracker = tracker
+        trackerID = tracker.id
         emojiLabel.text = tracker.emoji
         habbitLabel.text = tracker.name
         backgroundContainer.backgroundColor = UIColor.fromCollectionColor(tracker.color) ?? .clear
         doneButtonContainer.backgroundColor = UIColor.fromCollectionColor(tracker.color) ?? .clear
         emojiContainer.backgroundColor = lightenColor(UIColor.fromCollectionColor(tracker.color) ?? .clear, by: 0.3)
         
-        let daysCount = tracker.daysCount
+        // Проверяем, был ли выполнен трекер на текущую дату
+        let currentDate = Date()
+        let isCompleted = trackerRecords.contains { $0.trackerID == tracker.id && Calendar.current.isDate($0.date, inSameDayAs: currentDate) }
+        
+        
+        // Обновляем кнопку в зависимости от состояния выполнения
+        doneButton.setImage(UIImage(systemName: isCompleted ? "checkmark" : "plus"), for: .normal)
+        
+        let baseColor = UIColor.fromCollectionColor(currentSelectedTracker?.color ?? .collectionBeige7) ?? .collectionBeige7
+    
+           
+           let adjustedColor = isCompleted ? lightenColor(baseColor, by: 0.3) : baseColor
+           doneButtonContainer.backgroundColor = adjustedColor
+
+        // Отображаем количество дней
+        let daysCount = tracker.daysCount 
         daysNumberLabel.text = "\(daysCount)"
         daysCountLabel.text = getDayWord(for: daysCount)
     }
-    func executeHabit(_ tracker: Tracker) {
-        // Создаём обновлённый трекер
-        let updatedTracker = Tracker(
-            id: tracker.id,
-            name: tracker.name,
-            color: tracker.color,
-            emoji: tracker.emoji,
-            daysCount: tracker.daysCount + 1,
-            weekDays: tracker.weekDays
-        )
-        
-        // Создаём запись выполненного трекера
-        let completedTrackerRecord = TrackerRecord(executedTracker: updatedTracker, date: currentDate)
-        
-        // Добавляем запись в массив
-        completedTrackers.append(completedTrackerRecord)
-        
-        // Обновляем интерфейс
-        daysNumberLabel.text = "\(updatedTracker.daysCount)"
-       
-    }
-        
+    
+    
+    
     @objc func doneButtonTapped() {
-        print("done button tapped")
-        doneButton.setImage(UIImage(systemName: "checkmark"), for: .normal)
-        if let tracker = currentSelectedTracker {
-            executeHabit(tracker)
-        }
+       
+        // Передаём в делегат изменения
+        guard let trackerID = trackerID else {
+               print("Tracker ID is missing!")
+               return
+           }
+
+           delegate?.trackerCell(self, didTapDoneButtonFor: trackerID)
     }
 }
+
+/* guard let currentTracker = currentSelectedTracker else { return }
+
+isChecked.toggle()
+
+let newImage = UIImage(systemName: isChecked ? "checkmark" : "plus")
+doneButton.setImage(newImage, for: .normal)
+
+let baseColor = UIColor.fromCollectionColor(currentSelectedTracker?.color ?? .collectionBeige7) ?? .collectionBeige7
+let adjustedColor = isChecked ? lightenColor(baseColor, by: 0.3) : baseColor
+doneButtonContainer.backgroundColor = adjustedColor
+*/

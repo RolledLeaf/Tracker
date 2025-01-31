@@ -3,7 +3,7 @@
 import UIKit
 
 final class TrackersViewController: UIViewController, UICollectionViewDataSource, UICollectionViewDelegateFlowLayout, NewHabitViewControllerDelegate {
-
+    
     
     
     private let plusButton = UIButton()
@@ -11,11 +11,10 @@ final class TrackersViewController: UIViewController, UICollectionViewDataSource
     private let emptyFieldStarImage = UIImageView()
     private let emptyFieldLabel = UILabel()
     
-    var flatTrackers: [Tracker] = []
+    
     private var datePickerHeightConstraint: NSLayoutConstraint?
     var categories: [TrackerCategory] = []
-    var trackers: [Tracker] = []
-    var completedTrackers: [TrackerRecord]?
+    var trackerRecords: [TrackerRecord] = []
     var currentDate: Date = Date()
     var currentSelectedTracker: Tracker?
     
@@ -72,38 +71,50 @@ final class TrackersViewController: UIViewController, UICollectionViewDataSource
     override func viewDidLoad() {
         super.viewDidLoad()
         setupInitialUI()
-    
+        
         setupDefaultCategories()
-        flatTrackers = categories.flatMap { $0.tracker }
         reloadCategoryData()
         updateUI()
     }
     
     private func setupDefaultCategories() {
-            let defaultTracker1 = Tracker(id: 1, name: "Уборка", color: .collectionBlue3, emoji: "🙂", daysCount: 1, weekDays: ["Вт", "Ср", "Чт", "СБ"])
-            let defaultTracker2 = Tracker(id: 2, name: "Стирка", color: .collectionPink12, emoji: "😻", daysCount: 3, weekDays: ["Пт"])
-            let defaultTracker3 = Tracker(id: 3, name: "Зарядка", color: .collectionDarkPurple10, emoji: "❤️", daysCount: 4, weekDays: ["Сб"])
-            let defaultTraker4 = Tracker(id: 4, name: "Подготовка к сноуборду", color: .collectionViolet6, emoji: "😈", daysCount: 5, weekDays: ["Вт", "Ср", "Чт", "Пт", "Сб"])
-            let defaultTracker5 = Tracker(id: 5, name: "Подготовка лыжам", color: .collectionOrange2, emoji: "🥶", daysCount: 2, weekDays: ["Вт", "Пт", "Сб"])
-            let defaultTracker6 = Tracker(id: 6, name: "Работа в саду", color: .collectionGreen18, emoji: "🌺", daysCount: 2, weekDays: ["Вт", "Ср", "Чт", "Пт", "Сб"])
-            
-            let defaultCategory = TrackerCategory(title: "Стандартная", tracker: [defaultTracker1, defaultTracker2, defaultTracker3])
-            let newCategory = TrackerCategory(title: "Новая категория", tracker: [defaultTraker4, defaultTracker5, defaultTracker6])
-            
-            categories.append(defaultCategory)
-            categories.append(newCategory)
-        }
+        let defaultTracker1 = Tracker(id: 1, name: "Уборка", color: .collectionBlue3, emoji: "🙂", daysCount: 1, weekDays: ["Вт", "Ср", "Чт", "СБ"])
+        let defaultTracker2 = Tracker(id: 2, name: "Стирка", color: .collectionPink12, emoji: "😻", daysCount: 3, weekDays: ["Пт"])
+        let defaultTracker3 = Tracker(id: 3, name: "Зарядка", color: .collectionDarkPurple10, emoji: "❤️", daysCount: 4, weekDays: ["Сб"])
+        let defaultTraker4 = Tracker(id: 4, name: "Подготовка к сноуборду", color: .collectionViolet6, emoji: "😈", daysCount: 5, weekDays: ["Вт", "Ср", "Чт", "Пт", "Сб"])
+        let defaultTracker5 = Tracker(id: 5, name: "Подготовка лыжам", color: .collectionOrange2, emoji: "🥶", daysCount: 2, weekDays: ["Вт", "Пт", "Сб"])
+        let defaultTracker6 = Tracker(id: 6, name: "Работа в саду", color: .collectionGreen18, emoji: "🌺", daysCount: 2, weekDays: ["Вт", "Ср", "Чт", "Пт", "Сб"])
+        
+        let defaultCategory = TrackerCategory(title: "Стандартная", tracker: [defaultTracker1, defaultTracker2, defaultTracker3])
+        let newCategory = TrackerCategory(title: "Новая категория", tracker: [defaultTraker4, defaultTracker5, defaultTracker6])
+        
+        categories.append(defaultCategory)
+        categories.append(newCategory)
+    }
     
     func reloadCategoryData() {
-            // Ваш код для обновления UI, например, перезагрузка таблицы
+        // Ваш код для обновления UI, например, перезагрузка таблицы
         categoriesCollectionView.reloadData()
         
-        }
+    }
     
     private func currentDateFormatted() -> String {
         let formatter = DateFormatter()
         formatter.dateFormat = "dd.MM.yy"
         return formatter.string(from: Date())
+    }
+    
+    private func getDayWord(for count: Int) -> String {
+        let remainder10 = count % 10
+        let remainder100 = count % 100
+        
+        if remainder10 == 1 && remainder100 != 11 {
+            return "день"
+        } else if remainder10 >= 2 && remainder10 <= 4 && (remainder100 < 10 || remainder100 >= 20) {
+            return "дня"
+        } else {
+            return "дней"
+        }
     }
     
     
@@ -184,7 +195,7 @@ final class TrackersViewController: UIViewController, UICollectionViewDataSource
             categoriesCollectionView.trailingAnchor.constraint(equalTo: view.safeAreaLayoutGuide.trailingAnchor, constant: -16),
             categoriesCollectionView.topAnchor.constraint(equalTo: searchBar.bottomAnchor, constant: 34),
             categoriesCollectionView.heightAnchor.constraint(equalToConstant: 1200),
-        
+            
             
             plusButton.heightAnchor.constraint(equalToConstant: 19),
             plusButton.widthAnchor.constraint(equalToConstant: 18),
@@ -235,19 +246,107 @@ final class TrackersViewController: UIViewController, UICollectionViewDataSource
     }
     
     func didCreateTracker(_ tracker: Tracker) {
-          
-        trackers.append(tracker)
-            
+        
+        
+        
         categoriesCollectionView.reloadData()
-        }
+    }
     
 }
+
+extension TrackersViewController: TrackerCellDelegate {
+    func getTrackerByID(_ trackerID: Int) -> Tracker? {
+        for category in categories {
+            if let tracker = category.tracker.first(where: { $0.id == trackerID }) {
+                return tracker
+            }
+        }
+        return nil
+    }
+    
+    func trackerCell(_ cell: TrackerCategoryCell, didTapDoneButtonFor trackerID: Int) {
+        let currentDate = Date()
+        let calendar = Calendar.current
+
+        if let existingIndex = trackerRecords.firstIndex(where: { $0.trackerID == trackerID && calendar.isDate($0.date, inSameDayAs: currentDate) }) {
+            // Удаляем запись
+            trackerRecords.remove(at: existingIndex)
+            updateTrackerDaysCount(for: trackerID, isChecked: false)
+            print("Удалена запись для трекера \(trackerID)")
+            
+        } else {
+            // Добавляем новую запись
+            let newRecord = TrackerRecord(trackerID: trackerID, date: currentDate)
+            trackerRecords.append(newRecord)
+            print("Добавлена запись: \(newRecord)")
+            updateTrackerDaysCount(for: trackerID, isChecked: true)
+        }
+
+        // Определяем актуальное состояние (true — трекер активен, false — удалён)
+        let isChecked = trackerRecords.contains(where: { $0.trackerID == trackerID && calendar.isDate($0.date, inSameDayAs: currentDate) })
+
+        // Обновляем UI ячейки через модель данных
+        if let indexPath = categoriesCollectionView.indexPath(for: cell),
+           let tracker = getTrackerByID(trackerID) {
+
+            categoriesCollectionView.performBatchUpdates({
+                cell.doneButton.setImage(UIImage(systemName: isChecked ? "checkmark" : "plus"), for: .normal)
+                if let baseColor = UIColor.fromCollectionColor(tracker.color) {
+                    cell.doneButtonContainer.backgroundColor = isChecked ? lightenColor(baseColor, by: 0.3) : baseColor
+                } else {
+                    cell.doneButtonContainer.backgroundColor = .gray
+                }
+                cell.daysNumberLabel.text = "\(tracker.daysCount)" // Обновляем значение дней
+               }, completion: nil)
+        }
+    }
+    
+    private func updateTrackerDaysCount(for trackerID: Int, isChecked: Bool) {
+        if let categoryIndex = categories.firstIndex(where: { category in
+            category.tracker.contains(where: { $0.id == trackerID })
+        }) {
+            let category = categories[categoryIndex]
+            
+            if let trackerIndex = category.tracker.firstIndex(where: { $0.id == trackerID }) {
+                let tracker = category.tracker[trackerIndex]
+                
+                // Обновляем количество дней
+                let updatedDaysCount = tracker.daysCount + (isChecked ? 1 : -1)
+                
+                // Создаём новый обновлённый трекер
+                let updatedTracker = Tracker(
+                    id: tracker.id,
+                    name: tracker.name,
+                    color: tracker.color,
+                    emoji: tracker.emoji,
+                    daysCount: max(0, updatedDaysCount),
+                    weekDays: tracker.weekDays
+                )
+                
+                // Создаём новый массив трекеров с обновлённым трекером
+                var updatedTrackers = category.tracker
+                updatedTrackers[trackerIndex] = updatedTracker
+                
+                // Создаём новую категорию с обновлённым массивом трекеров
+                let updatedCategory = TrackerCategory(title: category.title, tracker: updatedTrackers)
+                
+                // Создаём новый массив категорий с обновлённой категорией
+                var updatedCategories = categories
+                updatedCategories[categoryIndex] = updatedCategory
+                
+                // Обновляем основной массив категорий
+                categories = updatedCategories
+            }
+        }
+    }
+}
+
 
 extension TrackersViewController {
     
     func numberOfSections(in collectionView: UICollectionView) -> Int {
-        print("Number of sections: \(categories.count)")
-       return categories.count
+        
+        return categories.count
     }
     
     func collectionView(_ collectionView: UICollectionView, numberOfItemsInSection section: Int) -> Int {
@@ -267,6 +366,7 @@ extension TrackersViewController {
         
         print("Выбран трекер: \(selectedTracker.name)")
         
+        
     }
     
     func collectionView(_ collectionView: UICollectionView, layout collectionViewLayout: UICollectionViewLayout, insetForSectionAt section: Int) -> UIEdgeInsets {
@@ -283,21 +383,21 @@ extension TrackersViewController {
         guard let cell = categoriesCollectionView.dequeueReusableCell(withReuseIdentifier: TrackerCategoryCell.reuseIdentifier, for: indexPath) as? TrackerCategoryCell else {
             return UICollectionViewCell()
         }
-        let category = categories[indexPath.section]
-            
-            // Извлекаем трекер из массива трекеров в категории
-            let tracker = category.tracker[indexPath.item]
-            
-            // Настраиваем ячейку с помощью трекера
-            cell.configure(with: tracker)
-            
-            return cell
         
+        let category = categories[indexPath.section]  // Получаем категорию для текущей секции
+        let tracker = category.tracker[indexPath.item]  // Получаем трекер из этой категории
+        
+        // Получаем записи для данного трекера
+        let trackerRecordsForTracker = trackerRecords.filter { $0.trackerID == tracker.id }
+        cell.delegate = self
+        // Настроим ячейку
+        cell.configure(with: tracker, trackerRecords: trackerRecordsForTracker)
+        
+        return cell
     }
     
-
+    
     func collectionView(_ collectionView: UICollectionView, viewForSupplementaryElementOfKind kind: String, at indexPath: IndexPath) -> UICollectionReusableView {
-        print("Requested supplementary view for kind: \(kind), section: \(indexPath.section)")
         guard kind == UICollectionView.elementKindSectionHeader,
               let header = collectionView.dequeueReusableSupplementaryView(
                 ofKind: kind,
@@ -312,7 +412,7 @@ extension TrackersViewController {
         
         return header
     }
-
+    
     
     func collectionView(_ collectionView: UICollectionView, layout collectionViewLayout: UICollectionViewLayout, referenceSizeForHeaderInSection section: Int) -> CGSize {
         return CGSize(width: 150, height: 18)
@@ -325,7 +425,7 @@ extension TrackersViewController {
         // Отступы (если они заданы в layout)
         let sectionInset = (collectionViewLayout as? UICollectionViewFlowLayout)?.sectionInset ?? .zero
         let minimumSpacing = (collectionViewLayout as? UICollectionViewFlowLayout)?.minimumInteritemSpacing ?? 0
-
+        
         // Доступное пространство для ячеек (убираем отступы секции)
         let availableWidth = collectionWidth - sectionInset.left - sectionInset.right
         

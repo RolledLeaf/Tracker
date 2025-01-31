@@ -17,6 +17,6 @@ struct TrackerCategory {
 }
 
 struct TrackerRecord {
-    let executedTracker: Tracker
+    let trackerID: Int
     let date: Date
 }
