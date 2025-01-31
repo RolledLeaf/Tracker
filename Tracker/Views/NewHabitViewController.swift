@@ -402,7 +402,6 @@ extension NewHabitViewController: ScheduleViewControllerDelegate {
 
 extension NewHabitViewController: CategoriesListViewControllerDelegate {
     func updateCategory(with category: String) {
-        // Обновляем subtitle для категории
         if let index = tableViewOptions.firstIndex(where: { $0.title == "Категория" }) {
             tableViewOptions[index].subtitle = category
         }

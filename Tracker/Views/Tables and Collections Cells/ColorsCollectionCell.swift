@@ -64,9 +64,7 @@ class ColorsCollectionViewCell: UICollectionViewCell {
         }
     }
     
-    private func adjustAlpha(_ color: UIColor, to alpha: CGFloat) -> UIColor {
-            return color.withAlphaComponent(alpha)
-        }
+
     
     // MARK: - Configuration Method
     
