@@ -1,7 +1,7 @@
 import UIKit
 
 protocol NewHabitViewControllerDelegate: AnyObject {
-    func didCreateTracker(_ tracker: Tracker)
+    func didCreateTracker(_ tracker: Tracker,_ category: TrackerCategory)
 }
 
 final class NewHabitViewController: UIViewController, UITableViewDelegate, UITableViewDataSource, UICollectionViewDataSource, UICollectionViewDelegateFlowLayout {
@@ -28,6 +28,15 @@ final class NewHabitViewController: UIViewController, UITableViewDelegate, UITab
         let paddingView = UIView(frame: CGRect(x: 0, y: 0, width: 16, height: textField.frame.height))
         textField.leftView = paddingView
         textField.leftViewMode = .always
+        
+        let toolbar = UIToolbar()
+            toolbar.sizeToFit()
+            
+            let flexSpace = UIBarButtonItem(barButtonSystemItem: .flexibleSpace, target: nil, action: nil)
+            let doneButton = UIBarButtonItem(title: "Готово", style: .done, target: textField, action: #selector(UIResponder.resignFirstResponder))
+            toolbar.items = [flexSpace, doneButton]
+            
+            textField.inputAccessoryView = toolbar
         
         return textField
     }()
@@ -375,8 +384,11 @@ final class NewHabitViewController: UIViewController, UITableViewDelegate, UITab
             daysCount: 0,
             weekDays: selectedWeekDays
         )
+        
+        let category = TrackerCategory(title: selectedCategory, tracker: [tracker])
+        
         let trackersVC = TrackersViewController()
-        delegate?.didCreateTracker(tracker)
+        delegate?.didCreateTracker(tracker, category)
         let navigationController = UINavigationController(rootViewController: trackersVC)
         present(navigationController, animated: true)
     }

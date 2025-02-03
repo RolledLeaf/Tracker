@@ -13,6 +13,7 @@ final class TrackersViewController: UIViewController, UICollectionViewDataSource
     
     
     private var datePickerHeightConstraint: NSLayoutConstraint?
+    
     var categories: [TrackerCategory] = []
     var filteredCategories: [TrackerCategory] = []
     var trackerRecords: [TrackerRecord] = []
@@ -38,7 +39,6 @@ final class TrackersViewController: UIViewController, UICollectionViewDataSource
         searchBar.searchBarStyle = .minimal
         searchBar.setImage(UIImage(systemName: "magnifyingglass"), for: .search, state: .normal)
         searchBar.layer.cornerRadius = 10
-        
         return searchBar
     }()
     
@@ -99,6 +99,15 @@ final class TrackersViewController: UIViewController, UICollectionViewDataSource
     func reloadCategoryData() {
         categoriesCollectionView.reloadData()
         
+    }
+    
+    //функциональность метода под вопросом
+    func didCreateTracker(_ tracker: Tracker, _ category: TrackerCategory) {
+        
+        categories.append(category)
+        
+        print("Вызван метод didCreateTracker и добавлена категория \(category)")
+        reloadCategoryData()
     }
     
     private func currentDateFormatted() -> String {
@@ -231,7 +240,7 @@ final class TrackersViewController: UIViewController, UICollectionViewDataSource
             trackersLabel.leadingAnchor.constraint(equalTo: view.safeAreaLayoutGuide.leadingAnchor, constant: 16),
             trackersLabel.topAnchor.constraint(equalTo: view.safeAreaLayoutGuide.topAnchor, constant: 44),
             
-            searchBar.widthAnchor.constraint(equalToConstant: 343),
+            searchBar.trailingAnchor.constraint(equalTo:view.safeAreaLayoutGuide.trailingAnchor, constant: -16),
             searchBar.heightAnchor.constraint(equalToConstant: 36),
             searchBar.leadingAnchor.constraint(equalTo: view.safeAreaLayoutGuide.leadingAnchor, constant: 16),
             searchBar.topAnchor.constraint(equalTo: trackersLabel.bottomAnchor, constant: 12),
@@ -254,6 +263,7 @@ final class TrackersViewController: UIViewController, UICollectionViewDataSource
         categoriesCollectionView.register(TrackerCategoryCell.self, forCellWithReuseIdentifier: TrackerCategoryCell.reuseIdentifier)
         
         categoriesCollectionView.delegate = self
+        searchBar.delegate = self
     }
     
     
@@ -266,12 +276,7 @@ final class TrackersViewController: UIViewController, UICollectionViewDataSource
         present(navigationController, animated: true)
     }
     
-    func didCreateTracker(_ tracker: Tracker) {
-        
-        
-        
-        categoriesCollectionView.reloadData()
-    }
+  
     
 }
 
@@ -317,6 +322,8 @@ extension TrackersViewController: TrackerCellDelegate {
                 } else {
                     cell.doneButtonContainer.backgroundColor = .gray
                 }
+                let daysCount = tracker.daysCount
+                cell.daysCountLabel.text = getDayWord(for: daysCount)
                 cell.daysNumberLabel.text = "\(tracker.daysCount)" // Обновляем значение дней
                }, completion: nil)
         }
@@ -457,5 +464,28 @@ extension TrackersViewController {
         let cellHeight: CGFloat = 148 // Например, фиксированная высота
         
         return CGSize(width: cellWidth, height: cellHeight)
+    }
+}
+
+extension TrackersViewController: UISearchBarDelegate {
+    func searchBar(_ searchBar: UISearchBar, textDidChange searchText: String) {
+        filterTrackers(for: searchText)
+    }
+    
+   
+    
+    private func filterTrackers(for searchText: String) {
+        if searchText.isEmpty {
+            filteredCategories = categories // Если строка пустая, показываем все
+        } else {
+            filteredCategories = categories.compactMap { category in
+                let filteredTrackers = category.tracker.filter { tracker in
+                    tracker.name.lowercased().contains(searchText.lowercased())
+                }
+                return filteredTrackers.isEmpty ? nil : TrackerCategory(title: category.title, tracker: filteredTrackers)
+            }
+        }
+        
+        categoriesCollectionView.reloadData()
     }
 }
