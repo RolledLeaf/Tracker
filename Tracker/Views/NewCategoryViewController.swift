@@ -29,13 +29,12 @@ final class NewCategoryViewController: UIViewController {
         textField.leftViewMode = .always
         
         let toolbar = UIToolbar()
-            toolbar.sizeToFit()
-            
-            let flexSpace = UIBarButtonItem(barButtonSystemItem: .flexibleSpace, target: nil, action: nil)
-            let doneButton = UIBarButtonItem(title: "Готово", style: .done, target: textField, action: #selector(UIResponder.resignFirstResponder))
-            toolbar.items = [flexSpace, doneButton]
-            
-            textField.inputAccessoryView = toolbar
+        toolbar.sizeToFit()
+        let flexSpace = UIBarButtonItem(barButtonSystemItem: .flexibleSpace, target: nil, action: nil)
+        let doneButton = UIBarButtonItem(title: "Готово", style: .done, target: textField, action: #selector(UIResponder.resignFirstResponder))
+        toolbar.items = [flexSpace, doneButton]
+        
+        textField.inputAccessoryView = toolbar
         return textField
     }()
     
@@ -80,7 +79,7 @@ final class NewCategoryViewController: UIViewController {
             doneButton.trailingAnchor.constraint(equalTo: view.trailingAnchor, constant: -20),
             doneButton.heightAnchor.constraint(equalToConstant: 60),
             doneButton.bottomAnchor.constraint(equalTo: view.safeAreaLayoutGuide.bottomAnchor, constant: -16)
-            ])
+        ])
     }
     
     @objc func doneButtonTapped() {

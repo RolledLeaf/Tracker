@@ -192,14 +192,3 @@ final class TrackerCategoryCell: UICollectionViewCell {
     }
 }
 
-/* guard let currentTracker = currentSelectedTracker else { return }
-
-isChecked.toggle()
-
-let newImage = UIImage(systemName: isChecked ? "checkmark" : "plus")
-doneButton.setImage(newImage, for: .normal)
-
-let baseColor = UIColor.fromCollectionColor(currentSelectedTracker?.color ?? .collectionBeige7) ?? .collectionBeige7
-let adjustedColor = isChecked ? lightenColor(baseColor, by: 0.3) : baseColor
-doneButtonContainer.backgroundColor = adjustedColor
-*/

@@ -39,6 +39,18 @@ final class TrackersViewController: UIViewController, UICollectionViewDataSource
         searchBar.searchBarStyle = .minimal
         searchBar.setImage(UIImage(systemName: "magnifyingglass"), for: .search, state: .normal)
         searchBar.layer.cornerRadius = 10
+        
+        let toolbar = UIToolbar()
+        toolbar.sizeToFit()
+        let flexSpace = UIBarButtonItem(barButtonSystemItem: .flexibleSpace, target: nil, action: nil)
+        let doneButton = if #available(iOS 15.0, *) {
+            UIBarButtonItem(image: UIImage(systemName: "keyboard.chevron.compact.down"), style: .done, target: searchBar, action: #selector(UIResponder.resignFirstResponder)) }
+        else {
+            UIBarButtonItem(image: UIImage(systemName: "keyboard"), style: .done, target: searchBar, action: #selector(UIResponder.resignFirstResponder))
+        }
+        toolbar.items = [flexSpace, doneButton]
+        
+        searchBar.inputAccessoryView = toolbar
         return searchBar
     }()
     
@@ -103,10 +115,25 @@ final class TrackersViewController: UIViewController, UICollectionViewDataSource
     
     //функциональность метода под вопросом
     func didCreateTracker(_ tracker: Tracker, _ category: TrackerCategory) {
+        // Ищем индекс существующей категории
+        if let existingCategoryIndex = categories.firstIndex(where: { $0.title == category.title }) {
+            let existingCategory = categories[existingCategoryIndex]
+            
+            // Проверяем, есть ли уже такой трекер в категории
+            if !existingCategory.tracker.contains(where: { $0.name == tracker.name }) {
+                // Создаём новую категорию с обновлённым массивом трекеров
+                let updatedCategory = TrackerCategory(title: existingCategory.title, tracker: existingCategory.tracker + [tracker])
+                categories[existingCategoryIndex] = updatedCategory
+                print("Добавлен новый трекер \(tracker.name) в существующую категорию \(category.title)")
+            } else {
+                print("Трекер \(tracker.name) уже существует в категории \(category.title), не добавляем повторно.")
+            }
+        } else {
+            // Если категории нет, добавляем новую
+            categories.append(category)
+            print("Создана новая категория \(category.title) и добавлен трекер \(tracker.name)")
+        }
         
-        categories.append(category)
-        
-        print("Вызван метод didCreateTracker и добавлена категория \(category)")
         reloadCategoryData()
     }
     
@@ -130,7 +157,26 @@ final class TrackersViewController: UIViewController, UICollectionViewDataSource
         categoriesCollectionView.reloadData()
     }
     
+    private func filterCategoryByDate(_ category: TrackerCategory) -> TrackerCategory? {
+        let selectedWeekday = getSelectedWeekday() // Получаем текущий день недели в нужном формате
+        
+        let filteredTrackers = category.tracker.filter { tracker in
+            tracker.weekDays.contains(selectedWeekday)
+        }
+        
+        return filteredTrackers.isEmpty ? nil : TrackerCategory(title: category.title, tracker: filteredTrackers)
+    }
+    
+    private func getSelectedWeekday() -> String {
+        let formatter = DateFormatter()
+        formatter.locale = Locale.current // Учитываем локализацию системы
+        formatter.dateFormat = "E" // "E" означает сокращенное название дня недели ("Mon", "Вт", "Paz")
+        
+        return formatter.string(from: datePicker.date)
+    }
+    
     @objc private func datePickerValueChanged(_ sender: UIDatePicker) {
+        
         updateVisibleTrackers(for: sender.date)
     }
     
@@ -295,7 +341,7 @@ extension TrackersViewController: TrackerCellDelegate {
         let calendar = Calendar.current
 
         if let existingIndex = trackerRecords.firstIndex(where: { $0.trackerID == trackerID && calendar.isDate($0.date, inSameDayAs: currentDate) }) {
-            // Удаляем запись
+            // Удаляем записьGh
             trackerRecords.remove(at: existingIndex)
             updateTrackerDaysCount(for: trackerID, isChecked: false)
             print("Удалена запись для трекера \(trackerID)")
@@ -472,13 +518,16 @@ extension TrackersViewController: UISearchBarDelegate {
         filterTrackers(for: searchText)
     }
     
-   
+    func searchBarSearchButtonClicked(_ searchBar: UISearchBar) {
+           searchBar.resignFirstResponder() // Скрываем клавиатуру
+       }
     
     private func filterTrackers(for searchText: String) {
+        let dateFilteredCategories = categories.compactMap { filterCategoryByDate($0) }
         if searchText.isEmpty {
-            filteredCategories = categories // Если строка пустая, показываем все
+            filteredCategories = categories.compactMap {filterCategoryByDate($0)}
         } else {
-            filteredCategories = categories.compactMap { category in
+            filteredCategories = dateFilteredCategories.compactMap { category in
                 let filteredTrackers = category.tracker.filter { tracker in
                     tracker.name.lowercased().contains(searchText.lowercased())
                 }

@@ -389,8 +389,10 @@ final class NewHabitViewController: UIViewController, UITableViewDelegate, UITab
         
         let trackersVC = TrackersViewController()
         delegate?.didCreateTracker(tracker, category)
+        self.view.window?.rootViewController?.dismiss(animated: true, completion: nil)
         let navigationController = UINavigationController(rootViewController: trackersVC)
         present(navigationController, animated: true)
+  
     }
     
     @objc private func cancelButtonTapped(_ sender: UIButton) {
