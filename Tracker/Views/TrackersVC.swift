@@ -13,6 +13,7 @@ final class TrackersViewController: UIViewController, UICollectionViewDataSource
     
     
     private var datePickerHeightConstraint: NSLayoutConstraint?
+    private var categoriesCollectionViewHeight: NSLayoutConstraint?
     
     var categories: [TrackerCategory] = []
     var filteredCategories: [TrackerCategory] = []
@@ -20,7 +21,7 @@ final class TrackersViewController: UIViewController, UICollectionViewDataSource
     var currentDate: Date = Date()
     var currentSelectedTracker: Tracker?
     
-    
+   
     
     private let categoriesCollectionView: UICollectionView = {
         let layout = UICollectionViewFlowLayout()
@@ -265,12 +266,13 @@ final class TrackersViewController: UIViewController, UICollectionViewDataSource
             ])
         }
         
+        
         NSLayoutConstraint.activate([
             
             categoriesCollectionView.leadingAnchor.constraint(equalTo: view.safeAreaLayoutGuide.leadingAnchor, constant: 16),
             categoriesCollectionView.trailingAnchor.constraint(equalTo: view.safeAreaLayoutGuide.trailingAnchor, constant: -16),
             categoriesCollectionView.topAnchor.constraint(equalTo: searchBar.bottomAnchor, constant: 34),
-            categoriesCollectionView.heightAnchor.constraint(equalToConstant: 1200),
+            categoriesCollectionView.bottomAnchor.constraint(equalTo: view.bottomAnchor, constant: -50),
             
             
             plusButton.heightAnchor.constraint(equalToConstant: 19),
@@ -326,7 +328,7 @@ final class TrackersViewController: UIViewController, UICollectionViewDataSource
     
 }
 
-extension TrackersViewController: TrackerCellDelegate {
+extension TrackersViewController: TrackerCategoryCellDelegate {
     func getTrackerByID(_ trackerID: Int) -> Tracker? {
         for category in categories {
             if let tracker = category.tracker.first(where: { $0.id == trackerID }) {
@@ -336,44 +338,44 @@ extension TrackersViewController: TrackerCellDelegate {
         return nil
     }
     
-    func trackerCell(_ cell: TrackerCategoryCell, didTapDoneButtonFor trackerID: Int) {
-        let currentDate = Date()
-        let calendar = Calendar.current
+    func trackerCell(_ cell: TrackerCategoryCell, didTapDoneButtonFor trackerID: Int, selectedDate: Date) {
+            let calendar = Calendar.current
 
-        if let existingIndex = trackerRecords.firstIndex(where: { $0.trackerID == trackerID && calendar.isDate($0.date, inSameDayAs: currentDate) }) {
-            // Удаляем записьGh
-            trackerRecords.remove(at: existingIndex)
-            updateTrackerDaysCount(for: trackerID, isChecked: false)
-            print("Удалена запись для трекера \(trackerID)")
-            
-        } else {
-            // Добавляем новую запись
-            let newRecord = TrackerRecord(trackerID: trackerID, date: currentDate)
-            trackerRecords.append(newRecord)
-            print("Добавлена запись: \(newRecord)")
-            updateTrackerDaysCount(for: trackerID, isChecked: true)
+            if let existingIndex = trackerRecords.firstIndex(where: { $0.trackerID == trackerID && calendar.isDate($0.date, inSameDayAs: selectedDate) }) {
+                // Удаляем запись для выбранной даты
+                trackerRecords.remove(at: existingIndex)
+                updateTrackerDaysCount(for: trackerID, isChecked: false)
+                print("Удалена запись для трекера \(trackerID) на \(selectedDate)")
+            } else {
+                // Добавляем запись для выбранной даты
+                let newRecord = TrackerRecord(trackerID: trackerID, date: selectedDate)
+                trackerRecords.append(newRecord)
+                print("Добавлена запись для трекера \(trackerID) на \(selectedDate)")
+                updateTrackerDaysCount(for: trackerID, isChecked: true)
+            }
+
+            // Обновляем UI ячейки с учётом выбранной даты
+            if let indexPath = categoriesCollectionView.indexPath(for: cell),
+               let tracker = getTrackerByID(trackerID) {
+
+                categoriesCollectionView.performBatchUpdates({
+                    let isChecked = trackerRecords.contains(where: { $0.trackerID == trackerID && calendar.isDate($0.date, inSameDayAs: selectedDate) })
+                    
+                    // Обновляем картинку кнопки и цвета
+                    cell.doneButton.setImage(UIImage(systemName: isChecked ? "checkmark" : "plus"), for: .normal)
+                    if let baseColor = UIColor.fromCollectionColor(tracker.color) {
+                        cell.doneButtonContainer.backgroundColor = isChecked ? lightenColor(baseColor, by: 0.3) : baseColor
+                    } else {
+                        cell.doneButtonContainer.backgroundColor = .gray
+                    }
+                    
+                    // Обновляем лейблы с учётом дня
+                    let daysCount = tracker.daysCount
+                    cell.daysCountLabel.text = getDayWord(for: daysCount)
+                    cell.daysNumberLabel.text = "\(tracker.daysCount)" // Обновляем значение дней
+                }, completion: nil)
+            }
         }
-
-        // Определяем актуальное состояние (true — трекер активен, false — удалён)
-        let isChecked = trackerRecords.contains(where: { $0.trackerID == trackerID && calendar.isDate($0.date, inSameDayAs: currentDate) })
-
-        // Обновляем UI ячейки через модель данных
-        if let indexPath = categoriesCollectionView.indexPath(for: cell),
-           let tracker = getTrackerByID(trackerID) {
-
-            categoriesCollectionView.performBatchUpdates({
-                cell.doneButton.setImage(UIImage(systemName: isChecked ? "checkmark" : "plus"), for: .normal)
-                if let baseColor = UIColor.fromCollectionColor(tracker.color) {
-                    cell.doneButtonContainer.backgroundColor = isChecked ? lightenColor(baseColor, by: 0.3) : baseColor
-                } else {
-                    cell.doneButtonContainer.backgroundColor = .gray
-                }
-                let daysCount = tracker.daysCount
-                cell.daysCountLabel.text = getDayWord(for: daysCount)
-                cell.daysNumberLabel.text = "\(tracker.daysCount)" // Обновляем значение дней
-               }, completion: nil)
-        }
-    }
     
     private func updateTrackerDaysCount(for trackerID: Int, isChecked: Bool) {
         if let categoryIndex = categories.firstIndex(where: { category in

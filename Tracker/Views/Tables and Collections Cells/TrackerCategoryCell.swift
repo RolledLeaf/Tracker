@@ -1,11 +1,11 @@
 import UIKit
 
-    protocol TrackerCellDelegate: AnyObject {
-        func trackerCell(_ cell: TrackerCategoryCell, didTapDoneButtonFor trackerID: Int)
-    }
+protocol TrackerCategoryCellDelegate: AnyObject {
+    func trackerCell(_ cell: TrackerCategoryCell, didTapDoneButtonFor trackerID: Int, selectedDate: Date)
+}
 
 final class TrackerCategoryCell: UICollectionViewCell {
-    weak var delegate: TrackerCellDelegate?
+    weak var delegate: TrackerCategoryCellDelegate?
     
     static let reuseIdentifier = "TrackerCategoryCell"
     
@@ -181,14 +181,21 @@ final class TrackerCategoryCell: UICollectionViewCell {
     
     
     @objc func doneButtonTapped() {
-       
-        // Передаём в делегат изменения
-        guard let trackerID = trackerID else {
+           // Получаем ID трекера из ячейки
+           guard let trackerID = trackerID else {
                print("Tracker ID is missing!")
                return
            }
+           
+           // Здесь передаем дату, используя какой-то механизм для получения значения даты (например, переданный из контроллера)
+           guard let selectedDate = currentDate as? Date else {
+               print("Date Picker is not set!")
+               return
+           }
+        
 
-           delegate?.trackerCell(self, didTapDoneButtonFor: trackerID)
+           // Передаем событие в делегат
+           delegate?.trackerCell(self, didTapDoneButtonFor: trackerID, selectedDate: selectedDate)
+       }
     }
-}
 
