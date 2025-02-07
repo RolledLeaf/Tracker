@@ -56,29 +56,20 @@ final class CategoriesListViewController: UIViewController, UITableViewDataSourc
         return button
     }()
     
-    private let scrollView: UIScrollView = {
-        let scrollView = UIScrollView()
-        scrollView.translatesAutoresizingMaskIntoConstraints = false
-        scrollView.showsVerticalScrollIndicator = false
-        scrollView.backgroundColor = .clear
-        return scrollView
-    }()
-
-    private let contentStackView: UIStackView = {
-        let stackView = UIStackView()
-        stackView.axis = .vertical
-        stackView.spacing = 16
-        stackView.translatesAutoresizingMaskIntoConstraints = false
-        return stackView
-    }()
+    let scrollView = UIScrollView()
+    let contentView = UIView()
     
     private let categoriesKey = "categoriesListKey"
     
     private var tableHeightConstraint: NSLayoutConstraint?
+    private var contentViewHeightConstraint: NSLayoutConstraint?
     
-    var categoriesList: [String] = []
-    var tableHeight: CGFloat {
+    private var categoriesList: [String] = []
+    private var tableHeight: CGFloat {
         return 75
+    }
+    private var contentViewHeight: CGFloat {
+        return  260
     }
     
     override func viewDidLoad() {
@@ -89,14 +80,13 @@ final class CategoriesListViewController: UIViewController, UITableViewDataSourc
         
     }
     
-    
-    
     private func updateUI() {
         let isEmpty = categoriesList.isEmpty
         emptyFieldLabel.isHidden = !isEmpty
         emptyFieldStarImage.isHidden = !isEmpty
         categoriesListTableView.isHidden = isEmpty
         updateTableHeight()
+        updateContentViewHeight()
     }
     
     
@@ -108,25 +98,27 @@ final class CategoriesListViewController: UIViewController, UITableViewDataSourc
         stackView.spacing = 8
         
         
-        let uiElements = [titleLabel, emptyFieldLabel, emptyFieldStarImage, categoriesListTableView, addCategoryButton]
+        let uiElements = [titleLabel, emptyFieldLabel, emptyFieldStarImage, categoriesListTableView]
         uiElements.forEach { $0.translatesAutoresizingMaskIntoConstraints = false }
-        
+       
         view.addSubview(scrollView)
-        scrollView.addSubview(contentStackView)
-        uiElements.forEach { contentStackView.addSubview($0) }
         
+        scrollView.addSubview(contentView)
+        uiElements.forEach { contentView.addSubview($0) }
+        view.addSubview(addCategoryButton)
+        
+        addCategoryButton.translatesAutoresizingMaskIntoConstraints = false
         scrollView.translatesAutoresizingMaskIntoConstraints = false
-        contentStackView.translatesAutoresizingMaskIntoConstraints = false
+        contentView.translatesAutoresizingMaskIntoConstraints = false
         
-        categoriesListTableView.dataSource = self
-        categoriesListTableView.delegate = self
-        
+       
         categoriesListTableView.register(CategoriesListTableCell.self, forCellReuseIdentifier: CategoriesListTableCell.identifier)
         
         let tableHeightConstraint = categoriesListTableView.heightAnchor.constraint(equalToConstant: tableHeight)
            self.tableHeightConstraint = tableHeightConstraint
         
-        contentStackView.heightAnchor.constraint(greaterThanOrEqualTo: scrollView.heightAnchor).isActive = true
+        let contentViewHeightConstraint = contentView.heightAnchor.constraint(equalToConstant: contentViewHeight)
+        self.contentViewHeightConstraint = contentViewHeightConstraint
         
         NSLayoutConstraint.activate([
             // Настройка scrollView
@@ -134,47 +126,51 @@ final class CategoriesListViewController: UIViewController, UITableViewDataSourc
             scrollView.leadingAnchor.constraint(equalTo: view.leadingAnchor),
             scrollView.trailingAnchor.constraint(equalTo: view.trailingAnchor),
             scrollView.bottomAnchor.constraint(equalTo: view.bottomAnchor),
+            
 
             // Настройка contentStackView
-            contentStackView.topAnchor.constraint(equalTo: scrollView.topAnchor),
-            contentStackView.leadingAnchor.constraint(equalTo: scrollView.leadingAnchor),
-            contentStackView.trailingAnchor.constraint(equalTo: scrollView.trailingAnchor),
-            contentStackView.bottomAnchor.constraint(equalTo: scrollView.bottomAnchor),
-            contentStackView.widthAnchor.constraint(equalTo: scrollView.widthAnchor),
-            contentStackView.heightAnchor.constraint(greaterThanOrEqualTo: scrollView.heightAnchor), // Устанавливаем минимальную высоту
+            contentView.topAnchor.constraint(equalTo: scrollView.topAnchor),
+            contentView.leadingAnchor.constraint(equalTo: scrollView.leadingAnchor),
+            contentView.trailingAnchor.constraint(equalTo: scrollView.trailingAnchor),
+            contentView.bottomAnchor.constraint(equalTo: scrollView.bottomAnchor),
+            contentView.widthAnchor.constraint(equalTo: scrollView.widthAnchor),
+            contentViewHeightConstraint,
+            
 
             // Настройка titleLabel
-            titleLabel.centerXAnchor.constraint(equalTo: contentStackView.centerXAnchor),
-            titleLabel.topAnchor.constraint(equalTo: contentStackView.topAnchor, constant: 20),
+            titleLabel.centerXAnchor.constraint(equalTo: contentView.centerXAnchor),
+            titleLabel.topAnchor.constraint(equalTo: contentView.topAnchor, constant: 20),
             titleLabel.widthAnchor.constraint(equalToConstant: 200),
             titleLabel.heightAnchor.constraint(equalToConstant: 40),
 
             // Настройка categoriesListTableView
-            categoriesListTableView.trailingAnchor.constraint(equalTo: contentStackView.trailingAnchor, constant: -16),
-            categoriesListTableView.leadingAnchor.constraint(equalTo: contentStackView.leadingAnchor, constant: 16),
+            categoriesListTableView.trailingAnchor.constraint(equalTo: contentView.trailingAnchor, constant: -16),
+            categoriesListTableView.leadingAnchor.constraint(equalTo: contentView.leadingAnchor, constant: 16),
             categoriesListTableView.topAnchor.constraint(equalTo: titleLabel.bottomAnchor, constant: 24),
             categoriesListTableView.widthAnchor.constraint(equalToConstant: 343),
             tableHeightConstraint,
 
             // Настройка emptyFieldStarImage
-            emptyFieldStarImage.centerXAnchor.constraint(equalTo: contentStackView.centerXAnchor),
+            emptyFieldStarImage.centerXAnchor.constraint(equalTo: contentView.centerXAnchor),
             emptyFieldStarImage.topAnchor.constraint(equalTo: titleLabel.bottomAnchor, constant: 232),
             emptyFieldStarImage.heightAnchor.constraint(equalToConstant: 80),
             emptyFieldStarImage.widthAnchor.constraint(equalToConstant: 80),
 
             // Настройка emptyFieldLabel
             emptyFieldLabel.topAnchor.constraint(equalTo: emptyFieldStarImage.bottomAnchor, constant: 8),
-            emptyFieldLabel.centerXAnchor.constraint(equalTo: contentStackView.centerXAnchor),
+            emptyFieldLabel.centerXAnchor.constraint(equalTo: contentView.centerXAnchor),
             emptyFieldLabel.widthAnchor.constraint(equalToConstant: 343),
             emptyFieldLabel.heightAnchor.constraint(equalToConstant: 72),
 
             // Настройка addCategoryButton
-            addCategoryButton.leadingAnchor.constraint(equalTo: contentStackView.leadingAnchor, constant: 20),
-            addCategoryButton.trailingAnchor.constraint(equalTo: contentStackView.trailingAnchor, constant: -20),
+            addCategoryButton.leadingAnchor.constraint(equalTo: view.leadingAnchor, constant: 20),
+            addCategoryButton.trailingAnchor.constraint(equalTo: view.trailingAnchor, constant: -20),
             addCategoryButton.heightAnchor.constraint(equalToConstant: 60),
              // Исправление привязки
-            addCategoryButton.bottomAnchor.constraint(equalTo: view.bottomAnchor, constant: -45) // Привязываем к contentStackView
+            addCategoryButton.bottomAnchor.constraint(equalTo: view.safeAreaLayoutGuide.bottomAnchor, constant: -16) // Привязываем к contentStackView
         ])
+        categoriesListTableView.dataSource = self
+        categoriesListTableView.delegate = self
         
         
     }
@@ -185,6 +181,15 @@ final class CategoriesListViewController: UIViewController, UITableViewDataSourc
         tableHeightConstraint?.constant = newHeight
         view.layoutIfNeeded()
         print("Table height updated to \(newHeight)")// Применяем изменения макета
+    }
+    
+    
+    func updateContentViewHeight() {
+        let rowHeight: CGFloat = contentViewHeight
+        let newHeight = rowHeight + CGFloat(tableHeightConstraint?.constant ?? 500)
+        contentViewHeightConstraint?.constant = newHeight
+        view.layoutIfNeeded()
+        print("Content view height updated to \(newHeight)")
     }
     
     @objc private func addCategoryButtonTapped() {

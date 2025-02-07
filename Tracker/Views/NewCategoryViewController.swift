@@ -27,7 +27,7 @@ final class NewCategoryViewController: UIViewController {
         let paddingView = UIView(frame: CGRect(x: 0, y: 0, width: 16, height: textField.frame.height))
         textField.leftView = paddingView
         textField.leftViewMode = .always
-        
+        textField.clearButtonMode = .whileEditing
         let toolbar = UIToolbar()
         toolbar.sizeToFit()
         let flexSpace = UIBarButtonItem(barButtonSystemItem: .flexibleSpace, target: nil, action: nil)
