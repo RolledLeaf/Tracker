@@ -341,7 +341,8 @@ final class NewHabitViewController: UIViewController, UITableViewDelegate, UITab
     
     func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
         guard let cell = tableView.dequeueReusableCell(withIdentifier: CategoryAndScheduleTableViewCell.identifier, for: indexPath) as? CategoryAndScheduleTableViewCell else {
-            fatalError("Unable to dequeue CategoryAndScheduleTableViewCell")
+            print("Unable to dequeue cell")
+            return UITableViewCell()
         }
         cell.configure(with: tableViewOptions[indexPath.row])
         return cell

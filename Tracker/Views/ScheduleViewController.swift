@@ -114,6 +114,7 @@ final class ScheduleViewController: UIViewController, UITableViewDelegate, UITab
                 let isOn = selectedWeekDays.contains(day)  // Проверяем, выбран ли день
                 cell.configure(with: day, isOn: isOn)
                 cell.delegate = self
+        cell.selectionStyle = .none
                 return cell
     }
     

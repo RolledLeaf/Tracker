@@ -14,14 +14,20 @@ final class TrackersViewController: UIViewController, UICollectionViewDataSource
     
     private var datePickerHeightConstraint: NSLayoutConstraint?
     private var categoriesCollectionViewHeight: NSLayoutConstraint?
+    private var selectedDate: Date = Date()
     
     var categories: [TrackerCategory] = []
     var filteredCategories: [TrackerCategory] = []
     var trackerRecords: [TrackerRecord] = []
-    var currentDate: Date = Date()
     var currentSelectedTracker: Tracker?
+    var currentDate: Date = Date()
     
    
+    private let dateFormatter: DateFormatter = {
+        let formatter = DateFormatter()
+        formatter.dateFormat = "dd.MM.yy"
+        return formatter
+    }()
     
     private let categoriesCollectionView: UICollectionView = {
         let layout = UICollectionViewFlowLayout()
@@ -79,6 +85,7 @@ final class TrackersViewController: UIViewController, UICollectionViewDataSource
         picker.isHidden = true // Скрыт по умолчанию
         picker.addTarget(self, action: #selector(dateChanged(_:)), for: .valueChanged)
         picker.backgroundColor = UIColor.custom(.backgroundGray)
+        
         return picker
     }()
     
@@ -138,11 +145,6 @@ final class TrackersViewController: UIViewController, UICollectionViewDataSource
         reloadCategoryData()
     }
     
-    private func currentDateFormatted() -> String {
-        let formatter = DateFormatter()
-        formatter.dateFormat = "dd.MM.yy"
-        return formatter.string(from: Date())
-    }
     
     private func updateVisibleTrackers(for selectedDate: Date) {
         let calendar = Calendar.current
@@ -194,19 +196,32 @@ final class TrackersViewController: UIViewController, UICollectionViewDataSource
         }
     }
     
+    func getSelectedDate() -> Date {
+            return selectedDate
+        }
+    
+    func getFormattedDate() -> String {
+            return dateFormatter.string(from: selectedDate)
+        }
+    
+    private func currentDateFormatted() -> String {
+        let formatter = dateFormatter
+       
+        return formatter.string(from: currentDate)
+    }
     
     @objc private func dateChanged(_ sender: UIDatePicker) {
-        let formatter = DateFormatter()
-        formatter.dateFormat = "dd.MM.yy"
-        let selectedDate = formatter.string(from: sender.date)
-        dateButton.setTitle(selectedDate, for: .normal)
-        // После выбора скрываем календарь
+        selectedDate = sender.date
+        let formattedDate = dateFormatter.string(from: sender.date)
+        dateButton.setTitle(formattedDate, for: .normal)
+
         UIView.animate(withDuration: 0.3, animations: {
             self.datePickerHeightConstraint?.constant = 0 // Убираем высоту
             self.view.layoutIfNeeded() // Перестраиваем интерфейс
         }, completion: { _ in
             self.datePicker.isHidden = true // Скрываем календарь
         })
+        categoriesCollectionView.reloadData()
     }
     
     
@@ -466,6 +481,7 @@ extension TrackersViewController {
         // Получаем записи для данного трекера
         let trackerRecordsForTracker = trackerRecords.filter { $0.trackerID == tracker.id }
         cell.delegate = self
+        cell.viewController = self
         // Настроим ячейку
         cell.configure(with: tracker, trackerRecords: trackerRecordsForTracker)
         

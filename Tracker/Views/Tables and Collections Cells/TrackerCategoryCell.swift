@@ -6,12 +6,15 @@ protocol TrackerCategoryCellDelegate: AnyObject {
 
 final class TrackerCategoryCell: UICollectionViewCell {
     weak var delegate: TrackerCategoryCellDelegate?
+    weak var viewController: TrackersViewController?
     
     static let reuseIdentifier = "TrackerCategoryCell"
     
     var currentSelectedTracker: Tracker?
     var trackerID: Int?
     var currentDate: Date = Date()
+    
+    
     
     let habbitLabel: UILabel = {
         let label = UILabel()
@@ -188,7 +191,7 @@ final class TrackerCategoryCell: UICollectionViewCell {
            }
            
            // Здесь передаем дату, используя какой-то механизм для получения значения даты (например, переданный из контроллера)
-           guard let selectedDate = currentDate as? Date else {
+           guard let selectedDate = viewController?.getSelectedDate() else {
                print("Date Picker is not set!")
                return
            }
