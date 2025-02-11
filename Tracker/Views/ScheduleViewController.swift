@@ -53,6 +53,17 @@ final class ScheduleViewController: UIViewController, UITableViewDelegate, UITab
         "Воскресенье": "Sun"
     ]
     
+    // russian days = ["Пн", "Вт", "Ср", "Чт", "Пт", "Сб", "Вск"]
+    
+    /* словарь = "Понедельник": "Mon",
+    "Вторник": "Tue",
+    "Среда": "Wed",
+    "Четверг": "Thu",
+    "Пятница": "Fri",
+    "Суббота": "Sat",
+    "Воскресенье": "Sun"
+    */
+    
     private var selectedWeekDays: [String] = []
     private var tempSelectedWeekDays: [String] = []
     

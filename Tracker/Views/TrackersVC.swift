@@ -140,10 +140,11 @@ final class TrackersViewController: UIViewController, UICollectionViewDataSource
             // Если категории нет, добавляем новую
             categories.append(category)
             print("Создана новая категория \(category.title) и добавлен трекер \(tracker.name)")
+            reloadCategoryData()
+            updateUI()
         }
         
-        reloadCategoryData()
-        updateUI()
+        
     }
     
     

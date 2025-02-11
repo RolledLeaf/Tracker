@@ -485,24 +485,28 @@ final class NewHabitViewController: UIViewController, UITableViewDelegate, UITab
 extension NewHabitViewController: ScheduleViewControllerDelegate {
     func updateSubtitle(for title: String, with subtitle: String?) {
         if let index = tableViewOptions.firstIndex(where: { $0.title == title }) {
-               tableViewOptions[index].subtitle = subtitle
+            tableViewOptions[index].subtitle = subtitle
             categoryAndScheduleTableView.reloadData()
-           }
+        }
         if title == "Расписание", let subtitle = subtitle {
-                    selectedWeekDays = subtitle.split(separator: ",").map { $0.trimmingCharacters(in: .whitespaces) }
-                }
+            if subtitle == "Ежедневно" {
+                selectedWeekDays = ["Mon", "Tue", "Wed", "Thu", "Fri", "Sat", "Sun"]
+            } else {
+                selectedWeekDays = subtitle.split(separator: ",").map { $0.trimmingCharacters(in: .whitespaces) }
             }
         }
-
-extension NewHabitViewController: CategoriesListViewControllerDelegate {
-    func updateCategory(with category: String) {
-        if let index = tableViewOptions.firstIndex(where: { $0.title == "Категория" }) {
-            tableViewOptions[index].subtitle = category
-        }
-
-        // Сохраняем выбранную категорию
-        selectedCategory = category
-
-        categoryAndScheduleTableView.reloadData()
     }
 }
+    extension NewHabitViewController: CategoriesListViewControllerDelegate {
+        func updateCategory(with category: String) {
+            if let index = tableViewOptions.firstIndex(where: { $0.title == "Категория" }) {
+                tableViewOptions[index].subtitle = category
+            }
+            
+            // Сохраняем выбранную категорию
+            selectedCategory = category
+            
+            categoryAndScheduleTableView.reloadData()
+        }
+    }
+
