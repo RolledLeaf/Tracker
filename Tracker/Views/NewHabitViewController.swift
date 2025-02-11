@@ -93,6 +93,7 @@ final class NewHabitViewController: UIViewController, UITableViewDelegate, UITab
         button.setTitle("Создать", for: .normal)
         button.titleLabel?.font = UIFont.systemFont(ofSize: 16, weight: .medium)
         button.setTitleColor(.white, for: .normal)
+        
         button.backgroundColor = UIColor.custom(.textFieldGray)
         button.layer.cornerRadius = 16
         button.addTarget(self, action: #selector(createTrackerButtonTapped), for: .touchUpInside)
@@ -112,25 +113,51 @@ final class NewHabitViewController: UIViewController, UITableViewDelegate, UITab
         return button
     }()
     
-    var tableViewOptions: [(title: String, subtitle: String?)] = [
-        (title: "Категория", subtitle: nil),
-        (title: "Расписание", subtitle: nil)
-    ]
+   
     private let emojis = ["🙂", "😻", "🌺", "🐶", "❤️", "😱", "😇", "😡", "🥶", "🤔", "🙌", "🍔", "🥦", "🏓", "🥇", "🎸", "🏝️", "😪"]
     private let trackerCollectionColors: [CollectionColors] = [.collectionRed1, .collectionOrange2, .collectionBlue3, .collectionPurple4, .collectionLightGreen5, .collectionViolet6, .collectionBeige7, .collectionLightBlue8, .collectionJadeGreen9, .collectionDarkPurple10, .collectionCarrotOrange11, .collectionPink12, .collectionLightBrick13, .collectionSemiblue14, .collectionLightPurple15, .collectionDarkViolet16, .collectionPalePurple17, .collectionGreen18]
     
     let scrollView = UIScrollView()
     let contentView = UIView()
     
-    private var selectedColor: CollectionColors?
-    private var selectedEmoji: String?
-    private var selectedWeekDays: [String]?
-    private var selectedCategory: String?
+   
+    
+    var tableViewOptions: [(title: String, subtitle: String?)] = [
+        (title: "Категория", subtitle: nil),
+        (title: "Расписание", subtitle: nil)
+    ]
+    
+ 
+    var selectedWeekDays: [String]? {
+        didSet {
+            updateCreateCategoryButtonColor()
+        }
+    }
+    
+    var selectedColor: CollectionColors? {
+        didSet {
+            updateCreateCategoryButtonColor()
+        }
+    }
+    var selectedEmoji: String? {
+        didSet {
+            updateCreateCategoryButtonColor()
+        }
+    }
+  
+    
+    var selectedCategory: String? {
+        didSet {
+            updateCreateCategoryButtonColor()
+        }
+    }
+ 
     
     override func viewDidLoad() {
         super.viewDidLoad()
         view.backgroundColor = .systemBackground
         setupViews()
+        trackerNameTextField.addTarget(self, action: #selector(textFieldDidChange), for: .editingChanged)
     }
     
     
@@ -233,6 +260,30 @@ final class NewHabitViewController: UIViewController, UITableViewDelegate, UITab
         categoryAndScheduleTableView.register(CategoryAndScheduleTableViewCell.self, forCellReuseIdentifier: CategoryAndScheduleTableViewCell.identifier) //регистрация по ячейке
         
         
+    }
+    
+    @objc func textFieldDidChange() {
+        updateCreateCategoryButtonColor()
+    }
+    
+    func showAlert(message: String) {
+       let alert = UIAlertController(title: "Привычка не создана", message: message, preferredStyle: .alert)
+       alert.addAction(UIAlertAction(title: "OK", style: .default))
+       present(alert, animated: true)
+   }
+    
+    func updateCreateCategoryButtonColor() {
+        if let name = trackerNameTextField.text, !name.isEmpty,
+           selectedColor != nil,
+           selectedEmoji != nil,
+           let selectedWeekDays = selectedWeekDays, !selectedWeekDays.isEmpty,
+           selectedCategory != nil {
+            createTrackerButton.backgroundColor = UIColor.custom(.createButtonColor)  // Активный цвет
+            print("Условия выполнены, кнопка Создать перекрашена в \(UIColor.custom(.createButtonColor))")
+        } else {
+            createTrackerButton.backgroundColor = UIColor.custom(.textFieldGray)  // Неактивный цвет
+            print("Условия не выполнены, кнопка Создать снова \(UIColor.custom(.textFieldGray)) цвета")
+        }
     }
     
     func textField(_ textField: UITextField, shouldChangeCharactersIn range: NSRange, replacementString string: String) -> Bool {
@@ -397,7 +448,7 @@ final class NewHabitViewController: UIViewController, UITableViewDelegate, UITab
               let selectedWeekDays = selectedWeekDays,
             let selectedCategory = selectedCategory
         else {
-                // Показать сообщение об ошибке, если данные не выбраны
+                showAlert(message: "Не все данные выбраны!")
                 print("Не все данные выбраны!")
                 return
             }

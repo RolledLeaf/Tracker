@@ -266,6 +266,7 @@ final class TrackersViewController: UIViewController, UICollectionViewDataSource
     }
     
     private func setupInitialUI() {
+        datePicker.maximumDate = Date()
         updateUI()
         
         view.backgroundColor = UIColor(named: CustomColors.backgroundGray.rawValue)
