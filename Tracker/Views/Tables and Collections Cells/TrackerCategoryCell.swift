@@ -13,7 +13,7 @@ final class TrackerCategoryCell: UICollectionViewCell {
     var currentSelectedTracker: Tracker?
     var trackerID: Int?
     var currentDate: Date = Date()
-    
+    var selectedIndexPaths: Set<IndexPath> = []
     
     
     let habbitLabel: UILabel = {
@@ -162,12 +162,12 @@ final class TrackerCategoryCell: UICollectionViewCell {
         emojiContainer.backgroundColor = lightenColor(UIColor.fromCollectionColor(tracker.color) ?? .clear, by: 0.3)
         
         // Проверяем, был ли выполнен трекер на текущую дату
-        let currentDate = Date()
-        let isCompleted = trackerRecords.contains { $0.trackerID == tracker.id && Calendar.current.isDate($0.date, inSameDayAs: currentDate) }
+           let currentDate = Date()
+        let isCompleted = trackerRecords.contains { $0.trackerID == tracker.id && Calendar.current.isDate($0.date, inSameDayAs: viewController?.selectedDate ?? currentDate) }
         
         
         // Обновляем кнопку в зависимости от состояния выполнения
-        doneButton.setImage(UIImage(systemName: isCompleted ? "checkmark" : "plus"), for: .normal)
+       doneButton.setImage(UIImage(systemName: isCompleted ? "checkmark" : "plus"), for: .normal)
         
         let baseColor = UIColor.fromCollectionColor(currentSelectedTracker?.color ?? .collectionBeige7) ?? .collectionBeige7
     
@@ -184,21 +184,18 @@ final class TrackerCategoryCell: UICollectionViewCell {
     
     
     @objc func doneButtonTapped() {
-           // Получаем ID трекера из ячейки
            guard let trackerID = trackerID else {
                print("Tracker ID is missing!")
                return
            }
            
-           // Здесь передаем дату, используя какой-то механизм для получения значения даты (например, переданный из контроллера)
            guard let selectedDate = viewController?.getSelectedDate() else {
                print("Date Picker is not set!")
                return
            }
         
-
-           // Передаем событие в делегат
            delegate?.trackerCell(self, didTapDoneButtonFor: trackerID, selectedDate: selectedDate)
+        
        }
     }
 
