@@ -27,15 +27,14 @@ final class NewCategoryViewController: UIViewController {
         let paddingView = UIView(frame: CGRect(x: 0, y: 0, width: 16, height: textField.frame.height))
         textField.leftView = paddingView
         textField.leftViewMode = .always
-        
+        textField.clearButtonMode = .whileEditing
         let toolbar = UIToolbar()
-            toolbar.sizeToFit()
-            
-            let flexSpace = UIBarButtonItem(barButtonSystemItem: .flexibleSpace, target: nil, action: nil)
-            let doneButton = UIBarButtonItem(title: "Готово", style: .done, target: textField, action: #selector(UIResponder.resignFirstResponder))
-            toolbar.items = [flexSpace, doneButton]
-            
-            textField.inputAccessoryView = toolbar
+        toolbar.sizeToFit()
+        let flexSpace = UIBarButtonItem(barButtonSystemItem: .flexibleSpace, target: nil, action: nil)
+        let doneButton = UIBarButtonItem(title: "Готово", style: .done, target: textField, action: #selector(UIResponder.resignFirstResponder))
+        toolbar.items = [flexSpace, doneButton]
+        
+        textField.inputAccessoryView = toolbar
         return textField
     }()
     
@@ -80,7 +79,7 @@ final class NewCategoryViewController: UIViewController {
             doneButton.trailingAnchor.constraint(equalTo: view.trailingAnchor, constant: -20),
             doneButton.heightAnchor.constraint(equalToConstant: 60),
             doneButton.bottomAnchor.constraint(equalTo: view.safeAreaLayoutGuide.bottomAnchor, constant: -16)
-            ])
+        ])
     }
     
     @objc func doneButtonTapped() {

@@ -41,16 +41,16 @@ final class ScheduleViewController: UIViewController, UITableViewDelegate, UITab
     
     private let weekDays: [String] = ["Понедельник", "Вторник", "Среда", "Четверг", "Пятница", "Суббота", "Воскресенье"]
     
-    private let weekDayOrder = ["Пн", "Вт", "Ср", "Чт", "Пт", "Сб", "Вск"]
+    private let weekDayOrder = ["Mon", "Tue", "Wed", "Thu", "Fri", "Sat", "Sun"]
     
     private let weekDayAbbreviations: [String: String] = [
-        "Понедельник": "Пн",
-        "Вторник": "Вт",
-        "Среда": "Ср",
-        "Четверг": "Чт",
-        "Пятница": "Пт",
-        "Суббота": "Сб",
-        "Воскресенье": "Вск"
+        "Понедельник": "Mon",
+        "Вторник": "Tue",
+        "Среда": "Wed",
+        "Четверг": "Thu",
+        "Пятница": "Fri",
+        "Суббота": "Sat",
+        "Воскресенье": "Sun"
     ]
     
     private var selectedWeekDays: [String] = []
@@ -114,6 +114,7 @@ final class ScheduleViewController: UIViewController, UITableViewDelegate, UITab
                 let isOn = selectedWeekDays.contains(day)  // Проверяем, выбран ли день
                 cell.configure(with: day, isOn: isOn)
                 cell.delegate = self
+        cell.selectionStyle = .none
                 return cell
     }
     

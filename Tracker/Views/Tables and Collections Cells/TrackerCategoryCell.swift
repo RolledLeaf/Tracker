@@ -1,17 +1,20 @@
 import UIKit
 
-    protocol TrackerCellDelegate: AnyObject {
-        func trackerCell(_ cell: TrackerCategoryCell, didTapDoneButtonFor trackerID: Int)
-    }
+protocol TrackerCategoryCellDelegate: AnyObject {
+    func trackerCell(_ cell: TrackerCategoryCell, didTapDoneButtonFor trackerID: Int, selectedDate: Date)
+}
 
 final class TrackerCategoryCell: UICollectionViewCell {
-    weak var delegate: TrackerCellDelegate?
+    weak var delegate: TrackerCategoryCellDelegate?
+    weak var viewController: TrackersViewController?
     
     static let reuseIdentifier = "TrackerCategoryCell"
     
     var currentSelectedTracker: Tracker?
     var trackerID: Int?
     var currentDate: Date = Date()
+    var selectedIndexPaths: Set<IndexPath> = []
+    
     
     let habbitLabel: UILabel = {
         let label = UILabel()
@@ -159,12 +162,12 @@ final class TrackerCategoryCell: UICollectionViewCell {
         emojiContainer.backgroundColor = lightenColor(UIColor.fromCollectionColor(tracker.color) ?? .clear, by: 0.3)
         
         // Проверяем, был ли выполнен трекер на текущую дату
-        let currentDate = Date()
-        let isCompleted = trackerRecords.contains { $0.trackerID == tracker.id && Calendar.current.isDate($0.date, inSameDayAs: currentDate) }
+           let currentDate = Date()
+        let isCompleted = trackerRecords.contains { $0.trackerID == tracker.id && Calendar.current.isDate($0.date, inSameDayAs: viewController?.selectedDate ?? currentDate) }
         
         
         // Обновляем кнопку в зависимости от состояния выполнения
-        doneButton.setImage(UIImage(systemName: isCompleted ? "checkmark" : "plus"), for: .normal)
+       doneButton.setImage(UIImage(systemName: isCompleted ? "checkmark" : "plus"), for: .normal)
         
         let baseColor = UIColor.fromCollectionColor(currentSelectedTracker?.color ?? .collectionBeige7) ?? .collectionBeige7
     
@@ -181,25 +184,18 @@ final class TrackerCategoryCell: UICollectionViewCell {
     
     
     @objc func doneButtonTapped() {
-       
-        // Передаём в делегат изменения
-        guard let trackerID = trackerID else {
+           guard let trackerID = trackerID else {
                print("Tracker ID is missing!")
                return
            }
-
-           delegate?.trackerCell(self, didTapDoneButtonFor: trackerID)
+           
+           guard let selectedDate = viewController?.getSelectedDate() else {
+               print("Date Picker is not set!")
+               return
+           }
+        
+           delegate?.trackerCell(self, didTapDoneButtonFor: trackerID, selectedDate: selectedDate)
+        
+       }
     }
-}
 
-/* guard let currentTracker = currentSelectedTracker else { return }
-
-isChecked.toggle()
-
-let newImage = UIImage(systemName: isChecked ? "checkmark" : "plus")
-doneButton.setImage(newImage, for: .normal)
-
-let baseColor = UIColor.fromCollectionColor(currentSelectedTracker?.color ?? .collectionBeige7) ?? .collectionBeige7
-let adjustedColor = isChecked ? lightenColor(baseColor, by: 0.3) : baseColor
-doneButtonContainer.backgroundColor = adjustedColor
-*/

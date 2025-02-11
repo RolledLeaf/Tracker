@@ -1,10 +1,10 @@
 import UIKit
 
 protocol NewHabitViewControllerDelegate: AnyObject {
-    func didCreateTracker(_ tracker: Tracker)
+    func didCreateTracker(_ tracker: Tracker,_ category: TrackerCategory)
 }
 
-final class NewHabitViewController: UIViewController, UITableViewDelegate, UITableViewDataSource, UICollectionViewDataSource, UICollectionViewDelegateFlowLayout {
+final class NewHabitViewController: UIViewController, UITableViewDelegate, UITableViewDataSource, UICollectionViewDataSource, UICollectionViewDelegateFlowLayout, UITextFieldDelegate {
     
     weak var delegate: NewHabitViewControllerDelegate?
     
@@ -12,7 +12,17 @@ final class NewHabitViewController: UIViewController, UITableViewDelegate, UITab
         let label = UILabel()
         label.text = "Новая привычка"
         label.font = .systemFont(ofSize: 16, weight: .medium)
-        label.textColor = .black
+        label.textColor = UIColor.custom(.createButtonColor)
+        label.textAlignment = .center
+        return label
+    }()
+    
+    private let characterLimitLabel: UILabel = {
+        let label = UILabel()
+        label.text = "Ограничение 38 символов"
+        label.font = .systemFont(ofSize: 14)
+        label.textColor = UIColor.custom(.cancelButtonRed)
+        label.isHidden = true
         label.textAlignment = .center
         return label
     }()
@@ -28,6 +38,15 @@ final class NewHabitViewController: UIViewController, UITableViewDelegate, UITab
         let paddingView = UIView(frame: CGRect(x: 0, y: 0, width: 16, height: textField.frame.height))
         textField.leftView = paddingView
         textField.leftViewMode = .always
+        textField.clearButtonMode = .whileEditing 
+        let toolbar = UIToolbar()
+            toolbar.sizeToFit()
+            
+            let flexSpace = UIBarButtonItem(barButtonSystemItem: .flexibleSpace, target: nil, action: nil)
+            let doneButton = UIBarButtonItem(title: "Готово", style: .done, target: textField, action: #selector(UIResponder.resignFirstResponder))
+            toolbar.items = [flexSpace, doneButton]
+            
+            textField.inputAccessoryView = toolbar
         
         return textField
     }()
@@ -129,7 +148,7 @@ final class NewHabitViewController: UIViewController, UITableViewDelegate, UITab
         collectionsStackView.distribution = .fillEqually
         
         
-        let uiElements = [titleLabel, trackerNameTextField, categoryAndScheduleTableView, collectionsStackView, buttonsStackView]
+        let uiElements = [titleLabel, trackerNameTextField, characterLimitLabel, categoryAndScheduleTableView, collectionsStackView, buttonsStackView]
         uiElements.forEach {
             $0.translatesAutoresizingMaskIntoConstraints = false
         }
@@ -141,7 +160,7 @@ final class NewHabitViewController: UIViewController, UITableViewDelegate, UITab
         scrollView.translatesAutoresizingMaskIntoConstraints = false
         contentView.translatesAutoresizingMaskIntoConstraints = false
         
-        
+        trackerNameTextField.delegate = self
         
         NSLayoutConstraint.activate([
             
@@ -155,7 +174,7 @@ final class NewHabitViewController: UIViewController, UITableViewDelegate, UITab
             contentView.trailingAnchor.constraint(equalTo: scrollView.trailingAnchor),
             contentView.bottomAnchor.constraint(equalTo: scrollView.bottomAnchor),
             contentView.widthAnchor.constraint(equalTo: scrollView.widthAnchor),
-            contentView.heightAnchor.constraint(equalToConstant: 1000),
+            contentView.heightAnchor.constraint(equalToConstant: 962),
             
             
             titleLabel.topAnchor.constraint(equalTo: contentView.topAnchor),
@@ -166,13 +185,20 @@ final class NewHabitViewController: UIViewController, UITableViewDelegate, UITab
             trackerNameTextField.leadingAnchor.constraint(equalTo: contentView.leadingAnchor, constant: 16),
             trackerNameTextField.trailingAnchor.constraint(equalTo: contentView.trailingAnchor, constant: -16),
             
-            categoryAndScheduleTableView.topAnchor.constraint(equalTo: trackerNameTextField.bottomAnchor, constant: 24),
+           
+            characterLimitLabel.heightAnchor.constraint(equalToConstant: 22),
+            characterLimitLabel.leadingAnchor.constraint(equalTo: view.leadingAnchor, constant: 44),
+            characterLimitLabel.trailingAnchor.constraint(equalTo: view.trailingAnchor, constant: -44),
+            characterLimitLabel.topAnchor.constraint(equalTo: trackerNameTextField.bottomAnchor, constant: 8),
+            
+            
+            categoryAndScheduleTableView.topAnchor.constraint(equalTo: trackerNameTextField.bottomAnchor, constant: 62),
             categoryAndScheduleTableView.leadingAnchor.constraint(equalTo: contentView.leadingAnchor, constant: 16),
             categoryAndScheduleTableView.trailingAnchor.constraint(equalTo: contentView.trailingAnchor, constant: -16),
             categoryAndScheduleTableView.heightAnchor.constraint(equalToConstant: 150),
             
             collectionsStackView.topAnchor.constraint(equalTo: categoryAndScheduleTableView.bottomAnchor, constant: 50),
-            collectionsStackView.heightAnchor.constraint(equalToConstant: 510),
+            collectionsStackView.heightAnchor.constraint(equalToConstant: 442),
             collectionsStackView.leadingAnchor.constraint(equalTo: contentView.leadingAnchor, constant: 23),
             collectionsStackView.trailingAnchor.constraint(equalTo: contentView.trailingAnchor, constant: -23),
             
@@ -210,9 +236,20 @@ final class NewHabitViewController: UIViewController, UITableViewDelegate, UITab
     }
     
     func textField(_ textField: UITextField, shouldChangeCharactersIn range: NSRange, replacementString string: String) -> Bool {
-        let currentText = textField.text ?? ""
-        let newText = (currentText as NSString).replacingCharacters(in: range, with: string)
-        return newText.count <= 38
+        guard let currentText = textField.text, let textRange = Range(range, in: currentText) else {
+            return true
+        }
+
+        let updatedText = currentText.replacingCharacters(in: textRange, with: string)
+
+        // Ограничение в 38 символов
+        if updatedText.count > 38 {
+            characterLimitLabel.isHidden = false
+            return false
+        } else {
+            characterLimitLabel.isHidden = true
+            return true
+        }
     }
     
     func collectionView(_ collectionView: UICollectionView, viewForSupplementaryElementOfKind kind: String, at indexPath: IndexPath) -> UICollectionReusableView {
@@ -304,7 +341,8 @@ final class NewHabitViewController: UIViewController, UITableViewDelegate, UITab
     
     func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
         guard let cell = tableView.dequeueReusableCell(withIdentifier: CategoryAndScheduleTableViewCell.identifier, for: indexPath) as? CategoryAndScheduleTableViewCell else {
-            fatalError("Unable to dequeue CategoryAndScheduleTableViewCell")
+            print("Unable to dequeue cell")
+            return UITableViewCell()
         }
         cell.configure(with: tableViewOptions[indexPath.row])
         return cell
@@ -375,10 +413,15 @@ final class NewHabitViewController: UIViewController, UITableViewDelegate, UITab
             daysCount: 0,
             weekDays: selectedWeekDays
         )
+        
+        let category = TrackerCategory(title: selectedCategory, tracker: [tracker])
+        
         let trackersVC = TrackersViewController()
-        delegate?.didCreateTracker(tracker)
+        delegate?.didCreateTracker(tracker, category)
+        self.view.window?.rootViewController?.dismiss(animated: true, completion: nil)
         let navigationController = UINavigationController(rootViewController: trackersVC)
         present(navigationController, animated: true)
+  
     }
     
     @objc private func cancelButtonTapped(_ sender: UIButton) {
