@@ -3,9 +3,9 @@ import UIKit
 final class EmojiAndColorCollectionHeaderView: UICollectionReusableView {
     static let identifier = "CollectionHeaderView"
     
-     let titleLabel: UILabel = {
+    let titleLabel: UILabel = {
         let label = UILabel()
-         label.font = .systemFont(ofSize: 19, weight: .bold)
+        label.font = .systemFont(ofSize: 19, weight: .bold)
         label.textColor = UIColor.custom(.textColor)
         label.textAlignment = .left
         return label
@@ -13,9 +13,7 @@ final class EmojiAndColorCollectionHeaderView: UICollectionReusableView {
     
     override init(frame: CGRect) {
         super.init(frame: frame)
-        
         addSubview(titleLabel)
-        
         titleLabel.translatesAutoresizingMaskIntoConstraints = false
         
         NSLayoutConstraint.activate([

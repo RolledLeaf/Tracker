@@ -77,7 +77,6 @@ final class CategoriesListViewController: UIViewController, UITableViewDataSourc
         setupUI()
         loadCategoriesFromUserDefaults()
         updateUI()
-        
     }
     
     private func updateUI() {
@@ -89,7 +88,6 @@ final class CategoriesListViewController: UIViewController, UITableViewDataSourc
         updateContentViewHeight()
     }
     
-    
     func setupUI() {
         view.backgroundColor = .white
         
@@ -100,7 +98,7 @@ final class CategoriesListViewController: UIViewController, UITableViewDataSourc
         
         let uiElements = [titleLabel, emptyFieldLabel, emptyFieldStarImage, categoriesListTableView]
         uiElements.forEach { $0.translatesAutoresizingMaskIntoConstraints = false }
-       
+        
         view.addSubview(scrollView)
         
         scrollView.addSubview(contentView)
@@ -111,11 +109,11 @@ final class CategoriesListViewController: UIViewController, UITableViewDataSourc
         scrollView.translatesAutoresizingMaskIntoConstraints = false
         contentView.translatesAutoresizingMaskIntoConstraints = false
         
-       
+        
         categoriesListTableView.register(CategoriesListTableCell.self, forCellReuseIdentifier: CategoriesListTableCell.identifier)
         
         let tableHeightConstraint = categoriesListTableView.heightAnchor.constraint(equalToConstant: tableHeight)
-           self.tableHeightConstraint = tableHeightConstraint
+        self.tableHeightConstraint = tableHeightConstraint
         
         let contentViewHeightConstraint = contentView.heightAnchor.constraint(equalToConstant: contentViewHeight)
         self.contentViewHeightConstraint = contentViewHeightConstraint
@@ -127,7 +125,7 @@ final class CategoriesListViewController: UIViewController, UITableViewDataSourc
             scrollView.trailingAnchor.constraint(equalTo: view.trailingAnchor),
             scrollView.bottomAnchor.constraint(equalTo: view.bottomAnchor),
             
-
+            
             // Настройка contentStackView
             contentView.topAnchor.constraint(equalTo: scrollView.topAnchor),
             contentView.leadingAnchor.constraint(equalTo: scrollView.leadingAnchor),
@@ -136,38 +134,32 @@ final class CategoriesListViewController: UIViewController, UITableViewDataSourc
             contentView.widthAnchor.constraint(equalTo: scrollView.widthAnchor),
             contentViewHeightConstraint,
             
-
-            // Настройка titleLabel
             titleLabel.centerXAnchor.constraint(equalTo: contentView.centerXAnchor),
             titleLabel.topAnchor.constraint(equalTo: contentView.topAnchor, constant: 20),
             titleLabel.widthAnchor.constraint(equalToConstant: 200),
             titleLabel.heightAnchor.constraint(equalToConstant: 40),
-
+            
             // Настройка categoriesListTableView
             categoriesListTableView.trailingAnchor.constraint(equalTo: contentView.trailingAnchor, constant: -16),
             categoriesListTableView.leadingAnchor.constraint(equalTo: contentView.leadingAnchor, constant: 16),
             categoriesListTableView.topAnchor.constraint(equalTo: titleLabel.bottomAnchor, constant: 24),
             categoriesListTableView.widthAnchor.constraint(equalToConstant: 343),
             tableHeightConstraint,
-
-            // Настройка emptyFieldStarImage
+            
             emptyFieldStarImage.centerXAnchor.constraint(equalTo: contentView.centerXAnchor),
             emptyFieldStarImage.topAnchor.constraint(equalTo: titleLabel.bottomAnchor, constant: 232),
             emptyFieldStarImage.heightAnchor.constraint(equalToConstant: 80),
             emptyFieldStarImage.widthAnchor.constraint(equalToConstant: 80),
-
-            // Настройка emptyFieldLabel
+            
             emptyFieldLabel.topAnchor.constraint(equalTo: emptyFieldStarImage.bottomAnchor, constant: 8),
             emptyFieldLabel.centerXAnchor.constraint(equalTo: contentView.centerXAnchor),
             emptyFieldLabel.widthAnchor.constraint(equalToConstant: 343),
             emptyFieldLabel.heightAnchor.constraint(equalToConstant: 72),
-
-            // Настройка addCategoryButton
+            
             addCategoryButton.leadingAnchor.constraint(equalTo: view.leadingAnchor, constant: 20),
             addCategoryButton.trailingAnchor.constraint(equalTo: view.trailingAnchor, constant: -20),
             addCategoryButton.heightAnchor.constraint(equalToConstant: 60),
-             // Исправление привязки
-            addCategoryButton.bottomAnchor.constraint(equalTo: view.safeAreaLayoutGuide.bottomAnchor, constant: -16) // Привязываем к contentStackView
+            addCategoryButton.bottomAnchor.constraint(equalTo: view.safeAreaLayoutGuide.bottomAnchor, constant: -16) //
         ])
         categoriesListTableView.dataSource = self
         categoriesListTableView.delegate = self
@@ -184,7 +176,7 @@ final class CategoriesListViewController: UIViewController, UITableViewDataSourc
     }
     
     
-    func updateContentViewHeight() {
+    private func updateContentViewHeight() {
         let rowHeight: CGFloat = contentViewHeight
         let newHeight = rowHeight + CGFloat(tableHeightConstraint?.constant ?? 500)
         contentViewHeightConstraint?.constant = newHeight
@@ -192,15 +184,71 @@ final class CategoriesListViewController: UIViewController, UITableViewDataSourc
         print("Content view height updated to \(newHeight)")
     }
     
+    private func saveCategoriesToUserDefaults() {
+        UserDefaults.standard.set(categoriesList, forKey: categoriesKey)
+    }
+    
+    private func loadCategoriesFromUserDefaults() {
+        if let savedCategories = UserDefaults.standard.array(forKey: categoriesKey) as? [String] {
+            categoriesList = savedCategories
+        }
+    }
+    
+    private func createContextMenu(for indexPath: IndexPath) -> UIMenu {
+        // Пункт "Редактировать"
+        let editAction = UIAction(title: "Редактировать", image: UIImage(systemName: "pencil")) { _ in
+            self.editItem(at: indexPath)
+        }
+        
+        let deleteAction = UIAction(title: "Удалить", image: UIImage(systemName: "trash"), attributes: .destructive) { _ in
+            self.deleteItem(at: indexPath)
+        }
+        return UIMenu(title: "", children: [editAction, deleteAction])
+    }
+    
+    private func editItem(at indexPath: IndexPath) {
+        guard let cell = categoriesListTableView.cellForRow(at: indexPath) as? CategoriesListTableCell else { return }
+        let currentText = cell.categoryNameLabel.text ?? ""
+        
+        let alert = UIAlertController(title: "Редактировать", message: "Введите новое название категории", preferredStyle: .alert)
+        alert.addTextField { textField in
+            textField.text = currentText
+            textField.placeholder = "Название категории"
+        }
+        
+        let saveAction = UIAlertAction(title: "Сохранить", style: .default) { [weak self] _ in
+            guard let newText = alert.textFields?.first?.text, !newText.isEmpty else { return }
+            
+            cell.categoryNameLabel.text = newText
+            self?.categoriesList[indexPath.row] = newText
+            self?.saveCategoriesToUserDefaults()
+            self?.categoriesListTableView.reloadData()
+        }
+        let cancelAction = UIAlertAction(title: "Отменить", style: .cancel, handler: nil)
+        
+        alert.addAction(saveAction)
+        alert.addAction(cancelAction)
+        
+        present(alert, animated: true, completion: nil)
+        print("Редактировать элемент: \(categoriesList[indexPath.row])")
+    }
+    
+    private func deleteItem(at indexPath: IndexPath) {
+        categoriesList.remove(at: indexPath.row)
+        categoriesListTableView.deleteRows(at: [indexPath], with: .automatic)
+        self.updateTableHeight()
+        self.saveCategoriesToUserDefaults()
+        self.categoriesListTableView.reloadData()
+        updateUI()
+    }
+    
     @objc private func addCategoryButtonTapped() {
         let newCategoryVC = NewCategoryViewController()
-        newCategoryVC.delegate = self 
+        newCategoryVC.delegate = self
         let navigationController = UINavigationController(rootViewController: newCategoryVC)
         navigationController.modalPresentationStyle = .automatic
         present(navigationController, animated: true)
     }
-    
-    
     
     func didAddCategory(_ category: String) {
         print("Вызван метод didAddCategory")
@@ -208,7 +256,7 @@ final class CategoriesListViewController: UIViewController, UITableViewDataSourc
         print("Добавлена новая категория \(category)")
         print("Массив категорий categoriesList теперь содержит: \(categoriesList)")
         saveCategoriesToUserDefaults()
-        categoriesListTableView.reloadData() // Обновляем таблицу после добавления
+        categoriesListTableView.reloadData()
         updateUI()
         
     }
@@ -217,7 +265,6 @@ final class CategoriesListViewController: UIViewController, UITableViewDataSourc
         let sections = categoriesList.count
         return sections
     }
-    
     
     func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
         guard let cell = tableView.dequeueReusableCell(withIdentifier: CategoriesListTableCell.identifier, for: indexPath) as? CategoriesListTableCell else {
@@ -235,104 +282,32 @@ final class CategoriesListViewController: UIViewController, UITableViewDataSourc
         delegate?.updateCategory(with: category)
         dismiss(animated: true)
     }
-   
+    
     func tableView(_ tableView: UITableView, contextMenuConfigurationForRowAt indexPath: IndexPath, point: CGPoint) -> UIContextMenuConfiguration? {
         
         let configuration = UIContextMenuConfiguration(
-                  identifier: indexPath as NSIndexPath,
-                  previewProvider: nil
-              ) { _ in
-                  return self.createContextMenu(for: indexPath)
-              }
-              return configuration
+            identifier: indexPath as NSIndexPath,
+            previewProvider: nil
+        ) { _ in
+            return self.createContextMenu(for: indexPath)
+        }
+        return configuration
     }
-    
-    private func saveCategoriesToUserDefaults() {
-        UserDefaults.standard.set(categoriesList, forKey: categoriesKey)
-    }
-    
-    private func loadCategoriesFromUserDefaults() {
-        if let savedCategories = UserDefaults.standard.array(forKey: categoriesKey) as? [String] {
-            categoriesList = savedCategories
-        }
-    }
-    
-    private func createContextMenu(for indexPath: IndexPath) -> UIMenu {
-            // Пункт "Редактировать"
-            let editAction = UIAction(title: "Редактировать", image: UIImage(systemName: "pencil")) { _ in
-                self.editItem(at: indexPath)
-            }
-            
-            // Пункт "Удалить"
-            let deleteAction = UIAction(title: "Удалить", image: UIImage(systemName: "trash"), attributes: .destructive) { _ in
-                self.deleteItem(at: indexPath)
-            }
-            
-            // Создание меню
-            return UIMenu(title: "", children: [editAction, deleteAction])
-        }
-        
-        private func editItem(at indexPath: IndexPath) {
-            // Получаем текущий текст из лейбла ячейки
-            guard let cell = categoriesListTableView.cellForRow(at: indexPath) as? CategoriesListTableCell else { return }
-                let currentText = cell.categoryNameLabel.text ?? ""
-                
-                // Создаём UIAlertController с текстовым полем
-                let alert = UIAlertController(title: "Редактировать", message: "Введите новое название категории", preferredStyle: .alert)
-                alert.addTextField { textField in
-                    textField.text = currentText
-                    textField.placeholder = "Название категории"
-                }
-                
-                // Добавляем действия
-                let saveAction = UIAlertAction(title: "Сохранить", style: .default) { [weak self] _ in
-                    guard let newText = alert.textFields?.first?.text, !newText.isEmpty else { return }
-                    
-                    // Обновляем текст лейбла
-                    cell.categoryNameLabel.text = newText
-                    
-                    // Если текст привязан к данным, обновляем и их
-                    self?.categoriesList[indexPath.row] = newText
-                    self?.saveCategoriesToUserDefaults()
-                    self?.categoriesListTableView.reloadData()
-                }
-                let cancelAction = UIAlertAction(title: "Отменить", style: .cancel, handler: nil)
-                
-                alert.addAction(saveAction)
-                alert.addAction(cancelAction)
-                
-                // Показываем UIAlertController
-                present(alert, animated: true, completion: nil)
-            print("Редактировать элемент: \(categoriesList[indexPath.row])")
-        }
-        
-        private func deleteItem(at indexPath: IndexPath) {
-            categoriesList.remove(at: indexPath.row)
-            categoriesListTableView.deleteRows(at: [indexPath], with: .automatic)
-            self.updateTableHeight()
-            self.saveCategoriesToUserDefaults()
-            self.categoriesListTableView.reloadData()
-            updateUI()
-        }
-    
     
     func tableView(_ tableView: UITableView, willDisplay cell: UITableViewCell, forRowAt indexPath: IndexPath) {
         let cornerRadius: CGFloat = 16
-
-        // Сброс настроек для всех ячеек
+        
         cell.layer.cornerRadius = 0
         cell.layer.maskedCorners = []
         cell.clipsToBounds = true
-        cell.separatorInset = UIEdgeInsets(top: 0, left: 16, bottom: 0, right: 16) // Обычные отступы для разделителя
-
-        // Скругление первой ячейки
+        cell.separatorInset = UIEdgeInsets(top: 0, left: 16, bottom: 0, right: 16)
+        
         if indexPath.row == 0 {
             cell.layer.cornerRadius = cornerRadius
             cell.layer.maskedCorners = [.layerMinXMinYCorner, .layerMaxXMinYCorner]
-            cell.separatorInset = UIEdgeInsets(top: 0, left: 16, bottom: 0, right: 16) // Разделитель остается видимым
+            cell.separatorInset = UIEdgeInsets(top: 0, left: 16, bottom: 0, right: 16)
         }
-
-        // Скругление последней ячейки
+        
         if indexPath.row == tableView.numberOfRows(inSection: indexPath.section) - 1 {
             cell.layer.cornerRadius = cornerRadius
             cell.layer.maskedCorners = [.layerMinXMaxYCorner, .layerMaxXMaxYCorner]

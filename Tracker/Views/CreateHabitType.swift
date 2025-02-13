@@ -34,7 +34,6 @@ final class CreateHabitTypeViewController: UIViewController {
     }
     
     private func setupUI() {
-        
         let stackView = UIStackView(arrangedSubviews: [habitButton, irregularEventButton])
         stackView.axis = .vertical
         stackView.spacing = 16
@@ -50,24 +49,19 @@ final class CreateHabitTypeViewController: UIViewController {
         ])
     }
     
-    
-        @objc private func habitButtonTapped() {
-               let habitCreationVC = NewHabitViewController()
-            habitCreationVC.delegate = delegate
-            let navigationController = UINavigationController(rootViewController: habitCreationVC)
-            navigationController.modalPresentationStyle = .automatic
-            present(navigationController, animated: true)
-           }
-
-           @objc private func irregularEventButtonTapped() {
-               let eventSettingsVC = NewIrregularEventViewController()
-               eventSettingsVC.delegate = delegate as? any NewIrregularEventViewControllerDelegate
-               let navigationController = UINavigationController(rootViewController: eventSettingsVC)
-               navigationController.modalPresentationStyle = .automatic
-               present(navigationController, animated: true)
-               
+    @objc private func habitButtonTapped() {
+        let habitCreationVC = NewHabitViewController()
+        habitCreationVC.delegate = delegate
+        let navigationController = UINavigationController(rootViewController: habitCreationVC)
+        navigationController.modalPresentationStyle = .automatic
+        present(navigationController, animated: true)
     }
     
-    
-    
+    @objc private func irregularEventButtonTapped() {
+        let eventSettingsVC = NewIrregularEventViewController()
+        eventSettingsVC.delegate = delegate as? any NewIrregularEventViewControllerDelegate
+        let navigationController = UINavigationController(rootViewController: eventSettingsVC)
+        navigationController.modalPresentationStyle = .automatic
+        present(navigationController, animated: true)
+    }
 }

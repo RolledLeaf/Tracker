@@ -68,14 +68,12 @@ class ScheduleTableCell: UITableViewCell {
     
     // MARK: - Configuration Method
     
-    // Этот метод вызывается при изменении состояния переключателя
     @objc private func toggleSwitchChanged() {
         onToggle?(toggleSwitch.isOn)
         delegate?.didChangeSwitchState(isOn: toggleSwitch.isOn, forDay: titleLabel.text ?? "")
         print("Toggle switch changed")
     }
     
-    // Метод для конфигурации ячейки
     func configure(with title: String, isOn: Bool) {
         titleLabel.text = title
         toggleSwitch.isOn = isOn

@@ -6,8 +6,7 @@ protocol ScheduleViewControllerDelegate: AnyObject {
 }
 
 final class ScheduleViewController: UIViewController, UITableViewDelegate, UITableViewDataSource, ScheduleTableCellDelegate {
-   
-  
+    
     weak var delegate: ScheduleViewControllerDelegate?
     
     private let titleLabel: UILabel = {
@@ -41,32 +40,31 @@ final class ScheduleViewController: UIViewController, UITableViewDelegate, UITab
     
     private let weekDays: [String] = ["Понедельник", "Вторник", "Среда", "Четверг", "Пятница", "Суббота", "Воскресенье"]
     
-    //English localization
-    private let weekDayOrder = ["Mon", "Tue", "Wed", "Thu", "Fri", "Sat", "Sun"]
-    private let weekDayAbbreviations: [String: String] = [
-        "Понедельник": "Mon",
-        "Вторник": "Tue",
-        "Среда": "Wed",
-        "Четверг": "Thu",
-        "Пятница": "Fri",
-        "Суббота": "Sat",
-        "Воскресенье": "Sun"
-    ]
-    
-    
     /*
-     // Russian localization
-     private let weekDayOrder = ["Пн", "Вт", "Ср", "Чт", "Пт", "Сб", "Вск"]
+     //English localization
+     private let weekDayOrder = ["Mon", "Tue", "Wed", "Thu", "Fri", "Sat", "Sun"]
      private let weekDayAbbreviations: [String: String] = [
-    "Понедельник": "Пн",
-    "Вторник": "Вт",
-    "Среда": "Ср",
-    "Четверг": "Чт",
-    "Пятница": "Пт",
-    "Суббота": "Сб",
-    "Воскресенье": "Вск"
+     "Понедельник": "Mon",
+     "Вторник": "Tue",
+     "Среда": "Wed",
+     "Четверг": "Thu",
+     "Пятница": "Fri",
+     "Суббота": "Sat",
+     "Воскресенье": "Sun"
      ]
-    */
+     */
+    
+    // Russian localization
+    private let weekDayOrder = ["Пн", "Вт", "Ср", "Чт", "Пт", "Сб", "Вск"]
+    private let weekDayAbbreviations: [String: String] = [
+        "Понедельник": "Пн",
+        "Вторник": "Вт",
+        "Среда": "Ср",
+        "Четверг": "Чт",
+        "Пятница": "Пт",
+        "Суббота": "Сб",
+        "Воскресенье": "Вск"
+    ]
     
     private var selectedWeekDays: [String] = []
     private var tempSelectedWeekDays: [String] = []
@@ -76,12 +74,11 @@ final class ScheduleViewController: UIViewController, UITableViewDelegate, UITab
         view.backgroundColor = .white
         setupViews()
         if let savedDays = UserDefaults.standard.array(forKey: "selectedWeekDays") as? [String] {
-                   selectedWeekDays = savedDays
+            selectedWeekDays = savedDays
             tempSelectedWeekDays = savedDays
-               }
+        }
         weekDaysTable.reloadData()
     }
-    
     
     private func setupViews() {
         
@@ -109,10 +106,33 @@ final class ScheduleViewController: UIViewController, UITableViewDelegate, UITab
             doneButton.bottomAnchor.constraint(equalTo: view.safeAreaLayoutGuide.bottomAnchor, constant: -16)
         ])
         
-        
         weekDaysTable.delegate = self
         weekDaysTable.dataSource = self
         weekDaysTable.register(ScheduleTableCell.self, forCellReuseIdentifier: ScheduleTableCell.identifier)
+    }
+    
+    private func getSortedSelectedWeekDays() -> String {
+        if selectedWeekDays.count == weekDays.count {
+            return "Ежедневно"
+        } else {
+            let sortedAbbreviations = selectedWeekDays.sorted {
+                let index1 = weekDayOrder.firstIndex(of: weekDayAbbreviations[$0] ?? "") ?? 0
+                let index2 = weekDayOrder.firstIndex(of: weekDayAbbreviations[$1] ?? "") ?? 0
+                return index1 < index2
+            }.compactMap { weekDayAbbreviations[$0] }
+            
+            return sortedAbbreviations.joined(separator: ", ")
+        }
+    }
+    
+    @objc private func doneButtonTapped() {
+        print("Schedule done button ")
+        print("Завершено. Переданные дни недели: \(tempSelectedWeekDays)")
+        selectedWeekDays = tempSelectedWeekDays
+        UserDefaults.standard.set(selectedWeekDays, forKey: "selectedWeekDays")
+        let sortedWeekDaysString = getSortedSelectedWeekDays()
+        delegate?.updateSubtitle(for: "Расписание", with: sortedWeekDaysString)
+        dismiss(animated: true, completion: nil) // Для модального
     }
     
     func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
@@ -126,11 +146,11 @@ final class ScheduleViewController: UIViewController, UITableViewDelegate, UITab
         
         
         let day = weekDays[indexPath.row]
-                let isOn = selectedWeekDays.contains(day)  // Проверяем, выбран ли день
-                cell.configure(with: day, isOn: isOn)
-                cell.delegate = self
+        let isOn = selectedWeekDays.contains(day)  // Проверяем, выбран ли день
+        cell.configure(with: day, isOn: isOn)
+        cell.delegate = self
         cell.selectionStyle = .none
-                return cell
+        return cell
     }
     
     func tableView(_ tableView: UITableView, willDisplay cell: UITableViewCell, forRowAt indexPath: IndexPath) {
@@ -157,43 +177,16 @@ final class ScheduleViewController: UIViewController, UITableViewDelegate, UITab
         }
     }
     
-    @objc private func doneButtonTapped() {
-        print("Schedule done button ")
-        print("Завершено. Переданные дни недели: \(tempSelectedWeekDays)")
-        selectedWeekDays = tempSelectedWeekDays
-        UserDefaults.standard.set(selectedWeekDays, forKey: "selectedWeekDays")
-        let sortedWeekDaysString = getSortedSelectedWeekDays()
-        delegate?.updateSubtitle(for: "Расписание", with: sortedWeekDaysString)
-               dismiss(animated: true, completion: nil) // Для модального
-    }
-    
     func didChangeSwitchState(isOn: Bool, forDay day: String) {
-            if isOn {
-                // Добавляем день в массив, если он выбран
-                if !tempSelectedWeekDays.contains(day) {
-                    tempSelectedWeekDays.append(day)
-                }
-            } else {
-                // Убираем день из массива, если он не выбран
-                if let index = tempSelectedWeekDays.firstIndex(of: day) {
-                    tempSelectedWeekDays.remove(at: index)
-                }
+        if isOn {
+            if !tempSelectedWeekDays.contains(day) {
+                tempSelectedWeekDays.append(day)
             }
-        }
-    
-   
-    
-    func getSortedSelectedWeekDays() -> String {
-        if selectedWeekDays.count == weekDays.count {
-            return "Ежедневно"
         } else {
-            let sortedAbbreviations = selectedWeekDays.sorted {
-                let index1 = weekDayOrder.firstIndex(of: weekDayAbbreviations[$0] ?? "") ?? 0
-                let index2 = weekDayOrder.firstIndex(of: weekDayAbbreviations[$1] ?? "") ?? 0
-                return index1 < index2
-            }.compactMap { weekDayAbbreviations[$0] }
             
-            return sortedAbbreviations.joined(separator: ", ")
+            if let index = tempSelectedWeekDays.firstIndex(of: day) {
+                tempSelectedWeekDays.remove(at: index)
+            }
         }
     }
     

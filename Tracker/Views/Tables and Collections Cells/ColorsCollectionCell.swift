@@ -3,7 +3,6 @@ import UIKit
 class ColorsCollectionViewCell: UICollectionViewCell {
     
     // MARK: - Identifier
-    
     static let identifier = "ColorsCollectionViewCell"
     
     let colorBlockImage: UIImageView = {
@@ -41,16 +40,14 @@ class ColorsCollectionViewCell: UICollectionViewCell {
         contentView.layer.cornerRadius = 8
         contentView.layer.masksToBounds = true
         contentView.layer.borderWidth = 0
-        
         contentView.addSubview(colorBlockImage)
         
         NSLayoutConstraint.activate([
-        colorBlockImage.centerXAnchor.constraint(equalTo: contentView.centerXAnchor),
-        colorBlockImage.centerYAnchor.constraint(equalTo: contentView.centerYAnchor),
-        colorBlockImage.widthAnchor.constraint(equalToConstant: 40),
-        colorBlockImage.heightAnchor.constraint(equalToConstant: 40)])
+            colorBlockImage.centerXAnchor.constraint(equalTo: contentView.centerXAnchor),
+            colorBlockImage.centerYAnchor.constraint(equalTo: contentView.centerYAnchor),
+            colorBlockImage.widthAnchor.constraint(equalToConstant: 40),
+            colorBlockImage.heightAnchor.constraint(equalToConstant: 40)])
     }
-    
     
     private func updateSelectionState() {
         if isSelected {
@@ -64,8 +61,6 @@ class ColorsCollectionViewCell: UICollectionViewCell {
         }
     }
     
-
-    
     // MARK: - Configuration Method
     
     func configure(with color: CollectionColors) {
@@ -73,8 +68,4 @@ class ColorsCollectionViewCell: UICollectionViewCell {
         baseColor = colorValue ?? .gray
         colorBlockImage.backgroundColor = color.uiColor
     }
-    
-    
-    
-    
 }

@@ -8,7 +8,7 @@ class EmojiCollectionViewCell: UICollectionViewCell {
     
     // MARK: - UI Elements
     
-     let emojiLabel: UILabel = {
+    let emojiLabel: UILabel = {
         let label = UILabel()
         label.font = .systemFont(ofSize: 32)
         label.textAlignment = .center
@@ -16,14 +16,13 @@ class EmojiCollectionViewCell: UICollectionViewCell {
         return label
     }()
     
-   
     private var selectionBackgroundView: UIView?
     
     override var isSelected: Bool {
-            didSet {
-                updateSelectionState()
-            }
+        didSet {
+            updateSelectionState()
         }
+    }
     
     // MARK: - Init
     
@@ -46,9 +45,8 @@ class EmojiCollectionViewCell: UICollectionViewCell {
             emojiLabel.centerYAnchor.constraint(equalTo: contentView.centerYAnchor),
         ])
         contentView.layer.cornerRadius = 16
-       
         contentView.layer.masksToBounds = true
-               contentView.layer.borderWidth = 0
+        contentView.layer.borderWidth = 0
     }
     
     func updateSelectionState() {
@@ -60,30 +58,27 @@ class EmojiCollectionViewCell: UICollectionViewCell {
     }
     
     private func addSelectionBackgroundView() {
-           if selectionBackgroundView != nil { return }
-           
-        
-           let backgroundView = UIView()
+        if selectionBackgroundView != nil { return }
+        let backgroundView = UIView()
         backgroundView.backgroundColor = UIColor.custom(CustomColors.backgroundGray)
-           backgroundView.layer.cornerRadius = 16
-           backgroundView.translatesAutoresizingMaskIntoConstraints = false
-           contentView.insertSubview(backgroundView, at: 0)
-           
-           NSLayoutConstraint.activate([
+        backgroundView.layer.cornerRadius = 16
+        backgroundView.translatesAutoresizingMaskIntoConstraints = false
+        contentView.insertSubview(backgroundView, at: 0)
+        
+        NSLayoutConstraint.activate([
             backgroundView.centerXAnchor.constraint(equalTo: contentView.centerXAnchor),
             backgroundView.centerYAnchor.constraint(equalTo: contentView.centerYAnchor),
-               backgroundView.heightAnchor.constraint(equalToConstant: 52),
-               backgroundView.widthAnchor.constraint(equalToConstant: 52)
-           ])
-           
-           selectionBackgroundView = backgroundView
-       }
-       
-       private func removeSelectionBackgroundView() {
-           selectionBackgroundView?.removeFromSuperview()
-           selectionBackgroundView = nil
-       }
+            backgroundView.heightAnchor.constraint(equalToConstant: 52),
+            backgroundView.widthAnchor.constraint(equalToConstant: 52)
+        ])
+        
+        selectionBackgroundView = backgroundView
+    }
     
+    private func removeSelectionBackgroundView() {
+        selectionBackgroundView?.removeFromSuperview()
+        selectionBackgroundView = nil
+    }
     
     // MARK: - Configuration Method
     

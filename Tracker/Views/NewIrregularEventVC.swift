@@ -40,14 +40,12 @@ final class NewIrregularEventViewController: UIViewController, UITableViewDelega
         textField.leftViewMode = .always
         textField.clearButtonMode = .whileEditing
         let toolbar = UIToolbar()
-            toolbar.sizeToFit()
-            
-            let flexSpace = UIBarButtonItem(barButtonSystemItem: .flexibleSpace, target: nil, action: nil)
-            let doneButton = UIBarButtonItem(title: "Готово", style: .done, target: textField, action: #selector(UIResponder.resignFirstResponder))
-            toolbar.items = [flexSpace, doneButton]
-            
-            textField.inputAccessoryView = toolbar
+        toolbar.sizeToFit()
         
+        let flexSpace = UIBarButtonItem(barButtonSystemItem: .flexibleSpace, target: nil, action: nil)
+        let doneButton = UIBarButtonItem(title: "Готово", style: .done, target: textField, action: #selector(UIResponder.resignFirstResponder))
+        toolbar.items = [flexSpace, doneButton]
+        textField.inputAccessoryView = toolbar
         return textField
     }()
     
@@ -58,7 +56,6 @@ final class NewIrregularEventViewController: UIViewController, UITableViewDelega
         tableView.backgroundColor = .clear
         tableView.rowHeight = 75
         let layer = tableView.layer
-        
         layer.cornerRadius = 16
         return tableView
     }()
@@ -96,7 +93,6 @@ final class NewIrregularEventViewController: UIViewController, UITableViewDelega
         button.setTitle("Создать", for: .normal)
         button.titleLabel?.font = UIFont.systemFont(ofSize: 16, weight: .medium)
         button.setTitleColor(.white, for: .normal)
-        
         button.backgroundColor = UIColor.custom(.textFieldGray)
         button.layer.cornerRadius = 16
         button.addTarget(self, action: #selector(createTrackerButtonTapped), for: .touchUpInside)
@@ -116,20 +112,18 @@ final class NewIrregularEventViewController: UIViewController, UITableViewDelega
         return button
     }()
     
-   
+    
     private let emojis = ["🙂", "😻", "🌺", "🐶", "❤️", "😱", "😇", "😡", "🥶", "🤔", "🙌", "🍔", "🥦", "🏓", "🥇", "🎸", "🏝️", "😪"]
     private let trackerCollectionColors: [CollectionColors] = [.collectionRed1, .collectionOrange2, .collectionBlue3, .collectionPurple4, .collectionLightGreen5, .collectionViolet6, .collectionBeige7, .collectionLightBlue8, .collectionJadeGreen9, .collectionDarkPurple10, .collectionCarrotOrange11, .collectionPink12, .collectionLightBrick13, .collectionSemiblue14, .collectionLightPurple15, .collectionDarkViolet16, .collectionPalePurple17, .collectionGreen18]
     
     let scrollView = UIScrollView()
     let contentView = UIView()
     let selectedWeekDays: String = " "
-   
+    
     
     var tableViewOptions: [(title: String, subtitle: String?)] = [
         (title: "Категория", subtitle: nil)
     ]
-    
- 
     
     var selectedColor: CollectionColors? {
         didSet {
@@ -141,14 +135,12 @@ final class NewIrregularEventViewController: UIViewController, UITableViewDelega
             updateCreateCategoryButtonColor()
         }
     }
-  
     
     var selectedCategory: String? {
         didSet {
             updateCreateCategoryButtonColor()
         }
     }
- 
     
     override func viewDidLoad() {
         super.viewDidLoad()
@@ -157,10 +149,7 @@ final class NewIrregularEventViewController: UIViewController, UITableViewDelega
         trackerNameTextField.addTarget(self, action: #selector(textFieldDidChange), for: .editingChanged)
     }
     
-    
     private func setupViews() {
-        
-        
         let buttonsStackView = UIStackView(arrangedSubviews: [ cancelButton, createTrackerButton])
         buttonsStackView.axis = .horizontal
         buttonsStackView.spacing = 8
@@ -171,7 +160,6 @@ final class NewIrregularEventViewController: UIViewController, UITableViewDelega
         collectionsStackView.spacing = 34
         collectionsStackView.distribution = .fillEqually
         
-        
         let uiElements = [titleLabel, trackerNameTextField, characterLimitLabel, categoryAndScheduleTableView, collectionsStackView, buttonsStackView]
         uiElements.forEach {
             $0.translatesAutoresizingMaskIntoConstraints = false
@@ -180,14 +168,11 @@ final class NewIrregularEventViewController: UIViewController, UITableViewDelega
         view.addSubview(scrollView)
         scrollView.addSubview(contentView)
         uiElements.forEach { contentView.addSubview($0) }
-        
         scrollView.translatesAutoresizingMaskIntoConstraints = false
         contentView.translatesAutoresizingMaskIntoConstraints = false
-        
         trackerNameTextField.delegate = self
         
         NSLayoutConstraint.activate([
-            
             scrollView.topAnchor.constraint(equalTo: view.topAnchor),
             scrollView.leadingAnchor.constraint(equalTo: view.leadingAnchor),
             scrollView.trailingAnchor.constraint(equalTo: view.trailingAnchor),
@@ -209,12 +194,11 @@ final class NewIrregularEventViewController: UIViewController, UITableViewDelega
             trackerNameTextField.leadingAnchor.constraint(equalTo: contentView.leadingAnchor, constant: 16),
             trackerNameTextField.trailingAnchor.constraint(equalTo: contentView.trailingAnchor, constant: -16),
             
-           
+            
             characterLimitLabel.heightAnchor.constraint(equalToConstant: 22),
             characterLimitLabel.leadingAnchor.constraint(equalTo: view.leadingAnchor, constant: 44),
             characterLimitLabel.trailingAnchor.constraint(equalTo: view.trailingAnchor, constant: -44),
             characterLimitLabel.topAnchor.constraint(equalTo: trackerNameTextField.bottomAnchor, constant: 8),
-            
             
             categoryAndScheduleTableView.topAnchor.constraint(equalTo: trackerNameTextField.bottomAnchor, constant: 62),
             categoryAndScheduleTableView.leadingAnchor.constraint(equalTo: contentView.leadingAnchor, constant: 16),
@@ -232,7 +216,6 @@ final class NewIrregularEventViewController: UIViewController, UITableViewDelega
             buttonsStackView.leadingAnchor.constraint(equalTo: contentView.leadingAnchor, constant: 20),
             buttonsStackView.trailingAnchor.constraint(equalTo: contentView.trailingAnchor, constant: -20)])
         
-        
         emojiCollectionView.delegate = self
         colorsCollectionView.delegate = self
         categoryAndScheduleTableView.delegate = self
@@ -247,7 +230,6 @@ final class NewIrregularEventViewController: UIViewController, UITableViewDelega
             withReuseIdentifier: EmojiAndColorCollectionHeaderView.identifier
         )
         
-        
         colorsCollectionView.register(
             EmojiAndColorCollectionHeaderView.self,
             forSupplementaryViewOfKind: UICollectionView.elementKindSectionHeader,
@@ -255,21 +237,19 @@ final class NewIrregularEventViewController: UIViewController, UITableViewDelega
         )
         
         categoryAndScheduleTableView.register(CategoryAndScheduleTableViewCell.self, forCellReuseIdentifier: CategoryAndScheduleTableViewCell.identifier) //регистрация по ячейке
-        
-        
     }
     
     @objc func textFieldDidChange() {
         updateCreateCategoryButtonColor()
     }
     
-    func showAlert(message: String) {
-       let alert = UIAlertController(title: "Привычка не создана", message: message, preferredStyle: .alert)
-       alert.addAction(UIAlertAction(title: "OK", style: .default))
-       present(alert, animated: true)
-   }
+    private func showAlert(message: String) {
+        let alert = UIAlertController(title: "Привычка не создана", message: message, preferredStyle: .alert)
+        alert.addAction(UIAlertAction(title: "OK", style: .default))
+        present(alert, animated: true)
+    }
     
-    func updateCreateCategoryButtonColor() {
+    private func updateCreateCategoryButtonColor() {
         if let name = trackerNameTextField.text, !name.isEmpty,
            selectedColor != nil,
            selectedEmoji != nil,
@@ -282,14 +262,47 @@ final class NewIrregularEventViewController: UIViewController, UITableViewDelega
         }
     }
     
+    @objc private func createTrackerButtonTapped(_ sender: UIButton) {
+        guard let name = trackerNameTextField.text,
+              let selectedColor = selectedColor,
+              let selectedEmoji = selectedEmoji,
+              
+                let selectedCategory = selectedCategory
+        else {
+            showAlert(message: "Не все данные выбраны!")
+            print("Не все данные выбраны!")
+            return
+        }
+        
+        print("Создаём трекер с названием: \(name), цвет: \(selectedColor), эмодзи: \(selectedEmoji), категория: \(selectedCategory), дни недели: \(selectedWeekDays)")
+        
+        let tracker = Tracker(
+            id: TrackerIdGenerator.generateId(),
+            name: name,
+            color: selectedColor,
+            emoji: selectedEmoji,
+            daysCount: 0,
+            weekDays: [" "]
+        )
+        
+        let category = TrackerCategory(title: selectedCategory, tracker: [tracker])
+        
+        let trackersVC = TrackersViewController()
+        delegate?.didCreateIrregularEvent(tracker, category)
+        self.view.window?.rootViewController?.dismiss(animated: true, completion: nil)
+        let navigationController = UINavigationController(rootViewController: trackersVC)
+        present(navigationController, animated: true)
+    }
+    
+    @objc private func cancelButtonTapped(_ sender: UIButton) {
+        dismiss(animated: true, completion: nil)
+    }
+    
     func textField(_ textField: UITextField, shouldChangeCharactersIn range: NSRange, replacementString string: String) -> Bool {
         guard let currentText = textField.text, let textRange = Range(range, in: currentText) else {
             return true
         }
-
         let updatedText = currentText.replacingCharacters(in: textRange, with: string)
-
-        // Ограничение в 38 символов
         if updatedText.count > 38 {
             characterLimitLabel.isHidden = false
             return false
@@ -318,13 +331,11 @@ final class NewIrregularEventViewController: UIViewController, UITableViewDelega
         
         print("Successfully dequeued CollectionHeaderView for section \(indexPath.section)")
         
-        // Configure header
         if collectionView == emojiCollectionView {
             header.configure(with: "Emoji")
         } else if collectionView == colorsCollectionView {
             header.configure(with: "Цвет")
         }
-        
         return header
     }
     
@@ -335,8 +346,8 @@ final class NewIrregularEventViewController: UIViewController, UITableViewDelega
     }
     
     func numberOfSections(in collectionView: UICollectionView) -> Int {
-          1
-      }
+        1
+    }
     
     
     func collectionView(_ collectionView: UICollectionView, numberOfItemsInSection section: Int) -> Int {
@@ -399,11 +410,11 @@ final class NewIrregularEventViewController: UIViewController, UITableViewDelega
     func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
         tableView.deselectRow(at: indexPath, animated: true)
         
-            let categoryListVC = CategoriesListViewController()
-            categoryListVC.delegate = self
-            let navigationController = UINavigationController(rootViewController: categoryListVC)
-            navigationController.modalPresentationStyle = .automatic
-            present(navigationController, animated: true)
+        let categoryListVC = CategoriesListViewController()
+        categoryListVC.delegate = self
+        let navigationController = UINavigationController(rootViewController: categoryListVC)
+        navigationController.modalPresentationStyle = .automatic
+        present(navigationController, animated: true)
         
     }
     
@@ -416,67 +427,22 @@ final class NewIrregularEventViewController: UIViewController, UITableViewDelega
         cell.clipsToBounds = true
         cell.separatorInset = UIEdgeInsets(top: 0, left: 16, bottom: 0, right: 16) // Обычные отступы для разделителя
         
-       
-            cell.layer.cornerRadius = cornerRadius
-            cell.layer.maskedCorners = [.layerMinXMaxYCorner, .layerMaxXMaxYCorner]
-            cell.separatorInset = UIEdgeInsets(top: 0, left: 0, bottom: 0, right: UIScreen.main.bounds.width)
+        
+        cell.layer.cornerRadius = cornerRadius
+        cell.layer.maskedCorners = [.layerMinXMaxYCorner, .layerMaxXMaxYCorner]
+        cell.separatorInset = UIEdgeInsets(top: 0, left: 0, bottom: 0, right: UIScreen.main.bounds.width)
         
     }
-    
-
-    
-    @objc private func createTrackerButtonTapped(_ sender: UIButton) {
-        guard let name = trackerNameTextField.text,
-              let selectedColor = selectedColor,
-              let selectedEmoji = selectedEmoji,
-              
-            let selectedCategory = selectedCategory
-        else {
-                showAlert(message: "Не все данные выбраны!")
-                print("Не все данные выбраны!")
-                return
-            }
-
-            // Выводим данные без Optional
-            print("Создаём трекер с названием: \(name), цвет: \(selectedColor), эмодзи: \(selectedEmoji), категория: \(selectedCategory), дни недели: \(selectedWeekDays)")
-        
-        let tracker = Tracker(
-            id: TrackerIdGenerator.generateId(),
-            name: name,
-            color: selectedColor,
-            emoji: selectedEmoji,
-            daysCount: 0,
-            weekDays: [" "]
-        )
-        
-        let category = TrackerCategory(title: selectedCategory, tracker: [tracker])
-        
-        let trackersVC = TrackersViewController()
-        delegate?.didCreateIrregularEvent(tracker, category)
-        self.view.window?.rootViewController?.dismiss(animated: true, completion: nil)
-        let navigationController = UINavigationController(rootViewController: trackersVC)
-        present(navigationController, animated: true)
-  
-    }
-    
-    @objc private func cancelButtonTapped(_ sender: UIButton) {
-        dismiss(animated: true, completion: nil)
-    }
-    
-  
 }
 
-
-    extension NewIrregularEventViewController: CategoriesListViewControllerDelegate {
-        func updateCategory(with category: String) {
-            if let index = tableViewOptions.firstIndex(where: { $0.title == "Категория" }) {
-                tableViewOptions[index].subtitle = category
-            }
-            
-            // Сохраняем выбранную категорию
-            selectedCategory = category
-            
-            categoryAndScheduleTableView.reloadData()
+extension NewIrregularEventViewController: CategoriesListViewControllerDelegate {
+    func updateCategory(with category: String) {
+        if let index = tableViewOptions.firstIndex(where: { $0.title == "Категория" }) {
+            tableViewOptions[index].subtitle = category
         }
+        
+        selectedCategory = category
+        categoryAndScheduleTableView.reloadData()
     }
+}
 
