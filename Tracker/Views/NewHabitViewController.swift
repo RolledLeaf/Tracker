@@ -452,8 +452,6 @@ final class NewHabitViewController: UIViewController, UITableViewDelegate, UITab
                 print("Не все данные выбраны!")
                 return
             }
-
-            // Выводим данные без Optional
             print("Создаём трекер с названием: \(name), цвет: \(selectedColor), эмодзи: \(selectedEmoji), категория: \(selectedCategory), дни недели: \(selectedWeekDays.joined(separator: ", "))")
         
         let tracker = Tracker(

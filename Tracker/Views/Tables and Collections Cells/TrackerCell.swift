@@ -1,14 +1,14 @@
 import UIKit
 
 protocol TrackerCategoryCellDelegate: AnyObject {
-    func trackerCell(_ cell: TrackerCategoryCell, didTapDoneButtonFor trackerID: Int, selectedDate: Date)
+    func trackerExecution(_ cell: TrackerCell, didTapDoneButtonFor trackerID: Int, selectedDate: Date)
 }
 
-final class TrackerCategoryCell: UICollectionViewCell {
+final class TrackerCell: UICollectionViewCell {
     weak var delegate: TrackerCategoryCellDelegate?
     weak var viewController: TrackersViewController?
     
-    static let reuseIdentifier = "TrackerCategoryCell"
+    static let reuseIdentifier = "TrackerCell"
     
     var currentSelectedTracker: Tracker?
     var trackerID: Int?
@@ -194,7 +194,7 @@ final class TrackerCategoryCell: UICollectionViewCell {
                return
            }
         
-           delegate?.trackerCell(self, didTapDoneButtonFor: trackerID, selectedDate: selectedDate)
+           delegate?.trackerExecution(self, didTapDoneButtonFor: trackerID, selectedDate: selectedDate)
         
        }
     }

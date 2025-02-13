@@ -41,8 +41,8 @@ final class ScheduleViewController: UIViewController, UITableViewDelegate, UITab
     
     private let weekDays: [String] = ["Понедельник", "Вторник", "Среда", "Четверг", "Пятница", "Суббота", "Воскресенье"]
     
+    //English localization
     private let weekDayOrder = ["Mon", "Tue", "Wed", "Thu", "Fri", "Sat", "Sun"]
-    
     private let weekDayAbbreviations: [String: String] = [
         "Понедельник": "Mon",
         "Вторник": "Tue",
@@ -53,15 +53,19 @@ final class ScheduleViewController: UIViewController, UITableViewDelegate, UITab
         "Воскресенье": "Sun"
     ]
     
-    // russian days = ["Пн", "Вт", "Ср", "Чт", "Пт", "Сб", "Вск"]
     
-    /* словарь = "Понедельник": "Mon",
-    "Вторник": "Tue",
-    "Среда": "Wed",
-    "Четверг": "Thu",
-    "Пятница": "Fri",
-    "Суббота": "Sat",
-    "Воскресенье": "Sun"
+    /*
+     // Russian localization
+     private let weekDayOrder = ["Пн", "Вт", "Ср", "Чт", "Пт", "Сб", "Вск"]
+     private let weekDayAbbreviations: [String: String] = [
+    "Понедельник": "Пн",
+    "Вторник": "Вт",
+    "Среда": "Ср",
+    "Четверг": "Чт",
+    "Пятница": "Пт",
+    "Суббота": "Сб",
+    "Воскресенье": "Вск"
+     ]
     */
     
     private var selectedWeekDays: [String] = []

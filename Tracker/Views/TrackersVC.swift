@@ -4,6 +4,16 @@ import UIKit
 final class TrackersViewController: UIViewController, UICollectionViewDataSource, UICollectionViewDelegateFlowLayout, UICollectionViewDelegate {
     
     
+   
+    
+    var selectedDate: Date = Date()
+    var categories: [TrackerCategory] = []
+    var filteredCategories: [TrackerCategory] = []
+    var trackerRecords: [TrackerRecord] = []
+    var currentSelectedTracker: Tracker?
+    var currentDate: Date = Date()
+    var selectedIndexPath: IndexPath?
+   
     private let plusButton = UIButton()
     private let trackersLabel = UILabel()
     private let emptyFieldStarImage = UIImageView()
@@ -12,15 +22,6 @@ final class TrackersViewController: UIViewController, UICollectionViewDataSource
     
     private var datePickerHeightConstraint: NSLayoutConstraint?
     private var categoriesCollectionViewHeight: NSLayoutConstraint?
-     var selectedDate: Date = Date()
-    
-    var categories: [TrackerCategory] = []
-    var filteredCategories: [TrackerCategory] = []
-    var trackerRecords: [TrackerRecord] = []
-    var currentSelectedTracker: Tracker?
-    var currentDate: Date = Date()
-    var selectedIndexPath: IndexPath?
-   
     private let dateFormatter: DateFormatter = {
         let formatter = DateFormatter()
         formatter.dateFormat = "dd.MM.yy"
@@ -93,7 +94,7 @@ final class TrackersViewController: UIViewController, UICollectionViewDataSource
         super.viewDidLoad()
         setupInitialUI()
         
-      setupDefaultCategories()
+       setupDefaultCategories()
         reloadCategoryData()
         updateUI()
        
@@ -113,11 +114,10 @@ final class TrackersViewController: UIViewController, UICollectionViewDataSource
         
         let defaultCategory = TrackerCategory(title: "Стандартная", tracker: [defaultTracker1, defaultTracker2, defaultTracker3])
         let newCategory = TrackerCategory(title: "Новая категория", tracker: [defaultTraker4, defaultTracker5, defaultTracker6])
-        let irregularCategory = TrackerCategory(title: "Домашние дела", tracker: [irregularTracker])
+       let irregularCategory = TrackerCategory(title: "Домашние дела", tracker: [irregularTracker])
         
-       // categories.append(defaultCategory)
-       // categories.append(newCategory)
-       // categories.append(irregularCategory)
+        categories.append(contentsOf: [defaultCategory, newCategory, irregularCategory])
+   
     }
     
     func reloadCategoryData() {
@@ -125,26 +125,26 @@ final class TrackersViewController: UIViewController, UICollectionViewDataSource
         
     }
     
-  
-
-    
     
     private func updateVisibleTrackers(for selectedDate: Date) {
         let calendar = Calendar.current
-        let formatter = DateFormatter()
-        formatter.locale = Locale.current
-        formatter.dateFormat = "E"
-
-        let selectedWeekday = formatter.string(from: selectedDate)
+        let weekdaySymbols = calendar.shortWeekdaySymbols
+        let selectedWeekdayIndex = calendar.component(.weekday, from: selectedDate) - 1
+        let selectedWeekday = weekdaySymbols[selectedWeekdayIndex]
 
         filteredCategories = categories.map { category in
-            let filteredTrackers = category.tracker.filter {
-                $0.weekDays.contains(selectedWeekday) || $0.weekDays.contains(" ")
+            let filteredTrackers = category.tracker.filter { tracker in
+                if tracker.weekDays.contains(" ") {
+                    // Если трекер выполнен, он должен отображаться только в день выполнения
+                    return !trackerRecords.contains { $0.trackerID == tracker.id && !$0.date.isSameDay(as: selectedDate) }
+                } else {
+                    // Обычные события отображаем по расписанию
+                    return tracker.weekDays.contains(selectedWeekday)
+                }
             }
             return TrackerCategory(title: category.title, tracker: filteredTrackers)
-        }.filter { !$0.tracker.isEmpty } // Убираем пустые категории
-
-        categoriesCollectionView.reloadData()
+        }.filter { !$0.tracker.isEmpty }
+        reloadCategoryData()
     }
     
     private func filterCategoryByDate(_ category: TrackerCategory) -> TrackerCategory? {
@@ -203,7 +203,7 @@ final class TrackersViewController: UIViewController, UICollectionViewDataSource
     }
     
     @objc private func dateChanged(_ sender: UIDatePicker) {
-        print("dateChamge method is called")
+        print("dateChange method is called")
 
         let formatter = dateFormatter
         selectedDate = sender.date
@@ -212,7 +212,7 @@ final class TrackersViewController: UIViewController, UICollectionViewDataSource
 
       
         updateUI()
-        // categoriesCollectionView.reloadData()
+         categoriesCollectionView.reloadData()
 
         UIView.animate(withDuration: 0.3, animations: {
             self.datePickerHeightConstraint?.constant = 0
@@ -322,7 +322,7 @@ final class TrackersViewController: UIViewController, UICollectionViewDataSource
         categoriesCollectionView.register(CategoriesCollectionHeaderView.self, forSupplementaryViewOfKind: UICollectionView.elementKindSectionHeader, withReuseIdentifier: CategoriesCollectionHeaderView.identifier)
         
         
-        categoriesCollectionView.register(TrackerCategoryCell.self, forCellWithReuseIdentifier: TrackerCategoryCell.reuseIdentifier)
+        categoriesCollectionView.register(TrackerCell.self, forCellWithReuseIdentifier: TrackerCell.reuseIdentifier)
         
         categoriesCollectionView.delegate = self
         searchBar.delegate = self
@@ -337,9 +337,6 @@ final class TrackersViewController: UIViewController, UICollectionViewDataSource
         navigationController.modalPresentationStyle = .automatic
         present(navigationController, animated: true)
     }
-    
-  
-    
 }
 
 extension TrackersViewController: TrackerCategoryCellDelegate {
@@ -352,7 +349,7 @@ extension TrackersViewController: TrackerCategoryCellDelegate {
         return nil
     }
     
-    func trackerCell(_ cell: TrackerCategoryCell, didTapDoneButtonFor trackerID: Int, selectedDate: Date) {
+    func trackerExecution(_ cell: TrackerCell, didTapDoneButtonFor trackerID: Int, selectedDate: Date) {
             let calendar = Calendar.current
         
         let indexPath = selectedIndexPath
@@ -365,7 +362,7 @@ extension TrackersViewController: TrackerCategoryCellDelegate {
                 print("Удалена запись для трекера \(trackerID) на \(selectedDate)")
             } else {
                 // Добавляем запись для выбранной даты
-                let newRecord = TrackerRecord(trackerID: trackerID, date: removeTime(from: selectedDate))
+                let newRecord = TrackerRecord(trackerID: trackerID, date: selectedDate)
                 trackerRecords.append(newRecord)
                 print("Добавлена запись для трекера \(trackerID) на \(selectedDate)")
                 updateTrackerDaysCount(for: trackerID, isChecked: true)
@@ -450,7 +447,7 @@ extension TrackersViewController {
     }
     
     func collectionView(_ collectionView: UICollectionView, cellForItemAt indexPath: IndexPath) -> UICollectionViewCell {
-        guard let cell = categoriesCollectionView.dequeueReusableCell(withReuseIdentifier: TrackerCategoryCell.reuseIdentifier, for: indexPath) as? TrackerCategoryCell else {
+        guard let cell = categoriesCollectionView.dequeueReusableCell(withReuseIdentifier: TrackerCell.reuseIdentifier, for: indexPath) as? TrackerCell else {
             return UICollectionViewCell()
         }
         
@@ -552,9 +549,9 @@ extension TrackersViewController: NewHabitViewControllerDelegate, NewIrregularEv
         } else {
             categories.append(category)
             print("Создана новая категория \(category.title) и добавлен трекер \(tracker.name)")
-            reloadCategoryData()
-            updateUI()
         }
+        updateUI()
+        updateVisibleTrackers(for: currentDate)
     }
     
     
@@ -573,9 +570,10 @@ extension TrackersViewController: NewHabitViewControllerDelegate, NewIrregularEv
         } else {
             categories.append(category)
             print("Создана новая категория \(category.title) и добавлен трекер \(tracker.name)")
-            reloadCategoryData()
-            updateUI()
+            
         }
+        updateUI()
+        updateVisibleTrackers(for: currentDate)
     }
 }
 
@@ -589,9 +587,29 @@ extension TrackersViewController: UISearchBarDelegate {
        }
     
     private func filterTrackers(for searchText: String) {
-        let dateFilteredCategories = categories.compactMap { filterCategoryByDate($0) }
+        let calendar = Calendar.current
+        
+        let dateFilteredCategories = categories.compactMap { category in
+            let filteredTrackers = category.tracker.filter { tracker in
+                let isRegular = !tracker.weekDays.contains(" ")
+                
+                // Проверяем, выполнено ли событие в какой-то другой день
+                let hasExecutionRecord = trackerRecords.contains { record in
+                    record.trackerID == tracker.id && !calendar.isDate(record.date, inSameDayAs: selectedDate)
+                }
+             
+                let isVisibleToday = isRegular
+                    ? filterCategoryByDate(category) != nil
+                    : !hasExecutionRecord || trackerRecords.contains { $0.trackerID == tracker.id && calendar.isDate($0.date, inSameDayAs: selectedDate) }
+
+                return isVisibleToday
+            }
+            return filteredTrackers.isEmpty ? nil : TrackerCategory(title: category.title, tracker: filteredTrackers)
+        }
+        
         if searchText.isEmpty {
-            filteredCategories = categories.compactMap {filterCategoryByDate($0)}
+            updateVisibleTrackers(for: selectedDate)
+            reloadCategoryData()
         } else {
             filteredCategories = dateFilteredCategories.compactMap { category in
                 let filteredTrackers = category.tracker.filter { tracker in
@@ -601,6 +619,13 @@ extension TrackersViewController: UISearchBarDelegate {
             }
         }
         
-        categoriesCollectionView.reloadData()
+        reloadCategoryData()
+    }
+}
+
+extension Date {
+    func isSameDay(as otherDate: Date) -> Bool {
+        let calendar = Calendar.current
+        return calendar.isDate(self, inSameDayAs: otherDate)
     }
 }
