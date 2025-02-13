@@ -2,11 +2,9 @@ import UIKit
 
 class CategoriesListTableCell: UITableViewCell {
     
-    // MARK: - UI Elements
-    
     static let identifier = "CategoriesListTableCell" //
     
-     let categoryNameLabel: UILabel = {
+    let categoryNameLabel: UILabel = {
         let label = UILabel()
         label.font = .systemFont(ofSize: 17, weight: .regular)
         label.textColor = UIColor.custom(.createButtonColor)
@@ -56,14 +54,14 @@ class CategoriesListTableCell: UITableViewCell {
     }
     
     override func setSelected(_ selected: Bool, animated: Bool) {
-           super.setSelected(selected, animated: animated)
+        super.setSelected(selected, animated: animated)
         contentView.backgroundColor = selected ? UIColor.custom(.backgroundGray) : UIColor.custom(.backgroundGray)
-           if selected {
-               checkMark.tintColor = UIColor.custom(.toggleSwitchBlue) // Цвет при выделении
-           } else {
-               checkMark.tintColor = UIColor.custom(.backgroundGray) // Цвет при отмене выделения
-           }
-       }
+        if selected {
+            checkMark.tintColor = UIColor.custom(.toggleSwitchBlue) // Цвет при выделении
+        } else {
+            checkMark.tintColor = UIColor.custom(.backgroundGray) // Цвет при отмене выделения
+        }
+    }
     
     // MARK: - Configuration Method
     func configure(with title: String){

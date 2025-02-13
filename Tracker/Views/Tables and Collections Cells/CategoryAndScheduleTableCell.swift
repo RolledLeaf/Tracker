@@ -2,9 +2,7 @@ import UIKit
 
 class CategoryAndScheduleTableViewCell: UITableViewCell {
     
-    // MARK: - UI Elements
-    
-    static let identifier = "CategoryAndScheduleTableViewCell" // Уникальный идентификатор для регистрации
+    static let identifier = "CategoryAndScheduleTableViewCell"
     
     private let titleLabel: UILabel = {
         let label = UILabel()
@@ -15,7 +13,7 @@ class CategoryAndScheduleTableViewCell: UITableViewCell {
         return label
     }()
     
-     let detailedTextLabel: UILabel = {
+    private let detailedTextLabel: UILabel = {
         let label = UILabel()
         label.font = .systemFont(ofSize: 17, weight: .regular)
         label.textColor = UIColor.custom(.textFieldGray)
@@ -23,8 +21,6 @@ class CategoryAndScheduleTableViewCell: UITableViewCell {
         label.translatesAutoresizingMaskIntoConstraints = false
         return label
     }()
-    
-    
     
     private let arrowImageView: UIImageView = {
         let imageView = UIImageView()
@@ -36,12 +32,11 @@ class CategoryAndScheduleTableViewCell: UITableViewCell {
     
     private var subtitleConstraints: [NSLayoutConstraint] = []
     private var noSubtitleConstraints: [NSLayoutConstraint] = []
-    
     private var hasSubtitle: Bool = false {
-            didSet {
-                updateConstraintsForSubtitle()
-            }
+        didSet {
+            updateConstraintsForSubtitle()
         }
+    }
     
     // MARK: - Init
     
@@ -62,8 +57,6 @@ class CategoryAndScheduleTableViewCell: UITableViewCell {
         contentView.addSubview(detailedTextLabel)
         contentView.backgroundColor = UIColor.custom(.backgroundGray)
         
-        
-        
         NSLayoutConstraint.activate([
             arrowImageView.trailingAnchor.constraint(equalTo: contentView.trailingAnchor, constant: -16),
             arrowImageView.centerYAnchor.constraint(equalTo: contentView.centerYAnchor),
@@ -72,35 +65,34 @@ class CategoryAndScheduleTableViewCell: UITableViewCell {
         ])
         
         subtitleConstraints = [
-        titleLabel.leadingAnchor.constraint(equalTo: contentView.leadingAnchor, constant: 16),
-        titleLabel.topAnchor.constraint(equalTo: contentView.topAnchor, constant: 15),
-        
-        detailedTextLabel.leadingAnchor.constraint(equalTo: contentView.leadingAnchor, constant: 16),
-        detailedTextLabel.topAnchor.constraint(equalTo: titleLabel.bottomAnchor, constant: 2),
-        detailedTextLabel.widthAnchor.constraint(equalToConstant: 271),
-        detailedTextLabel.heightAnchor.constraint(equalToConstant: 22),
+            titleLabel.leadingAnchor.constraint(equalTo: contentView.leadingAnchor, constant: 16),
+            titleLabel.topAnchor.constraint(equalTo: contentView.topAnchor, constant: 15),
+            
+            detailedTextLabel.leadingAnchor.constraint(equalTo: contentView.leadingAnchor, constant: 16),
+            detailedTextLabel.topAnchor.constraint(equalTo: titleLabel.bottomAnchor, constant: 2),
+            detailedTextLabel.widthAnchor.constraint(equalToConstant: 271),
+            detailedTextLabel.heightAnchor.constraint(equalToConstant: 22),
         ]
         
         noSubtitleConstraints = [
             titleLabel.leadingAnchor.constraint(equalTo: contentView.leadingAnchor, constant: 16),
             titleLabel.centerYAnchor.constraint(equalTo: contentView.centerYAnchor)
-            ]
-        
+        ]
     }
     
     // MARK: - Configuration Method
     
     private func updateConstraintsForSubtitle() {
-            if hasSubtitle {
-                detailedTextLabel.isHidden = false
-                NSLayoutConstraint.deactivate(noSubtitleConstraints)
-                NSLayoutConstraint.activate(subtitleConstraints)
-            } else {
-                detailedTextLabel.isHidden = true
-                NSLayoutConstraint.deactivate(subtitleConstraints)
-                NSLayoutConstraint.activate(noSubtitleConstraints)
-            }
+        if hasSubtitle {
+            detailedTextLabel.isHidden = false
+            NSLayoutConstraint.deactivate(noSubtitleConstraints)
+            NSLayoutConstraint.activate(subtitleConstraints)
+        } else {
+            detailedTextLabel.isHidden = true
+            NSLayoutConstraint.deactivate(subtitleConstraints)
+            NSLayoutConstraint.activate(noSubtitleConstraints)
         }
+    }
     
     func configure(with option: (title: String, subtitle: String?)) {
         // Устанавливаем текст для заголовка

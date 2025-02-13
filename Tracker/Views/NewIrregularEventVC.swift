@@ -1,12 +1,12 @@
 import UIKit
 
-protocol NewHabitViewControllerDelegate: AnyObject {
-    func didCreateTracker(_ tracker: Tracker,_ category: TrackerCategory)
+protocol NewIrregularEventViewControllerDelegate: AnyObject {
+    func didCreateIrregularEvent(_ tracker: Tracker,_ category: TrackerCategory)
 }
 
-final class NewHabitViewController: UIViewController, UITableViewDelegate, UITableViewDataSource, UICollectionViewDataSource, UICollectionViewDelegateFlowLayout, UITextFieldDelegate {
+final class NewIrregularEventViewController: UIViewController, UITableViewDelegate, UITableViewDataSource, UICollectionViewDataSource, UICollectionViewDelegateFlowLayout, UITextFieldDelegate {
     
-    weak var delegate: NewHabitViewControllerDelegate?
+    weak var delegate: NewIrregularEventViewControllerDelegate?
     
     private let titleLabel: UILabel = {
         let label = UILabel()
@@ -45,18 +45,18 @@ final class NewHabitViewController: UIViewController, UITableViewDelegate, UITab
         let flexSpace = UIBarButtonItem(barButtonSystemItem: .flexibleSpace, target: nil, action: nil)
         let doneButton = UIBarButtonItem(title: "Готово", style: .done, target: textField, action: #selector(UIResponder.resignFirstResponder))
         toolbar.items = [flexSpace, doneButton]
-        
         textField.inputAccessoryView = toolbar
-        
         return textField
     }()
     
     private let categoryAndScheduleTableView: UITableView = {
         let tableView = UITableView()
-        tableView.separatorStyle = .singleLine
+        tableView.separatorStyle = .none
         tableView.isScrollEnabled = false
         tableView.backgroundColor = .clear
         tableView.rowHeight = 75
+        let layer = tableView.layer
+        layer.cornerRadius = 16
         return tableView
     }()
     
@@ -93,7 +93,6 @@ final class NewHabitViewController: UIViewController, UITableViewDelegate, UITab
         button.setTitle("Создать", for: .normal)
         button.titleLabel?.font = UIFont.systemFont(ofSize: 16, weight: .medium)
         button.setTitleColor(.white, for: .normal)
-        
         button.backgroundColor = UIColor.custom(.textFieldGray)
         button.layer.cornerRadius = 16
         button.addTarget(self, action: #selector(createTrackerButtonTapped), for: .touchUpInside)
@@ -119,17 +118,12 @@ final class NewHabitViewController: UIViewController, UITableViewDelegate, UITab
     
     let scrollView = UIScrollView()
     let contentView = UIView()
+    let selectedWeekDays: String = " "
+    
     
     var tableViewOptions: [(title: String, subtitle: String?)] = [
-        (title: "Категория", subtitle: nil),
-        (title: "Расписание", subtitle: nil)
+        (title: "Категория", subtitle: nil)
     ]
-    
-    var selectedWeekDays: [String]? {
-        didSet {
-            updateCreateCategoryButtonColor()
-        }
-    }
     
     var selectedColor: CollectionColors? {
         didSet {
@@ -141,7 +135,6 @@ final class NewHabitViewController: UIViewController, UITableViewDelegate, UITab
             updateCreateCategoryButtonColor()
         }
     }
-    
     
     var selectedCategory: String? {
         didSet {
@@ -175,14 +168,11 @@ final class NewHabitViewController: UIViewController, UITableViewDelegate, UITab
         view.addSubview(scrollView)
         scrollView.addSubview(contentView)
         uiElements.forEach { contentView.addSubview($0) }
-        
         scrollView.translatesAutoresizingMaskIntoConstraints = false
         contentView.translatesAutoresizingMaskIntoConstraints = false
-        
         trackerNameTextField.delegate = self
         
         NSLayoutConstraint.activate([
-            
             scrollView.topAnchor.constraint(equalTo: view.topAnchor),
             scrollView.leadingAnchor.constraint(equalTo: view.leadingAnchor),
             scrollView.trailingAnchor.constraint(equalTo: view.trailingAnchor),
@@ -193,7 +183,7 @@ final class NewHabitViewController: UIViewController, UITableViewDelegate, UITab
             contentView.trailingAnchor.constraint(equalTo: scrollView.trailingAnchor),
             contentView.bottomAnchor.constraint(equalTo: scrollView.bottomAnchor),
             contentView.widthAnchor.constraint(equalTo: scrollView.widthAnchor),
-            contentView.heightAnchor.constraint(equalToConstant: 962),
+            contentView.heightAnchor.constraint(equalToConstant: 887),
             
             
             titleLabel.topAnchor.constraint(equalTo: contentView.topAnchor),
@@ -210,11 +200,10 @@ final class NewHabitViewController: UIViewController, UITableViewDelegate, UITab
             characterLimitLabel.trailingAnchor.constraint(equalTo: view.trailingAnchor, constant: -44),
             characterLimitLabel.topAnchor.constraint(equalTo: trackerNameTextField.bottomAnchor, constant: 8),
             
-            
             categoryAndScheduleTableView.topAnchor.constraint(equalTo: trackerNameTextField.bottomAnchor, constant: 62),
             categoryAndScheduleTableView.leadingAnchor.constraint(equalTo: contentView.leadingAnchor, constant: 16),
             categoryAndScheduleTableView.trailingAnchor.constraint(equalTo: contentView.trailingAnchor, constant: -16),
-            categoryAndScheduleTableView.heightAnchor.constraint(equalToConstant: 150),
+            categoryAndScheduleTableView.heightAnchor.constraint(equalToConstant: 75),
             
             collectionsStackView.topAnchor.constraint(equalTo: categoryAndScheduleTableView.bottomAnchor, constant: 50),
             collectionsStackView.heightAnchor.constraint(equalToConstant: 442),
@@ -247,7 +236,7 @@ final class NewHabitViewController: UIViewController, UITableViewDelegate, UITab
             withReuseIdentifier: EmojiAndColorCollectionHeaderView.identifier
         )
         
-        categoryAndScheduleTableView.register(CategoryAndScheduleTableViewCell.self, forCellReuseIdentifier: CategoryAndScheduleTableViewCell.identifier)
+        categoryAndScheduleTableView.register(CategoryAndScheduleTableViewCell.self, forCellReuseIdentifier: CategoryAndScheduleTableViewCell.identifier) //регистрация по ячейке
     }
     
     @objc func textFieldDidChange() {
@@ -264,7 +253,6 @@ final class NewHabitViewController: UIViewController, UITableViewDelegate, UITab
         if let name = trackerNameTextField.text, !name.isEmpty,
            selectedColor != nil,
            selectedEmoji != nil,
-           let selectedWeekDays = selectedWeekDays, !selectedWeekDays.isEmpty,
            selectedCategory != nil {
             createTrackerButton.backgroundColor = UIColor.custom(.createButtonColor)  // Активный цвет
             print("Условия выполнены, кнопка Создать перекрашена в \(UIColor.custom(.createButtonColor))")
@@ -278,14 +266,15 @@ final class NewHabitViewController: UIViewController, UITableViewDelegate, UITab
         guard let name = trackerNameTextField.text,
               let selectedColor = selectedColor,
               let selectedEmoji = selectedEmoji,
-              let selectedWeekDays = selectedWeekDays,
-              let selectedCategory = selectedCategory
+              
+                let selectedCategory = selectedCategory
         else {
             showAlert(message: "Не все данные выбраны!")
             print("Не все данные выбраны!")
             return
         }
-        print("Создаём трекер с названием: \(name), цвет: \(selectedColor), эмодзи: \(selectedEmoji), категория: \(selectedCategory), дни недели: \(selectedWeekDays.joined(separator: ", "))")
+        
+        print("Создаём трекер с названием: \(name), цвет: \(selectedColor), эмодзи: \(selectedEmoji), категория: \(selectedCategory), дни недели: \(selectedWeekDays)")
         
         let tracker = Tracker(
             id: TrackerIdGenerator.generateId(),
@@ -293,17 +282,16 @@ final class NewHabitViewController: UIViewController, UITableViewDelegate, UITab
             color: selectedColor,
             emoji: selectedEmoji,
             daysCount: 0,
-            weekDays: selectedWeekDays
+            weekDays: [" "]
         )
         
         let category = TrackerCategory(title: selectedCategory, tracker: [tracker])
         
         let trackersVC = TrackersViewController()
-        delegate?.didCreateTracker(tracker, category)
+        delegate?.didCreateIrregularEvent(tracker, category)
         self.view.window?.rootViewController?.dismiss(animated: true, completion: nil)
         let navigationController = UINavigationController(rootViewController: trackersVC)
         present(navigationController, animated: true)
-        
     }
     
     @objc private func cancelButtonTapped(_ sender: UIButton) {
@@ -314,10 +302,7 @@ final class NewHabitViewController: UIViewController, UITableViewDelegate, UITab
         guard let currentText = textField.text, let textRange = Range(range, in: currentText) else {
             return true
         }
-        
         let updatedText = currentText.replacingCharacters(in: textRange, with: string)
-        
-        // Ограничение в 38 символов
         if updatedText.count > 38 {
             characterLimitLabel.isHidden = false
             return false
@@ -346,13 +331,11 @@ final class NewHabitViewController: UIViewController, UITableViewDelegate, UITab
         
         print("Successfully dequeued CollectionHeaderView for section \(indexPath.section)")
         
-        // Configure header
         if collectionView == emojiCollectionView {
             header.configure(with: "Emoji")
         } else if collectionView == colorsCollectionView {
             header.configure(with: "Цвет")
         }
-        
         return header
     }
     
@@ -365,6 +348,7 @@ final class NewHabitViewController: UIViewController, UITableViewDelegate, UITab
     func numberOfSections(in collectionView: UICollectionView) -> Int {
         1
     }
+    
     
     func collectionView(_ collectionView: UICollectionView, numberOfItemsInSection section: Int) -> Int {
         if collectionView == emojiCollectionView {
@@ -410,7 +394,7 @@ final class NewHabitViewController: UIViewController, UITableViewDelegate, UITab
     }
     
     func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
-        return tableViewOptions.count
+        return 1
     }
     
     func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
@@ -425,67 +409,38 @@ final class NewHabitViewController: UIViewController, UITableViewDelegate, UITab
     
     func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
         tableView.deselectRow(at: indexPath, animated: true)
-        if indexPath.row == 0 {
-            view.endEditing(true)
-            let categoryListVC = CategoriesListViewController()
-            categoryListVC.delegate = self
-            let navigationController = UINavigationController(rootViewController: categoryListVC)
-            navigationController.modalPresentationStyle = .automatic
-            present(navigationController, animated: true)
-        } else if indexPath.row == 1 {
-            view.endEditing(true)
-            let scheduleVC = ScheduleViewController()
-            scheduleVC.delegate = self
-            let navigationController = UINavigationController(rootViewController: scheduleVC)
-            navigationController.modalPresentationStyle = .popover
-            present(navigationController, animated: true)
-        }
+        
+        let categoryListVC = CategoriesListViewController()
+        categoryListVC.delegate = self
+        let navigationController = UINavigationController(rootViewController: categoryListVC)
+        navigationController.modalPresentationStyle = .automatic
+        present(navigationController, animated: true)
+        
     }
     
     func tableView(_ tableView: UITableView, willDisplay cell: UITableViewCell, forRowAt indexPath: IndexPath) {
         let cornerRadius: CGFloat = 16
         
+        // Сброс настроек для всех ячеек
         cell.layer.cornerRadius = 0
         cell.layer.maskedCorners = []
         cell.clipsToBounds = true
-        cell.separatorInset = UIEdgeInsets(top: 0, left: 16, bottom: 0, right: 16)
+        cell.separatorInset = UIEdgeInsets(top: 0, left: 16, bottom: 0, right: 16) // Обычные отступы для разделителя
         
-        if indexPath.row == 0 {
-            cell.layer.cornerRadius = cornerRadius
-            cell.layer.maskedCorners = [.layerMinXMinYCorner, .layerMaxXMinYCorner]
-            cell.separatorInset = UIEdgeInsets(top: 0, left: 16, bottom: 0, right: 16)
-        }
         
-        if indexPath.row == tableView.numberOfRows(inSection: indexPath.section) - 1 {
-            cell.layer.cornerRadius = cornerRadius
-            cell.layer.maskedCorners = [.layerMinXMaxYCorner, .layerMaxXMaxYCorner]
-            cell.separatorInset = UIEdgeInsets(top: 0, left: 0, bottom: 0, right: UIScreen.main.bounds.width)
-        }
+        cell.layer.cornerRadius = cornerRadius
+        cell.layer.maskedCorners = [.layerMinXMaxYCorner, .layerMaxXMaxYCorner]
+        cell.separatorInset = UIEdgeInsets(top: 0, left: 0, bottom: 0, right: UIScreen.main.bounds.width)
+        
     }
 }
 
-extension NewHabitViewController: ScheduleViewControllerDelegate {
-    func updateSubtitle(for title: String, with subtitle: String?) {
-        if let index = tableViewOptions.firstIndex(where: { $0.title == title }) {
-            tableViewOptions[index].subtitle = subtitle
-            categoryAndScheduleTableView.reloadData()
-        }
-        if title == "Расписание", let subtitle = subtitle {
-            if subtitle == "Ежедневно" {
-                selectedWeekDays = ["Пн", "Вт", "Ср", "Чт", "Пт", "Сб", "Вс"]
-            } else {
-                selectedWeekDays = subtitle.split(separator: ",").map { $0.trimmingCharacters(in: .whitespaces) }
-            }
-        }
-    }
-}
-//let russianSelectedWeekDays = ["Пн", "Вт", "Ср", "Чт", "Пт", "Сб", "Вс"]
-//let engSelectedWeekDays = ["Mon", "Tue", "Wed", "Thu", "Fri", "Sat", "Sun"]
-extension NewHabitViewController: CategoriesListViewControllerDelegate {
+extension NewIrregularEventViewController: CategoriesListViewControllerDelegate {
     func updateCategory(with category: String) {
         if let index = tableViewOptions.firstIndex(where: { $0.title == "Категория" }) {
             tableViewOptions[index].subtitle = category
         }
+        
         selectedCategory = category
         categoryAndScheduleTableView.reloadData()
     }

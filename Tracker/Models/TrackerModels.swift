@@ -9,8 +9,6 @@ struct Tracker {
     let weekDays: [String]
 }
 
-
-
 struct TrackerCategory {
     let title: String
     let tracker: [Tracker]

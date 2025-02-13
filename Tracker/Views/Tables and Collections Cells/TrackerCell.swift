@@ -1,22 +1,22 @@
 import UIKit
 
 protocol TrackerCategoryCellDelegate: AnyObject {
-    func trackerCell(_ cell: TrackerCategoryCell, didTapDoneButtonFor trackerID: Int, selectedDate: Date)
+    func trackerExecution(_ cell: TrackerCell, didTapDoneButtonFor trackerID: Int, selectedDate: Date)
 }
 
-final class TrackerCategoryCell: UICollectionViewCell {
+final class TrackerCell: UICollectionViewCell {
     weak var delegate: TrackerCategoryCellDelegate?
     weak var viewController: TrackersViewController?
     
-    static let reuseIdentifier = "TrackerCategoryCell"
+    static let reuseIdentifier = "TrackerCell"
     
-    var currentSelectedTracker: Tracker?
-    var trackerID: Int?
-    var currentDate: Date = Date()
-    var selectedIndexPaths: Set<IndexPath> = []
+    private var currentSelectedTracker: Tracker?
+    private var trackerID: Int?
+    private var currentDate: Date = Date()
+    private var selectedIndexPaths: Set<IndexPath> = []
     
     
-    let habbitLabel: UILabel = {
+    private let habbitLabel: UILabel = {
         let label = UILabel()
         label.font = .systemFont(ofSize: 14, weight: .regular)
         label.textColor = UIColor.custom(.createButtonTextColor)
@@ -26,13 +26,14 @@ final class TrackerCategoryCell: UICollectionViewCell {
         return label
     }()
     
-     let doneButton: UIButton = {
+    let doneButton: UIButton = {
         let button = UIButton(type: .custom)
         button.setImage(UIImage(systemName: "plus"), for: .normal)
         button.tintColor = .black
         button.imageView?.contentMode = .scaleAspectFit
         button.tintColor = UIColor.custom(.createButtonTextColor)
         button.addTarget(self, action: #selector(doneButtonTapped), for: .touchUpInside)
+        
         return button
     }()
     
@@ -68,10 +69,11 @@ final class TrackerCategoryCell: UICollectionViewCell {
         return view
     }()
     
-     let doneButtonContainer: UIView = {
+    let doneButtonContainer: UIView = {
         let view = UIView()
         view.layer.cornerRadius = 17
         view.layer.masksToBounds = true
+        view.isUserInteractionEnabled = true
         return view
     }()
     
@@ -98,7 +100,9 @@ final class TrackerCategoryCell: UICollectionViewCell {
         uiElements.forEach { $0.translatesAutoresizingMaskIntoConstraints = false }
         uiElements.forEach { contentView.addSubview($0) }
         
-        
+        let tapGesture = UITapGestureRecognizer(target: self, action: #selector(doneButtonTapped))
+        doneButtonContainer.addGestureRecognizer(tapGesture)
+        doneButton.isUserInteractionEnabled = false
         
         NSLayoutConstraint.activate([
             daysNumberLabel.leadingAnchor.constraint(equalTo: contentView.leadingAnchor, constant: 12),
@@ -109,11 +113,13 @@ final class TrackerCategoryCell: UICollectionViewCell {
             daysCountLabel.heightAnchor.constraint(equalToConstant: 18),
             daysCountLabel.widthAnchor.constraint(equalToConstant: 101),
             
-            doneButton.trailingAnchor.constraint(equalTo: contentView.trailingAnchor, constant: -12),
-            doneButton.bottomAnchor.constraint(equalTo: contentView.bottomAnchor, constant: -24),
+            doneButton.centerXAnchor.constraint(equalTo: doneButtonContainer.centerXAnchor),
+            doneButton.centerYAnchor.constraint(equalTo: doneButtonContainer.centerYAnchor),
+            doneButton.heightAnchor.constraint(equalToConstant: 12),
+            doneButton.widthAnchor.constraint(equalToConstant: 12),
             
-            doneButtonContainer.centerXAnchor.constraint(equalTo: doneButton.centerXAnchor),
-            doneButtonContainer.centerYAnchor.constraint(equalTo: doneButton.centerYAnchor),
+            doneButtonContainer.trailingAnchor.constraint(equalTo: backgroundContainer.trailingAnchor, constant: -12),
+            doneButtonContainer.topAnchor.constraint(equalTo: backgroundContainer.bottomAnchor, constant: 8),
             doneButtonContainer.heightAnchor.constraint(equalToConstant: 34),
             doneButtonContainer.widthAnchor.constraint(equalToConstant: 34),
             
@@ -149,10 +155,7 @@ final class TrackerCategoryCell: UICollectionViewCell {
         }
     }
     
-    
-    
     func configure(with tracker: Tracker, trackerRecords: [TrackerRecord]) {
-        
         currentSelectedTracker = tracker
         trackerID = tracker.id
         emojiLabel.text = tracker.emoji
@@ -161,41 +164,30 @@ final class TrackerCategoryCell: UICollectionViewCell {
         doneButtonContainer.backgroundColor = UIColor.fromCollectionColor(tracker.color) ?? .clear
         emojiContainer.backgroundColor = lightenColor(UIColor.fromCollectionColor(tracker.color) ?? .clear, by: 0.3)
         
-        // Проверяем, был ли выполнен трекер на текущую дату
-           let currentDate = Date()
+        let currentDate = Date()
         let isCompleted = trackerRecords.contains { $0.trackerID == tracker.id && Calendar.current.isDate($0.date, inSameDayAs: viewController?.selectedDate ?? currentDate) }
         
-        
-        // Обновляем кнопку в зависимости от состояния выполнения
-       doneButton.setImage(UIImage(systemName: isCompleted ? "checkmark" : "plus"), for: .normal)
+        doneButton.setImage(UIImage(systemName: isCompleted ? "checkmark" : "plus"), for: .normal)
         
         let baseColor = UIColor.fromCollectionColor(currentSelectedTracker?.color ?? .collectionBeige7) ?? .collectionBeige7
-    
-           
-           let adjustedColor = isCompleted ? lightenColor(baseColor, by: 0.3) : baseColor
-           doneButtonContainer.backgroundColor = adjustedColor
-
-        // Отображаем количество дней
-        let daysCount = tracker.daysCount 
+        let adjustedColor = isCompleted ? lightenColor(baseColor, by: 0.3) : baseColor
+        doneButtonContainer.backgroundColor = adjustedColor
+        
+        let daysCount = tracker.daysCount
         daysNumberLabel.text = "\(daysCount)"
         daysCountLabel.text = getDayWord(for: daysCount)
     }
     
-    
-    
     @objc func doneButtonTapped() {
-           guard let trackerID = trackerID else {
-               print("Tracker ID is missing!")
-               return
-           }
-           
-           guard let selectedDate = viewController?.getSelectedDate() else {
-               print("Date Picker is not set!")
-               return
-           }
-        
-           delegate?.trackerCell(self, didTapDoneButtonFor: trackerID, selectedDate: selectedDate)
-        
-       }
+        guard let trackerID = trackerID else {
+            print("Tracker ID is missing!")
+            return
+        }
+        guard let selectedDate = viewController?.getSelectedDate() else {
+            print("Date Picker is not set!")
+            return
+        }
+        delegate?.trackerExecution(self, didTapDoneButtonFor: trackerID, selectedDate: selectedDate)
     }
+}
 

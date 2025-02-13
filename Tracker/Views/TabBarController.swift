@@ -4,9 +4,7 @@ final class TabBarController: UITabBarController {
     override func viewDidLoad() {
         super.viewDidLoad()
         setupTabBar()
-        
     }
-    
     
     private func setupTabBar() {
         let trackerVC = TrackersViewController()
@@ -19,6 +17,5 @@ final class TabBarController: UITabBarController {
                            UINavigationController(rootViewController: statisticsVC)]
         
         tabBar.backgroundColor = UIColor.custom(.createButtonTextColor)
-        
     }
 }

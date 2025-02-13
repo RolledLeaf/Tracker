@@ -38,8 +38,6 @@ final class NewCategoryViewController: UIViewController {
         return textField
     }()
     
-    
-    
     private let doneButton: UIButton = {
         let button = UIButton()
         button.setTitle("Готово", for: .normal)
@@ -88,7 +86,4 @@ final class NewCategoryViewController: UIViewController {
         dismiss(animated: true, completion: nil)
         
     }
-    
-    
-    
 }
