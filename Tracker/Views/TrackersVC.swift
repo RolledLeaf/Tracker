@@ -1,7 +1,7 @@
 
 import UIKit
 
-final class TrackersViewController: UIViewController, UICollectionViewDataSource, UICollectionViewDelegateFlowLayout, UICollectionViewDelegate, NewHabitViewControllerDelegate {
+final class TrackersViewController: UIViewController, UICollectionViewDataSource, UICollectionViewDelegateFlowLayout, UICollectionViewDelegate {
     
     
     private let plusButton = UIButton()
@@ -108,13 +108,16 @@ final class TrackersViewController: UIViewController, UICollectionViewDataSource
         let defaultTraker4 = Tracker(id: 4, name: "Подготовка к сноуборду", color: .collectionViolet6, emoji: "😈", daysCount: 5, weekDays: ["Tue", "Wed", "Thu", "Fri", "Sat"])
         let defaultTracker5 = Tracker(id: 5, name: "Подготовка лыжам", color: .collectionOrange2, emoji: "🥶", daysCount: 2, weekDays: ["Tue", "Fri", "Sat"])
         let defaultTracker6 = Tracker(id: 6, name: "Работа в саду", color: .collectionGreen18, emoji: "🌺", daysCount: 2, weekDays: ["Tue", "Wed", "Thu", "Fri", "Sun"])
+        let irregularTracker = Tracker(id: 8, name: "Repair the sink", color: .collectionBeige7, emoji: "🙌", daysCount: 0, weekDays: [" "])
         
         
         let defaultCategory = TrackerCategory(title: "Стандартная", tracker: [defaultTracker1, defaultTracker2, defaultTracker3])
         let newCategory = TrackerCategory(title: "Новая категория", tracker: [defaultTraker4, defaultTracker5, defaultTracker6])
+        let irregularCategory = TrackerCategory(title: "Домашние дела", tracker: [irregularTracker])
         
-        categories.append(defaultCategory)
-        categories.append(newCategory)
+       // categories.append(defaultCategory)
+       // categories.append(newCategory)
+       // categories.append(irregularCategory)
     }
     
     func reloadCategoryData() {
@@ -123,35 +126,21 @@ final class TrackersViewController: UIViewController, UICollectionViewDataSource
     }
     
   
-    func didCreateTracker(_ tracker: Tracker, _ category: TrackerCategory) {
-        // Ищем индекс существующей категории
-        if let existingCategoryIndex = categories.firstIndex(where: { $0.title == category.title }) {
-            let existingCategory = categories[existingCategoryIndex]
 
-            if !existingCategory.tracker.contains(where: { $0.name == tracker.name }) {
-                let updatedCategory = TrackerCategory(title: existingCategory.title, tracker: existingCategory.tracker + [tracker])
-                categories[existingCategoryIndex] = updatedCategory
-                print("Добавлен новый трекер \(tracker.name) в существующую категорию \(category.title)")
-            } else {
-                print("Трекер \(tracker.name) уже существует в категории \(category.title), не добавляем повторно.")
-            }
-        } else {
-            categories.append(category)
-            print("Создана новая категория \(category.title) и добавлен трекер \(tracker.name)")
-            reloadCategoryData()
-            updateUI()
-        }
-    }
     
     
     private func updateVisibleTrackers(for selectedDate: Date) {
         let calendar = Calendar.current
-        let weekdaySymbols = calendar.shortWeekdaySymbols
-        let selectedWeekdayIndex = calendar.component(.weekday, from: selectedDate) - 1
-        let selectedWeekday = weekdaySymbols[selectedWeekdayIndex]
+        let formatter = DateFormatter()
+        formatter.locale = Locale.current
+        formatter.dateFormat = "E"
+
+        let selectedWeekday = formatter.string(from: selectedDate)
 
         filteredCategories = categories.map { category in
-            let filteredTrackers = category.tracker.filter { $0.weekDays.contains(selectedWeekday) }
+            let filteredTrackers = category.tracker.filter {
+                $0.weekDays.contains(selectedWeekday) || $0.weekDays.contains(" ")
+            }
             return TrackerCategory(title: category.title, tracker: filteredTrackers)
         }.filter { !$0.tracker.isEmpty } // Убираем пустые категории
 
@@ -544,6 +533,49 @@ extension TrackersViewController {
         let cellHeight: CGFloat = 148 // Например, фиксированная высота
         
         return CGSize(width: cellWidth, height: cellHeight)
+    }
+}
+
+
+extension TrackersViewController: NewHabitViewControllerDelegate, NewIrregularEventViewControllerDelegate {
+    func didCreateIrregularEvent(_ tracker: Tracker, _ category: TrackerCategory) {
+        if let existingCategoryIndex = categories.firstIndex(where: { $0.title == category.title }) {
+            let existingCategory = categories[existingCategoryIndex]
+
+            if !existingCategory.tracker.contains(where: { $0.name == tracker.name }) {
+                let updatedCategory = TrackerCategory(title: existingCategory.title, tracker: existingCategory.tracker + [tracker])
+                categories[existingCategoryIndex] = updatedCategory
+                print("Добавлен новый трекер \(tracker.name) в существующую категорию \(category.title)")
+            } else {
+                print("Трекер \(tracker.name) уже существует в категории \(category.title), не добавляем повторно.")
+            }
+        } else {
+            categories.append(category)
+            print("Создана новая категория \(category.title) и добавлен трекер \(tracker.name)")
+            reloadCategoryData()
+            updateUI()
+        }
+    }
+    
+    
+    func didCreateTracker(_ tracker: Tracker, _ category: TrackerCategory) {
+        // Ищем индекс существующей категории
+        if let existingCategoryIndex = categories.firstIndex(where: { $0.title == category.title }) {
+            let existingCategory = categories[existingCategoryIndex]
+
+            if !existingCategory.tracker.contains(where: { $0.name == tracker.name }) {
+                let updatedCategory = TrackerCategory(title: existingCategory.title, tracker: existingCategory.tracker + [tracker])
+                categories[existingCategoryIndex] = updatedCategory
+                print("Добавлен новый трекер \(tracker.name) в существующую категорию \(category.title)")
+            } else {
+                print("Трекер \(tracker.name) уже существует в категории \(category.title), не добавляем повторно.")
+            }
+        } else {
+            categories.append(category)
+            print("Создана новая категория \(category.title) и добавлен трекер \(tracker.name)")
+            reloadCategoryData()
+            updateUI()
+        }
     }
 }
 

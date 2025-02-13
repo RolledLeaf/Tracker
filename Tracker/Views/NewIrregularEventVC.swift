@@ -1,7 +1,7 @@
 import UIKit
 
 protocol NewIrregularEventViewControllerDelegate: AnyObject {
-    func didCreateTracker(_ tracker: Tracker,_ category: TrackerCategory)
+    func didCreateIrregularEvent(_ tracker: Tracker,_ category: TrackerCategory)
 }
 
 final class NewIrregularEventViewController: UIViewController, UITableViewDelegate, UITableViewDataSource, UICollectionViewDataSource, UICollectionViewDelegateFlowLayout, UITextFieldDelegate {
@@ -122,7 +122,7 @@ final class NewIrregularEventViewController: UIViewController, UITableViewDelega
     
     let scrollView = UIScrollView()
     let contentView = UIView()
-    
+    let selectedWeekDays: String = " "
    
     
     var tableViewOptions: [(title: String, subtitle: String?)] = [
@@ -429,6 +429,7 @@ final class NewIrregularEventViewController: UIViewController, UITableViewDelega
         guard let name = trackerNameTextField.text,
               let selectedColor = selectedColor,
               let selectedEmoji = selectedEmoji,
+              
             let selectedCategory = selectedCategory
         else {
                 showAlert(message: "Не все данные выбраны!")
@@ -437,7 +438,7 @@ final class NewIrregularEventViewController: UIViewController, UITableViewDelega
             }
 
             // Выводим данные без Optional
-            print("Создаём трекер с названием: \(name), цвет: \(selectedColor), эмодзи: \(selectedEmoji), категория: \(selectedCategory))")
+            print("Создаём трекер с названием: \(name), цвет: \(selectedColor), эмодзи: \(selectedEmoji), категория: \(selectedCategory), дни недели: \(selectedWeekDays)")
         
         let tracker = Tracker(
             id: TrackerIdGenerator.generateId(),
@@ -445,13 +446,13 @@ final class NewIrregularEventViewController: UIViewController, UITableViewDelega
             color: selectedColor,
             emoji: selectedEmoji,
             daysCount: 0,
-            weekDays: [""]
+            weekDays: [" "]
         )
         
         let category = TrackerCategory(title: selectedCategory, tracker: [tracker])
         
         let trackersVC = TrackersViewController()
-        delegate?.didCreateTracker(tracker, category)
+        delegate?.didCreateIrregularEvent(tracker, category)
         self.view.window?.rootViewController?.dismiss(animated: true, completion: nil)
         let navigationController = UINavigationController(rootViewController: trackersVC)
         present(navigationController, animated: true)
