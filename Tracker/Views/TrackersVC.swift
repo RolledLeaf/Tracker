@@ -100,6 +100,7 @@ final class TrackersViewController: UIViewController, UICollectionViewDataSource
         updateVisibleTrackers(for: datePicker.date)
     }
     
+    
     private func setupDefaultCategories() {
         let defaultTracker1 = Tracker(id: 1, name: "Уборка", color: .collectionBlue3, emoji: "🙂", daysCount: 1, weekDays: [ "Mon", "Wed"])
         let defaultTracker2 = Tracker(id: 2, name: "Стирка", color: .collectionPink12, emoji: "😻", daysCount: 3, weekDays: ["Fri"])
@@ -121,15 +122,13 @@ final class TrackersViewController: UIViewController, UICollectionViewDataSource
         
     }
     
-    //функциональность метода под вопросом
+  
     func didCreateTracker(_ tracker: Tracker, _ category: TrackerCategory) {
         // Ищем индекс существующей категории
         if let existingCategoryIndex = categories.firstIndex(where: { $0.title == category.title }) {
             let existingCategory = categories[existingCategoryIndex]
-            
-            // Проверяем, есть ли уже такой трекер в категории
+
             if !existingCategory.tracker.contains(where: { $0.name == tracker.name }) {
-                // Создаём новую категорию с обновлённым массивом трекеров
                 let updatedCategory = TrackerCategory(title: existingCategory.title, tracker: existingCategory.tracker + [tracker])
                 categories[existingCategoryIndex] = updatedCategory
                 print("Добавлен новый трекер \(tracker.name) в существующую категорию \(category.title)")
@@ -137,14 +136,11 @@ final class TrackersViewController: UIViewController, UICollectionViewDataSource
                 print("Трекер \(tracker.name) уже существует в категории \(category.title), не добавляем повторно.")
             }
         } else {
-            // Если категории нет, добавляем новую
             categories.append(category)
             print("Создана новая категория \(category.title) и добавлен трекер \(tracker.name)")
             reloadCategoryData()
             updateUI()
         }
-        
-        
     }
     
     

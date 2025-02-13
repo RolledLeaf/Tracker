@@ -60,7 +60,11 @@ final class CreateHabitTypeViewController: UIViewController {
            }
 
            @objc private func irregularEventButtonTapped() {
-               let eventSettingsVC = EventSettingsViewController()
+               let eventSettingsVC = NewIrregularEventViewController()
+               eventSettingsVC.delegate = delegate as? any NewIrregularEventViewControllerDelegate
+               let navigationController = UINavigationController(rootViewController: eventSettingsVC)
+               navigationController.modalPresentationStyle = .automatic
+               present(navigationController, animated: true)
                
     }
     
