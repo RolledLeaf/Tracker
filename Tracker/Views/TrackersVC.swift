@@ -118,7 +118,7 @@ final class TrackersViewController: UIViewController, UICollectionViewDataSource
                 
                 plusButton.heightAnchor.constraint(equalToConstant: 19),
                 plusButton.widthAnchor.constraint(equalToConstant: 18),
-                plusButton.leadingAnchor.constraint(equalTo: navView.safeAreaLayoutGuide.leadingAnchor, constant: 12),
+                plusButton.leadingAnchor.constraint(equalTo: navView.safeAreaLayoutGuide.leadingAnchor, constant: 18),
                 plusButton.topAnchor.constraint(equalTo: navView.safeAreaLayoutGuide.topAnchor, constant: 13),
             ])
         }
@@ -241,6 +241,7 @@ final class TrackersViewController: UIViewController, UICollectionViewDataSource
         
         configureLabel(trackersLabel, text: "Трекеры", fontSize: 34, weight: .bold, color: .textColor)
         configureLabel(emptyFieldLabel, text: "Что будем отслеживать?", fontSize: 12, weight: .regular, color: .textColor)
+        trackersLabel.textAlignment = .left
         plusButton.setImage(UIImage(named: "plusButton"), for: .normal)
         plusButton.addTarget(self, action: #selector(plusButtonTapped), for: .touchUpInside)
         emptyFieldStarImage.image = UIImage(named: "dizzyStar")
