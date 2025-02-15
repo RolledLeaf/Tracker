@@ -5,7 +5,7 @@ class ColorsCollectionViewCell: UICollectionViewCell {
     // MARK: - Identifier
     static let identifier = "ColorsCollectionViewCell"
     
-    let colorBlockImage: UIImageView = {
+    lazy var colorBlockImage: UIImageView = {
         let imageView = UIImageView()
         imageView.contentMode = .scaleAspectFill
         imageView.clipsToBounds = true

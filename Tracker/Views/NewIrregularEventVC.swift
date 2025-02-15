@@ -8,16 +8,16 @@ final class NewIrregularEventViewController: UIViewController, UITableViewDelega
     
     weak var delegate: NewIrregularEventViewControllerDelegate?
     
-    private let titleLabel: UILabel = {
+    private lazy var titleLabel: UILabel = {
         let label = UILabel()
-        label.text = "Новая привычка"
+        label.text = "Новое нерегулярное событие"
         label.font = .systemFont(ofSize: 16, weight: .medium)
         label.textColor = UIColor.custom(.createButtonColor)
         label.textAlignment = .center
         return label
     }()
     
-    private let characterLimitLabel: UILabel = {
+    private lazy var characterLimitLabel: UILabel = {
         let label = UILabel()
         label.text = "Ограничение 38 символов"
         label.font = .systemFont(ofSize: 14)
@@ -27,13 +27,13 @@ final class NewIrregularEventViewController: UIViewController, UITableViewDelega
         return label
     }()
     
-    private let trackerNameTextField: UITextField = {
+    private lazy var trackerNameTextField: UITextField = {
         let textField = UITextField()
         textField.placeholder = "Введите название трекера"
         textField.layer.cornerRadius = 16
         textField.font = .systemFont(ofSize: 17, weight: .regular)
         textField.textColor = UIColor.custom(.createButtonColor)
-        textField.backgroundColor = UIColor.custom(.backgroundGray)
+        textField.backgroundColor = UIColor.custom(.tablesColor)
         textField.textAlignment = .left
         let paddingView = UIView(frame: CGRect(x: 0, y: 0, width: 16, height: textField.frame.height))
         textField.leftView = paddingView
@@ -49,7 +49,7 @@ final class NewIrregularEventViewController: UIViewController, UITableViewDelega
         return textField
     }()
     
-    private let categoryAndScheduleTableView: UITableView = {
+    private lazy var categoryTableView: UITableView = {
         let tableView = UITableView()
         tableView.separatorStyle = .none
         tableView.isScrollEnabled = false
@@ -60,13 +60,13 @@ final class NewIrregularEventViewController: UIViewController, UITableViewDelega
         return tableView
     }()
     
-    private let emojiCollectionView: UICollectionView = {
+    private lazy var emojiCollectionView: UICollectionView = {
         let layout = UICollectionViewFlowLayout()
         layout.itemSize = CGSize(width: 52, height: 52)
         layout.sectionInset = UIEdgeInsets(top: 30, left: 0, bottom: 0, right: 0)
         layout.scrollDirection = .vertical
         layout.minimumLineSpacing = 0
-        layout.minimumInteritemSpacing = 5
+        layout.minimumInteritemSpacing = 3
         let collectionView = UICollectionView(frame: .zero, collectionViewLayout: layout)
         collectionView.register(EmojiCollectionViewCell.self, forCellWithReuseIdentifier: EmojiCollectionViewCell.identifier)
         collectionView.backgroundColor = .clear
@@ -74,13 +74,13 @@ final class NewIrregularEventViewController: UIViewController, UITableViewDelega
         return collectionView
     }()
     
-    private let colorsCollectionView: UICollectionView = {
+    private lazy var colorsCollectionView: UICollectionView = {
         let layout = UICollectionViewFlowLayout()
         layout.itemSize = CGSize(width: 52, height: 52)
         layout.sectionInset = UIEdgeInsets(top: 30, left: 0, bottom: 0, right: 0)
         layout.scrollDirection = .vertical
         layout.minimumLineSpacing = 0
-        layout.minimumInteritemSpacing = 5
+        layout.minimumInteritemSpacing = 3
         let collectionView = UICollectionView(frame: .zero, collectionViewLayout: layout)
         collectionView.register(ColorsCollectionViewCell.self, forCellWithReuseIdentifier: ColorsCollectionViewCell.identifier)
         collectionView.backgroundColor = .clear
@@ -88,7 +88,7 @@ final class NewIrregularEventViewController: UIViewController, UITableViewDelega
         return collectionView
     }()
     
-    private let createTrackerButton: UIButton = {
+    private lazy var createTrackerButton: UIButton = {
         let button = UIButton()
         button.setTitle("Создать", for: .normal)
         button.titleLabel?.font = UIFont.systemFont(ofSize: 16, weight: .medium)
@@ -99,7 +99,7 @@ final class NewIrregularEventViewController: UIViewController, UITableViewDelega
         return button
     }()
     
-    private let cancelButton: UIButton = {
+    private lazy var cancelButton: UIButton = {
         let button = UIButton()
         button.setTitle("Отменить", for: .normal)
         button.titleLabel?.font = UIFont.systemFont(ofSize: 16, weight: .medium)
@@ -111,10 +111,6 @@ final class NewIrregularEventViewController: UIViewController, UITableViewDelega
         button.addTarget(self, action: #selector(cancelButtonTapped), for: .touchUpInside)
         return button
     }()
-    
-    
-    private let emojis = ["🙂", "😻", "🌺", "🐶", "❤️", "😱", "😇", "😡", "🥶", "🤔", "🙌", "🍔", "🥦", "🏓", "🥇", "🎸", "🏝️", "😪"]
-    private let trackerCollectionColors: [CollectionColors] = [.collectionRed1, .collectionOrange2, .collectionBlue3, .collectionPurple4, .collectionLightGreen5, .collectionViolet6, .collectionBeige7, .collectionLightBlue8, .collectionJadeGreen9, .collectionDarkPurple10, .collectionCarrotOrange11, .collectionPink12, .collectionLightBrick13, .collectionSemiblue14, .collectionLightPurple15, .collectionDarkViolet16, .collectionPalePurple17, .collectionGreen18]
     
     let scrollView = UIScrollView()
     let contentView = UIView()
@@ -147,6 +143,7 @@ final class NewIrregularEventViewController: UIViewController, UITableViewDelega
         view.backgroundColor = .systemBackground
         setupViews()
         trackerNameTextField.addTarget(self, action: #selector(textFieldDidChange), for: .editingChanged)
+        view.backgroundColor = UIColor(named: CustomColor.mainBackgroundColor.rawValue)
     }
     
     private func setupViews() {
@@ -160,7 +157,7 @@ final class NewIrregularEventViewController: UIViewController, UITableViewDelega
         collectionsStackView.spacing = 34
         collectionsStackView.distribution = .fillEqually
         
-        let uiElements = [titleLabel, trackerNameTextField, characterLimitLabel, categoryAndScheduleTableView, collectionsStackView, buttonsStackView]
+        let uiElements = [titleLabel, trackerNameTextField, characterLimitLabel, categoryTableView, collectionsStackView, buttonsStackView]
         uiElements.forEach {
             $0.translatesAutoresizingMaskIntoConstraints = false
         }
@@ -186,7 +183,7 @@ final class NewIrregularEventViewController: UIViewController, UITableViewDelega
             contentView.heightAnchor.constraint(equalToConstant: 887),
             
             
-            titleLabel.topAnchor.constraint(equalTo: contentView.topAnchor),
+            titleLabel.topAnchor.constraint(equalTo: contentView.topAnchor, constant: -33),
             titleLabel.centerXAnchor.constraint(equalTo: contentView.centerXAnchor),
             
             trackerNameTextField.heightAnchor.constraint(equalToConstant: 75),
@@ -200,12 +197,12 @@ final class NewIrregularEventViewController: UIViewController, UITableViewDelega
             characterLimitLabel.trailingAnchor.constraint(equalTo: view.trailingAnchor, constant: -44),
             characterLimitLabel.topAnchor.constraint(equalTo: trackerNameTextField.bottomAnchor, constant: 8),
             
-            categoryAndScheduleTableView.topAnchor.constraint(equalTo: trackerNameTextField.bottomAnchor, constant: 62),
-            categoryAndScheduleTableView.leadingAnchor.constraint(equalTo: contentView.leadingAnchor, constant: 16),
-            categoryAndScheduleTableView.trailingAnchor.constraint(equalTo: contentView.trailingAnchor, constant: -16),
-            categoryAndScheduleTableView.heightAnchor.constraint(equalToConstant: 75),
+            categoryTableView.topAnchor.constraint(equalTo: trackerNameTextField.bottomAnchor, constant: 24),
+            categoryTableView.leadingAnchor.constraint(equalTo: contentView.leadingAnchor, constant: 16),
+            categoryTableView.trailingAnchor.constraint(equalTo: contentView.trailingAnchor, constant: -16),
+            categoryTableView.heightAnchor.constraint(equalToConstant: 75),
             
-            collectionsStackView.topAnchor.constraint(equalTo: categoryAndScheduleTableView.bottomAnchor, constant: 50),
+            collectionsStackView.topAnchor.constraint(equalTo: categoryTableView.bottomAnchor, constant: 50),
             collectionsStackView.heightAnchor.constraint(equalToConstant: 442),
             collectionsStackView.leadingAnchor.constraint(equalTo: contentView.leadingAnchor, constant: 23),
             collectionsStackView.trailingAnchor.constraint(equalTo: contentView.trailingAnchor, constant: -23),
@@ -218,11 +215,11 @@ final class NewIrregularEventViewController: UIViewController, UITableViewDelega
         
         emojiCollectionView.delegate = self
         colorsCollectionView.delegate = self
-        categoryAndScheduleTableView.delegate = self
+        categoryTableView.delegate = self
         
         emojiCollectionView.dataSource = self
         colorsCollectionView.dataSource = self
-        categoryAndScheduleTableView.dataSource = self
+        categoryTableView.dataSource = self
         
         emojiCollectionView.register(
             EmojiAndColorCollectionHeaderView.self,
@@ -236,7 +233,7 @@ final class NewIrregularEventViewController: UIViewController, UITableViewDelega
             withReuseIdentifier: EmojiAndColorCollectionHeaderView.identifier
         )
         
-        categoryAndScheduleTableView.register(CategoryAndScheduleTableViewCell.self, forCellReuseIdentifier: CategoryAndScheduleTableViewCell.identifier) //регистрация по ячейке
+        categoryTableView.register(CategoryAndScheduleTableViewCell.self, forCellReuseIdentifier: CategoryAndScheduleTableViewCell.identifier) //регистрация по ячейке
     }
     
     @objc func textFieldDidChange() {
@@ -286,7 +283,6 @@ final class NewIrregularEventViewController: UIViewController, UITableViewDelega
         )
         
         let category = TrackerCategory(title: selectedCategory, tracker: [tracker])
-        
         let trackersVC = TrackersViewController()
         delegate?.didCreateIrregularEvent(tracker, category)
         self.view.window?.rootViewController?.dismiss(animated: true, completion: nil)
@@ -442,7 +438,7 @@ extension NewIrregularEventViewController: CategoriesListViewControllerDelegate 
         }
         
         selectedCategory = category
-        categoryAndScheduleTableView.reloadData()
+        categoryTableView.reloadData()
     }
 }
 

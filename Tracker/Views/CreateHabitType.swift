@@ -5,9 +5,19 @@ final class CreateHabitTypeViewController: UIViewController {
     
     weak var delegate: NewHabitViewControllerDelegate?
     
-    private let habitButton: UIButton = {
+    private lazy var titleLabel: UILabel = {
+        let label = UILabel()
+        label.text = "Создание трекера"
+        label.font = UIFont.systemFont(ofSize: 16, weight: .medium)
+        label.textColor = UIColor.custom(.textColor)
+        label.textAlignment = .center
+        return label
+    }()
+    
+    private lazy var habitButton: UIButton = {
         let button = UIButton(type: .system)
         button.setTitle("Привычка", for: .normal)
+        button.titleLabel?.font = UIFont.systemFont(ofSize: 16, weight: .medium)
         button.setTitleColor(UIColor.custom(.createButtonTextColor), for: .normal)
         button.backgroundColor = UIColor.custom(.createButtonColor)
         button.layer.cornerRadius = 16
@@ -16,9 +26,10 @@ final class CreateHabitTypeViewController: UIViewController {
         return button
     }()
     
-    private let irregularEventButton: UIButton = {
+    private lazy var irregularEventButton: UIButton = {
         let button = UIButton(type: .system)
-        button.setTitle("Нерегулярное событие", for: .normal)
+        button.setTitle("Нерегулярные событие", for: .normal)
+        button.titleLabel?.font = UIFont.systemFont(ofSize: 16, weight: .medium)
         button.setTitleColor(UIColor.custom(.createButtonTextColor), for: .normal)
         button.backgroundColor = UIColor.custom(.createButtonColor)
         button.layer.cornerRadius = 16
@@ -29,7 +40,7 @@ final class CreateHabitTypeViewController: UIViewController {
     
     override func viewDidLoad() {
         super.viewDidLoad()
-        view.backgroundColor = .white
+        view.backgroundColor = UIColor(named: CustomColor.mainBackgroundColor.rawValue)
         setupUI()
     }
     
@@ -40,10 +51,15 @@ final class CreateHabitTypeViewController: UIViewController {
         stackView.distribution = .fillEqually
         stackView.translatesAutoresizingMaskIntoConstraints = false
         view.addSubview(stackView)
+        view.addSubview(titleLabel)
+        titleLabel.translatesAutoresizingMaskIntoConstraints = false
         
         NSLayoutConstraint.activate([
+            titleLabel.topAnchor.constraint(equalTo: view.topAnchor, constant: 27),
+            titleLabel.centerXAnchor.constraint(equalTo: view.centerXAnchor),
+            
             stackView.heightAnchor.constraint(equalToConstant: 136),
-            stackView.bottomAnchor.constraint(equalTo: view.safeAreaLayoutGuide.bottomAnchor, constant: -281),
+            stackView.topAnchor.constraint(equalTo: view.topAnchor, constant: 344),
             stackView.leadingAnchor.constraint(equalTo: view.safeAreaLayoutGuide.leadingAnchor, constant: 20),
             stackView.trailingAnchor.constraint(equalTo: view.safeAreaLayoutGuide.trailingAnchor, constant: -20)
         ])

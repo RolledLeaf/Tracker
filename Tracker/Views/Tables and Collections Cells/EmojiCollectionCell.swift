@@ -8,7 +8,7 @@ class EmojiCollectionViewCell: UICollectionViewCell {
     
     // MARK: - UI Elements
     
-    let emojiLabel: UILabel = {
+    lazy var emojiLabel: UILabel = {
         let label = UILabel()
         label.font = .systemFont(ofSize: 32)
         label.textAlignment = .center
@@ -60,7 +60,7 @@ class EmojiCollectionViewCell: UICollectionViewCell {
     private func addSelectionBackgroundView() {
         if selectionBackgroundView != nil { return }
         let backgroundView = UIView()
-        backgroundView.backgroundColor = UIColor.custom(CustomColors.backgroundGray)
+        backgroundView.backgroundColor = UIColor.custom(CustomColor.backgroundGray)
         backgroundView.layer.cornerRadius = 16
         backgroundView.translatesAutoresizingMaskIntoConstraints = false
         contentView.insertSubview(backgroundView, at: 0)

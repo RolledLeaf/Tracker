@@ -16,7 +16,7 @@ final class TrackerCell: UICollectionViewCell {
     private var selectedIndexPaths: Set<IndexPath> = []
     
     
-    private let habbitLabel: UILabel = {
+    private lazy var habbitLabel: UILabel = {
         let label = UILabel()
         label.font = .systemFont(ofSize: 14, weight: .regular)
         label.textColor = UIColor.custom(.createButtonTextColor)
@@ -26,7 +26,7 @@ final class TrackerCell: UICollectionViewCell {
         return label
     }()
     
-    let doneButton: UIButton = {
+    lazy var doneButton: UIButton = {
         let button = UIButton(type: .custom)
         button.setImage(UIImage(systemName: "plus"), for: .normal)
         button.tintColor = .black
@@ -39,14 +39,14 @@ final class TrackerCell: UICollectionViewCell {
     
     private var isChecked = false
     
-    private let emojiLabel: UILabel = {
+    private lazy var emojiLabel: UILabel = {
         let label = UILabel()
         label.font = UIFont.systemFont(ofSize: 16)
         label.textAlignment = .center
         return label
     }()
     
-    var daysNumberLabel: UILabel = {
+    lazy var daysNumberLabel: UILabel = {
         let label = UILabel()
         label.font = .systemFont(ofSize: 14, weight: .bold)
         label.textColor = .black
@@ -54,7 +54,7 @@ final class TrackerCell: UICollectionViewCell {
         return label
     }()
     
-    let daysCountLabel: UILabel = {
+    lazy var daysCountLabel: UILabel = {
         let label = UILabel()
         label.font = .systemFont(ofSize: 12, weight: .regular)
         label.textColor = .black
@@ -62,14 +62,14 @@ final class TrackerCell: UICollectionViewCell {
         return label
     }()
     
-    private let emojiContainer: UIView = {
+    private lazy var emojiContainer: UIView = {
         let view = UIView()
         view.layer.cornerRadius = 12
         view.layer.masksToBounds = true
         return view
     }()
     
-    let doneButtonContainer: UIView = {
+    lazy var doneButtonContainer: UIView = {
         let view = UIView()
         view.layer.cornerRadius = 17
         view.layer.masksToBounds = true
@@ -77,7 +77,7 @@ final class TrackerCell: UICollectionViewCell {
         return view
     }()
     
-    private let backgroundContainer: UIView = {
+    private lazy var backgroundContainer: UIView = {
         let view = UIView()
         view.layer.cornerRadius = 16
         view.layer.masksToBounds = true
@@ -95,7 +95,6 @@ final class TrackerCell: UICollectionViewCell {
     }
     
     private func setupUI() {
-        
         let uiElements: [UIView] = [backgroundContainer,  habbitLabel, daysNumberLabel, daysCountLabel, emojiContainer, emojiLabel, doneButtonContainer, doneButton ]
         uiElements.forEach { $0.translatesAutoresizingMaskIntoConstraints = false }
         uiElements.forEach { contentView.addSubview($0) }
@@ -128,11 +127,13 @@ final class TrackerCell: UICollectionViewCell {
             backgroundContainer.trailingAnchor.constraint(equalTo: contentView.trailingAnchor),
             backgroundContainer.heightAnchor.constraint(equalToConstant: 90),
             
-            emojiLabel.topAnchor.constraint(equalTo: backgroundContainer.topAnchor, constant: 8),
-            emojiLabel.leadingAnchor.constraint(equalTo: backgroundContainer.leadingAnchor, constant: 8),
+            emojiLabel.centerXAnchor.constraint(equalTo: emojiContainer.centerXAnchor),
+            emojiLabel.centerYAnchor.constraint(equalTo: emojiContainer.centerYAnchor),
+            emojiLabel.heightAnchor.constraint(equalToConstant: 22),
+            emojiLabel.widthAnchor.constraint(equalToConstant: 22),
             
-            emojiContainer.centerXAnchor.constraint(equalTo: emojiLabel.centerXAnchor),
-            emojiContainer.centerYAnchor.constraint(equalTo: emojiLabel.centerYAnchor),
+            emojiContainer.topAnchor.constraint(equalTo: backgroundContainer.topAnchor, constant: 8),
+            emojiContainer.leadingAnchor.constraint(equalTo: backgroundContainer.leadingAnchor, constant: 8),
             emojiContainer.heightAnchor.constraint(equalToConstant: 24),
             emojiContainer.widthAnchor.constraint(equalToConstant: 24),
             

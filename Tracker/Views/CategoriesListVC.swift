@@ -9,7 +9,7 @@ final class CategoriesListViewController: UIViewController, UITableViewDataSourc
     
     weak var delegate: CategoriesListViewControllerDelegate?
     
-    private let titleLabel: UILabel = {
+    private lazy var titleLabel: UILabel = {
         let label = UILabel()
         label.textColor = UIColor.custom(.textColor)
         label.font = .systemFont(ofSize: 16, weight: .medium)
@@ -18,7 +18,7 @@ final class CategoriesListViewController: UIViewController, UITableViewDataSourc
         return label
     }()
     
-    private let categoriesListTableView: UITableView = {
+    private lazy var categoriesListTableView: UITableView = {
         let tableView = UITableView()
         tableView.separatorStyle = .singleLine
         tableView.separatorColor = UIColor.custom(.textFieldGray)
@@ -29,13 +29,13 @@ final class CategoriesListViewController: UIViewController, UITableViewDataSourc
         return tableView
     }()
     
-    private let emptyFieldStarImage: UIImageView = {
+    private lazy var emptyFieldStarImage: UIImageView = {
         let imageView = UIImageView()
         imageView.image = UIImage(named: "dizzyStar")
         return imageView
     }()
     
-    private let emptyFieldLabel: UILabel = {
+    private lazy var emptyFieldLabel: UILabel = {
         let label = UILabel()
         label.textColor = UIColor.custom(.textColor)
         label.font = .systemFont(ofSize: 12, weight: .regular)
@@ -45,9 +45,10 @@ final class CategoriesListViewController: UIViewController, UITableViewDataSourc
         return label
     }()
     
-    private let addCategoryButton: UIButton = {
+    private lazy var addCategoryButton: UIButton = {
         let button = UIButton()
         button.setTitle("Добавить категорию", for: .normal)
+        button.titleLabel?.font = UIFont.systemFont(ofSize: 16, weight: .medium)
         button.setTitleColor(UIColor.custom(.createButtonTextColor), for: .normal)
         button.backgroundColor = UIColor.custom(.createButtonColor)
         button.layer.cornerRadius = 16
@@ -60,22 +61,15 @@ final class CategoriesListViewController: UIViewController, UITableViewDataSourc
     let contentView = UIView()
     
     private let categoriesKey = "categoriesListKey"
-    
     private var tableHeightConstraint: NSLayoutConstraint?
     private var contentViewHeightConstraint: NSLayoutConstraint?
-    
     private var categoriesList: [String] = []
-    private var tableHeight: CGFloat {
-        return 75
-    }
-    private var contentViewHeight: CGFloat {
-        return  260
-    }
+    private var tableHeight: CGFloat = 75
+    private var contentViewHeight: CGFloat = 260
     
     override func viewDidLoad() {
         super.viewDidLoad()
         setupUI()
-        loadCategoriesFromUserDefaults()
         updateUI()
     }
     
@@ -88,9 +82,8 @@ final class CategoriesListViewController: UIViewController, UITableViewDataSourc
         updateContentViewHeight()
     }
     
-    func setupUI() {
-        view.backgroundColor = .white
-        
+    private func setupUI() {
+        view.backgroundColor = UIColor(named: CustomColor.mainBackgroundColor.rawValue)
         let stackView = UIStackView(arrangedSubviews: [emptyFieldStarImage, emptyFieldLabel])
         stackView.axis = .vertical
         stackView.spacing = 8
@@ -172,7 +165,7 @@ final class CategoriesListViewController: UIViewController, UITableViewDataSourc
         let newHeight = rowHeight * CGFloat(categoriesList.count)
         tableHeightConstraint?.constant = newHeight
         view.layoutIfNeeded()
-        print("Table height updated to \(newHeight)")// Применяем изменения макета
+        print("Table height updated to \(newHeight)")
     }
     
     
@@ -184,15 +177,6 @@ final class CategoriesListViewController: UIViewController, UITableViewDataSourc
         print("Content view height updated to \(newHeight)")
     }
     
-    private func saveCategoriesToUserDefaults() {
-        UserDefaults.standard.set(categoriesList, forKey: categoriesKey)
-    }
-    
-    private func loadCategoriesFromUserDefaults() {
-        if let savedCategories = UserDefaults.standard.array(forKey: categoriesKey) as? [String] {
-            categoriesList = savedCategories
-        }
-    }
     
     private func createContextMenu(for indexPath: IndexPath) -> UIMenu {
         // Пункт "Редактировать"
@@ -221,7 +205,6 @@ final class CategoriesListViewController: UIViewController, UITableViewDataSourc
             
             cell.categoryNameLabel.text = newText
             self?.categoriesList[indexPath.row] = newText
-            self?.saveCategoriesToUserDefaults()
             self?.categoriesListTableView.reloadData()
         }
         let cancelAction = UIAlertAction(title: "Отменить", style: .cancel, handler: nil)
@@ -237,7 +220,6 @@ final class CategoriesListViewController: UIViewController, UITableViewDataSourc
         categoriesList.remove(at: indexPath.row)
         categoriesListTableView.deleteRows(at: [indexPath], with: .automatic)
         self.updateTableHeight()
-        self.saveCategoriesToUserDefaults()
         self.categoriesListTableView.reloadData()
         updateUI()
     }
@@ -255,7 +237,6 @@ final class CategoriesListViewController: UIViewController, UITableViewDataSourc
         categoriesList.append(category)
         print("Добавлена новая категория \(category)")
         print("Массив категорий categoriesList теперь содержит: \(categoriesList)")
-        saveCategoriesToUserDefaults()
         categoriesListTableView.reloadData()
         updateUI()
         

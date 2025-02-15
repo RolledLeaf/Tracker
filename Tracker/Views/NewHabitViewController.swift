@@ -8,7 +8,7 @@ final class NewHabitViewController: UIViewController, UITableViewDelegate, UITab
     
     weak var delegate: NewHabitViewControllerDelegate?
     
-    private let titleLabel: UILabel = {
+    private lazy var titleLabel: UILabel = {
         let label = UILabel()
         label.text = "Новая привычка"
         label.font = .systemFont(ofSize: 16, weight: .medium)
@@ -17,7 +17,7 @@ final class NewHabitViewController: UIViewController, UITableViewDelegate, UITab
         return label
     }()
     
-    private let characterLimitLabel: UILabel = {
+    private lazy var characterLimitLabel: UILabel = {
         let label = UILabel()
         label.text = "Ограничение 38 символов"
         label.font = .systemFont(ofSize: 14)
@@ -27,13 +27,13 @@ final class NewHabitViewController: UIViewController, UITableViewDelegate, UITab
         return label
     }()
     
-    private let trackerNameTextField: UITextField = {
+    private lazy var trackerNameTextField: UITextField = {
         let textField = UITextField()
         textField.placeholder = "Введите название трекера"
         textField.layer.cornerRadius = 16
         textField.font = .systemFont(ofSize: 17, weight: .regular)
         textField.textColor = UIColor.custom(.createButtonColor)
-        textField.backgroundColor = UIColor.custom(.backgroundGray)
+        textField.backgroundColor = UIColor.custom(.tablesColor)
         textField.textAlignment = .left
         let paddingView = UIView(frame: CGRect(x: 0, y: 0, width: 16, height: textField.frame.height))
         textField.leftView = paddingView
@@ -51,22 +51,24 @@ final class NewHabitViewController: UIViewController, UITableViewDelegate, UITab
         return textField
     }()
     
-    private let categoryAndScheduleTableView: UITableView = {
+    private lazy var categoryAndScheduleTableView: UITableView = {
         let tableView = UITableView()
         tableView.separatorStyle = .singleLine
         tableView.isScrollEnabled = false
         tableView.backgroundColor = .clear
         tableView.rowHeight = 75
+        let layer = tableView.layer
+        layer.cornerRadius = 16
         return tableView
     }()
     
-    private let emojiCollectionView: UICollectionView = {
+    private lazy var emojiCollectionView: UICollectionView = {
         let layout = UICollectionViewFlowLayout()
         layout.itemSize = CGSize(width: 52, height: 52)
         layout.sectionInset = UIEdgeInsets(top: 30, left: 0, bottom: 0, right: 0)
         layout.scrollDirection = .vertical
         layout.minimumLineSpacing = 0
-        layout.minimumInteritemSpacing = 5
+        layout.minimumInteritemSpacing = 3
         let collectionView = UICollectionView(frame: .zero, collectionViewLayout: layout)
         collectionView.register(EmojiCollectionViewCell.self, forCellWithReuseIdentifier: EmojiCollectionViewCell.identifier)
         collectionView.backgroundColor = .clear
@@ -74,13 +76,13 @@ final class NewHabitViewController: UIViewController, UITableViewDelegate, UITab
         return collectionView
     }()
     
-    private let colorsCollectionView: UICollectionView = {
+    private lazy var colorsCollectionView: UICollectionView = {
         let layout = UICollectionViewFlowLayout()
         layout.itemSize = CGSize(width: 52, height: 52)
         layout.sectionInset = UIEdgeInsets(top: 30, left: 0, bottom: 0, right: 0)
         layout.scrollDirection = .vertical
         layout.minimumLineSpacing = 0
-        layout.minimumInteritemSpacing = 5
+        layout.minimumInteritemSpacing = 3
         let collectionView = UICollectionView(frame: .zero, collectionViewLayout: layout)
         collectionView.register(ColorsCollectionViewCell.self, forCellWithReuseIdentifier: ColorsCollectionViewCell.identifier)
         collectionView.backgroundColor = .clear
@@ -88,7 +90,7 @@ final class NewHabitViewController: UIViewController, UITableViewDelegate, UITab
         return collectionView
     }()
     
-    private let createTrackerButton: UIButton = {
+    private lazy var createTrackerButton: UIButton = {
         let button = UIButton()
         button.setTitle("Создать", for: .normal)
         button.titleLabel?.font = UIFont.systemFont(ofSize: 16, weight: .medium)
@@ -100,7 +102,7 @@ final class NewHabitViewController: UIViewController, UITableViewDelegate, UITab
         return button
     }()
     
-    private let cancelButton: UIButton = {
+    private lazy var cancelButton: UIButton = {
         let button = UIButton()
         button.setTitle("Отменить", for: .normal)
         button.titleLabel?.font = UIFont.systemFont(ofSize: 16, weight: .medium)
@@ -113,9 +115,6 @@ final class NewHabitViewController: UIViewController, UITableViewDelegate, UITab
         return button
     }()
     
-    
-    private let emojis = ["🙂", "😻", "🌺", "🐶", "❤️", "😱", "😇", "😡", "🥶", "🤔", "🙌", "🍔", "🥦", "🏓", "🥇", "🎸", "🏝️", "😪"]
-    private let trackerCollectionColors: [CollectionColors] = [.collectionRed1, .collectionOrange2, .collectionBlue3, .collectionPurple4, .collectionLightGreen5, .collectionViolet6, .collectionBeige7, .collectionLightBlue8, .collectionJadeGreen9, .collectionDarkPurple10, .collectionCarrotOrange11, .collectionPink12, .collectionLightBrick13, .collectionSemiblue14, .collectionLightPurple15, .collectionDarkViolet16, .collectionPalePurple17, .collectionGreen18]
     
     let scrollView = UIScrollView()
     let contentView = UIView()
@@ -142,7 +141,6 @@ final class NewHabitViewController: UIViewController, UITableViewDelegate, UITab
         }
     }
     
-    
     var selectedCategory: String? {
         didSet {
             updateCreateCategoryButtonColor()
@@ -151,9 +149,9 @@ final class NewHabitViewController: UIViewController, UITableViewDelegate, UITab
     
     override func viewDidLoad() {
         super.viewDidLoad()
-        view.backgroundColor = .systemBackground
         setupViews()
         trackerNameTextField.addTarget(self, action: #selector(textFieldDidChange), for: .editingChanged)
+        view.backgroundColor = UIColor(named: CustomColor.mainBackgroundColor.rawValue)
     }
     
     private func setupViews() {
@@ -196,7 +194,7 @@ final class NewHabitViewController: UIViewController, UITableViewDelegate, UITab
             contentView.heightAnchor.constraint(equalToConstant: 962),
             
             
-            titleLabel.topAnchor.constraint(equalTo: contentView.topAnchor),
+            titleLabel.topAnchor.constraint(equalTo: contentView.topAnchor, constant: -33),
             titleLabel.centerXAnchor.constraint(equalTo: contentView.centerXAnchor),
             
             trackerNameTextField.heightAnchor.constraint(equalToConstant: 75),
@@ -211,7 +209,7 @@ final class NewHabitViewController: UIViewController, UITableViewDelegate, UITab
             characterLimitLabel.topAnchor.constraint(equalTo: trackerNameTextField.bottomAnchor, constant: 8),
             
             
-            categoryAndScheduleTableView.topAnchor.constraint(equalTo: trackerNameTextField.bottomAnchor, constant: 62),
+            categoryAndScheduleTableView.topAnchor.constraint(equalTo: trackerNameTextField.bottomAnchor, constant: 24),
             categoryAndScheduleTableView.leadingAnchor.constraint(equalTo: contentView.leadingAnchor, constant: 16),
             categoryAndScheduleTableView.trailingAnchor.constraint(equalTo: contentView.trailingAnchor, constant: -16),
             categoryAndScheduleTableView.heightAnchor.constraint(equalToConstant: 150),
@@ -297,7 +295,6 @@ final class NewHabitViewController: UIViewController, UITableViewDelegate, UITab
         )
         
         let category = TrackerCategory(title: selectedCategory, tracker: [tracker])
-        
         let trackersVC = TrackersViewController()
         delegate?.didCreateTracker(tracker, category)
         self.view.window?.rootViewController?.dismiss(animated: true, completion: nil)
@@ -314,10 +311,7 @@ final class NewHabitViewController: UIViewController, UITableViewDelegate, UITab
         guard let currentText = textField.text, let textRange = Range(range, in: currentText) else {
             return true
         }
-        
         let updatedText = currentText.replacingCharacters(in: textRange, with: string)
-        
-        // Ограничение в 38 символов
         if updatedText.count > 38 {
             characterLimitLabel.isHidden = false
             return false

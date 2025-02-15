@@ -10,17 +10,17 @@ class ScheduleTableCell: UITableViewCell {
     
     static let identifier = "ScheduleTableCell"
     
-    private let titleLabel: UILabel = {
+    private lazy var titleLabel: UILabel = {
         let label = UILabel()
         label.font = .systemFont(ofSize: 17, weight: .regular)
         label.textColor = .black
-        label.backgroundColor = UIColor.custom(.backgroundGray)
+        label.backgroundColor = .clear
         label.textAlignment = .left
         label.translatesAutoresizingMaskIntoConstraints = false
         return label
     }()
     
-    private let toggleSwitch: UISwitch = {
+    private lazy var toggleSwitch: UISwitch = {
         let toggle = UISwitch()
         toggle.onTintColor = UIColor.custom(.toggleSwitchBlue)
         toggle.thumbTintColor = .white // Цвет кружка
@@ -51,7 +51,7 @@ class ScheduleTableCell: UITableViewCell {
     private func setupUI() {
         contentView.addSubview(titleLabel)
         contentView.addSubview(toggleSwitch)
-        contentView.backgroundColor = UIColor.custom(.backgroundGray)
+        contentView.backgroundColor = UIColor.custom(.tablesColor)
         
         NSLayoutConstraint.activate([
             // Расположение titleLabel

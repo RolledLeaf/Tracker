@@ -8,7 +8,7 @@ final class NewCategoryViewController: UIViewController {
     
     weak var delegate: NewCategoryDelegate?
     
-    private let titleLabel: UILabel = {
+    private lazy var titleLabel: UILabel = {
         let label = UILabel()
         label.textColor = UIColor.custom(.textColor)
         label.font = .systemFont(ofSize: 16, weight: .medium)
@@ -17,9 +17,10 @@ final class NewCategoryViewController: UIViewController {
         return label
     }()
     
-    private let categoryNameTextField:UITextField = {
+    private lazy var categoryNameTextField:UITextField = {
         let textField = UITextField()
         textField.layer.cornerRadius = 16
+        textField.placeholder = "Введите название категории"
         textField.font = .systemFont(ofSize: 17, weight: .regular)
         textField.textColor = UIColor.custom(.createButtonColor)
         textField.backgroundColor = UIColor.custom(.backgroundGray)
@@ -38,11 +39,12 @@ final class NewCategoryViewController: UIViewController {
         return textField
     }()
     
-    private let doneButton: UIButton = {
+    private lazy var doneButton: UIButton = {
         let button = UIButton()
         button.setTitle("Готово", for: .normal)
+        button.titleLabel?.font = UIFont.systemFont(ofSize: 16, weight: .medium)
         button.setTitleColor(UIColor.custom(.createButtonTextColor), for: .normal)
-        button.backgroundColor = UIColor.custom(.createButtonColor)
+        button.backgroundColor = UIColor.custom(.textFieldGray)
         button.layer.cornerRadius = 16
         button.addTarget(self, action: #selector(doneButtonTapped), for: .touchUpInside)
         button.clipsToBounds = true
@@ -51,12 +53,12 @@ final class NewCategoryViewController: UIViewController {
     
     override func viewDidLoad() {
         super.viewDidLoad()
-        view.backgroundColor = .white
+        view.backgroundColor = UIColor(named: CustomColor.mainBackgroundColor.rawValue)
         setupViews()
+        categoryNameTextField.addTarget(self, action: #selector(textFieldDidChange), for: .editingChanged)
     }
     
     private func setupViews() {
-        
         let uiElements = [titleLabel, categoryNameTextField, doneButton]
         uiElements.forEach { view.addSubview($0) }
         uiElements.forEach { $0.translatesAutoresizingMaskIntoConstraints = false }
@@ -78,6 +80,20 @@ final class NewCategoryViewController: UIViewController {
             doneButton.heightAnchor.constraint(equalToConstant: 60),
             doneButton.bottomAnchor.constraint(equalTo: view.safeAreaLayoutGuide.bottomAnchor, constant: -16)
         ])
+    }
+    
+    private func updateDoneButtonColor() {
+        if let name = categoryNameTextField.text, !name.isEmpty {
+            doneButton.backgroundColor =  UIColor.custom(.createButtonColor)
+            print("Условия выполнены, кнопка Готово перекрашена в \(UIColor.custom(.createButtonColor))")
+        } else {
+            doneButton.backgroundColor = UIColor.custom(.textFieldGray)
+            print("Условия не выполнены, кнопка Готово снова \(UIColor.custom(.textFieldGray)) цвета")
+        }
+    }
+    
+    @objc func textFieldDidChange() {
+        updateDoneButtonColor()
     }
     
     @objc func doneButtonTapped() {

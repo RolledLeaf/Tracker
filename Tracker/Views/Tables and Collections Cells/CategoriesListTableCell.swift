@@ -4,7 +4,7 @@ class CategoriesListTableCell: UITableViewCell {
     
     static let identifier = "CategoriesListTableCell" //
     
-    let categoryNameLabel: UILabel = {
+     lazy var categoryNameLabel: UILabel = {
         let label = UILabel()
         label.font = .systemFont(ofSize: 17, weight: .regular)
         label.textColor = UIColor.custom(.createButtonColor)
@@ -14,7 +14,7 @@ class CategoriesListTableCell: UITableViewCell {
         return label
     }()
     
-    private let checkMark: UIImageView = {
+    private lazy var checkMark: UIImageView = {
         let imageView = UIImageView()
         imageView.image = UIImage(systemName: "checkmark")
         imageView.tintColor = UIColor.custom(.backgroundGray)

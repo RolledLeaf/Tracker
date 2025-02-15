@@ -9,7 +9,7 @@ final class ScheduleViewController: UIViewController, UITableViewDelegate, UITab
     
     weak var delegate: ScheduleViewControllerDelegate?
     
-    private let titleLabel: UILabel = {
+    private lazy var titleLabel: UILabel = {
         let label = UILabel()
         label.textColor = UIColor.custom(.textColor)
         label.font = .systemFont(ofSize: 16, weight: .medium)
@@ -18,7 +18,7 @@ final class ScheduleViewController: UIViewController, UITableViewDelegate, UITab
         return label
     }()
     
-    private let weekDaysTable: UITableView = {
+    private lazy var weekDaysTable: UITableView = {
         let tableView = UITableView()
         tableView.separatorStyle = .singleLine
         tableView.isScrollEnabled = false
@@ -27,9 +27,10 @@ final class ScheduleViewController: UIViewController, UITableViewDelegate, UITab
         return tableView
     }()
     
-    private let doneButton: UIButton = {
+    private lazy var doneButton: UIButton = {
         let button = UIButton()
         button.setTitle("Готово", for: .normal)
+        button.titleLabel?.font = UIFont.systemFont(ofSize: 16, weight: .medium)
         button.setTitleColor(UIColor.custom(.createButtonTextColor), for: .normal)
         button.backgroundColor = UIColor.custom(.createButtonColor)
         button.layer.cornerRadius = 16
@@ -40,22 +41,9 @@ final class ScheduleViewController: UIViewController, UITableViewDelegate, UITab
     
     private let weekDays: [String] = ["Понедельник", "Вторник", "Среда", "Четверг", "Пятница", "Суббота", "Воскресенье"]
     
-    /*
-     //English localization
-     private let weekDayOrder = ["Mon", "Tue", "Wed", "Thu", "Fri", "Sat", "Sun"]
-     private let weekDayAbbreviations: [String: String] = [
-     "Понедельник": "Mon",
-     "Вторник": "Tue",
-     "Среда": "Wed",
-     "Четверг": "Thu",
-     "Пятница": "Fri",
-     "Суббота": "Sat",
-     "Воскресенье": "Sun"
-     ]
-     */
     
-    // Russian localization
-    private let weekDayOrder = ["Пн", "Вт", "Ср", "Чт", "Пт", "Сб", "Вск"]
+    //English localization
+    private let weekDayOrder = ["Mon", "Tue", "Wed", "Thu", "Fri", "Sat", "Sun"]
     private let weekDayAbbreviations: [String: String] = [
         "Понедельник": "Пн",
         "Вторник": "Вт",
@@ -63,9 +51,22 @@ final class ScheduleViewController: UIViewController, UITableViewDelegate, UITab
         "Четверг": "Чт",
         "Пятница": "Пт",
         "Суббота": "Сб",
-        "Воскресенье": "Вск"
+        "Воскресенье": "Вс"
     ]
     
+    /*
+     // Russian localization
+     private let weekDayOrder = ["Пн", "Вт", "Ср", "Чт", "Пт", "Сб", "Вск"]
+     private let weekDayAbbreviations: [String: String] = [
+     "Понедельник": "Пн",
+     "Вторник": "Вт",
+     "Среда": "Ср",
+     "Четверг": "Чт",
+     "Пятница": "Пт",
+     "Суббота": "Сб",
+     "Воскресенье": "Вск"
+     ]
+     */
     private var selectedWeekDays: [String] = []
     private var tempSelectedWeekDays: [String] = []
     
@@ -78,6 +79,7 @@ final class ScheduleViewController: UIViewController, UITableViewDelegate, UITab
             tempSelectedWeekDays = savedDays
         }
         weekDaysTable.reloadData()
+        view.backgroundColor = UIColor(named: CustomColor.mainBackgroundColor.rawValue)
     }
     
     private func setupViews() {
@@ -91,12 +93,12 @@ final class ScheduleViewController: UIViewController, UITableViewDelegate, UITab
         NSLayoutConstraint.activate([
             titleLabel.centerXAnchor.constraint(equalTo: view.centerXAnchor),
             titleLabel.topAnchor.constraint(equalTo: view.topAnchor, constant: 20),
-            titleLabel.widthAnchor.constraint(equalToConstant: 200),
-            titleLabel.heightAnchor.constraint(equalToConstant: 40),
+            titleLabel.widthAnchor.constraint(equalToConstant: 97),
+            titleLabel.heightAnchor.constraint(equalToConstant: 22),
             
             weekDaysTable.leadingAnchor.constraint(equalTo: view.leadingAnchor, constant: 16),
             weekDaysTable.trailingAnchor.constraint(equalTo: view.trailingAnchor, constant: -16),
-            weekDaysTable.topAnchor.constraint(equalTo: titleLabel.bottomAnchor, constant: 38),
+            weekDaysTable.topAnchor.constraint(equalTo: titleLabel.bottomAnchor, constant: 30),
             weekDaysTable.widthAnchor.constraint(equalToConstant: 150),
             weekDaysTable.heightAnchor.constraint(equalToConstant: tableHeight),
             
@@ -129,10 +131,9 @@ final class ScheduleViewController: UIViewController, UITableViewDelegate, UITab
         print("Schedule done button ")
         print("Завершено. Переданные дни недели: \(tempSelectedWeekDays)")
         selectedWeekDays = tempSelectedWeekDays
-        UserDefaults.standard.set(selectedWeekDays, forKey: "selectedWeekDays")
         let sortedWeekDaysString = getSortedSelectedWeekDays()
         delegate?.updateSubtitle(for: "Расписание", with: sortedWeekDaysString)
-        dismiss(animated: true, completion: nil) // Для модального
+        dismiss(animated: true, completion: nil)
     }
     
     func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
@@ -144,9 +145,8 @@ final class ScheduleViewController: UIViewController, UITableViewDelegate, UITab
             return UITableViewCell()
         }
         
-        
         let day = weekDays[indexPath.row]
-        let isOn = selectedWeekDays.contains(day)  // Проверяем, выбран ли день
+        let isOn = selectedWeekDays.contains(day)
         cell.configure(with: day, isOn: isOn)
         cell.delegate = self
         cell.selectionStyle = .none
@@ -156,20 +156,17 @@ final class ScheduleViewController: UIViewController, UITableViewDelegate, UITab
     func tableView(_ tableView: UITableView, willDisplay cell: UITableViewCell, forRowAt indexPath: IndexPath) {
         let cornerRadius: CGFloat = 16
         
-        // Сброс настроек для всех ячеек
         cell.layer.cornerRadius = 0
         cell.layer.maskedCorners = []
         cell.clipsToBounds = true
         cell.separatorInset = UIEdgeInsets(top: 0, left: 16, bottom: 0, right: 16) // Обычные отступы для разделителя
         
-        // Скругление первой ячейки
         if indexPath.row == 0 {
             cell.layer.cornerRadius = cornerRadius
             cell.layer.maskedCorners = [.layerMinXMinYCorner, .layerMaxXMinYCorner]
             cell.separatorInset = UIEdgeInsets(top: 0, left: 16, bottom: 0, right: 16) // Разделитель остается видимым
         }
         
-        // Скругление последней ячейки
         if indexPath.row == tableView.numberOfRows(inSection: indexPath.section) - 1 {
             cell.layer.cornerRadius = cornerRadius
             cell.layer.maskedCorners = [.layerMinXMaxYCorner, .layerMaxXMaxYCorner]

@@ -4,25 +4,25 @@ class CategoryAndScheduleTableViewCell: UITableViewCell {
     
     static let identifier = "CategoryAndScheduleTableViewCell"
     
-    private let titleLabel: UILabel = {
+    private lazy var titleLabel: UILabel = {
         let label = UILabel()
         label.font = .systemFont(ofSize: 17, weight: .regular)
         label.textColor = UIColor.custom(.createButtonColor)
-        label.backgroundColor = UIColor.custom(.backgroundGray)
+        label.backgroundColor = .clear
         label.translatesAutoresizingMaskIntoConstraints = false
         return label
     }()
     
-    private let detailedTextLabel: UILabel = {
+    private lazy var detailedTextLabel: UILabel = {
         let label = UILabel()
         label.font = .systemFont(ofSize: 17, weight: .regular)
         label.textColor = UIColor.custom(.textFieldGray)
-        label.backgroundColor = UIColor.custom(.backgroundGray)
+        label.backgroundColor = .clear
         label.translatesAutoresizingMaskIntoConstraints = false
         return label
     }()
     
-    private let arrowImageView: UIImageView = {
+    private lazy var arrowImageView: UIImageView = {
         let imageView = UIImageView()
         imageView.image = UIImage(systemName: "chevron.right")
         imageView.tintColor = .gray
@@ -55,7 +55,7 @@ class CategoryAndScheduleTableViewCell: UITableViewCell {
         contentView.addSubview(titleLabel)
         contentView.addSubview(arrowImageView)
         contentView.addSubview(detailedTextLabel)
-        contentView.backgroundColor = UIColor.custom(.backgroundGray)
+        contentView.backgroundColor = UIColor.custom(.tablesColor)
         
         NSLayoutConstraint.activate([
             arrowImageView.trailingAnchor.constraint(equalTo: contentView.trailingAnchor, constant: -16),

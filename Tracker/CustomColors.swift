@@ -1,7 +1,7 @@
 
 import UIKit
 
-enum CustomColors: String {
+enum CustomColor: String {
     case backgroundGray = "backgroundGray"
     case textColor = "TextColor"
     case dataGray = "dataGray"
@@ -10,6 +10,9 @@ enum CustomColors: String {
     case textFieldGray = "textFieldGray"
     case cancelButtonRed = "cancelButtonRed"
     case toggleSwitchBlue = "toggleSwitchBlue"
+    case mainBackgroundColor = "mainBackgroundColor"
+    case tabBarSeparateLineColor = "tabBarSeparateLineColor"
+    case tablesColor = "tablesColor"
 }
 
 enum CollectionColors: String  {
@@ -68,7 +71,7 @@ func lightenColor(_ color: UIColor, by percentage: CGFloat) -> UIColor {
 }
 
 extension UIColor {
-    static func custom(_ color: CustomColors) -> UIColor? {
+    static func custom(_ color: CustomColor) -> UIColor? {
         return UIColor(named: color.rawValue) ?? .clear
     }
     
