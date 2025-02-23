@@ -1,13 +1,12 @@
-
 import UIKit
 
 final class TrackersViewController: UIViewController, UICollectionViewDataSource, UICollectionViewDelegateFlowLayout, UICollectionViewDelegate {
     
     var selectedDate: Date = Date()
-    var categories: [TrackerCategory] = []
-    var filteredCategories: [TrackerCategory] = []
-    var trackerRecords: [TrackerRecord] = []
-    var currentSelectedTracker: Tracker?
+    var categories: [TrackerCategoryStore] = []
+    var filteredCategories: [TrackerCategoryStore] = []
+    var trackerRecords: [TrackerRecordStore] = []
+    var currentSelectedTracker: TrackerStore?
     var currentDate: Date = Date()
     var selectedIndexPath: IndexPath?
     
@@ -123,6 +122,7 @@ final class TrackersViewController: UIViewController, UICollectionViewDataSource
             ])
         }
     }
+    
     
     
     private func reloadCategoryData() {

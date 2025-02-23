@@ -24,9 +24,9 @@
 /* End PBXContainerItemProxy section */
 
 /* Begin PBXFileReference section */
-		B086C0B42D21642500855AFE /* Tracker.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = Tracker.app; sourceTree = BUILT_PRODUCTS_DIR; };
-		B086C0CA2D21642600855AFE /* TrackerTests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = TrackerTests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
-		B086C0D42D21642600855AFE /* TrackerUITests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = TrackerUITests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
+		B00D8F712D6B27C500DC3362 /* Tracker.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = Tracker.app; sourceTree = BUILT_PRODUCTS_DIR; };
+		B00D8F722D6B27C500DC3362 /* TrackerTests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = TrackerTests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
+		B00D8F732D6B27C500DC3362 /* TrackerUITests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = TrackerUITests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
 /* End PBXFileReference section */
 
 /* Begin PBXFileSystemSynchronizedBuildFileExceptionSet section */
@@ -88,21 +88,13 @@
 		B086C0AB2D21642500855AFE = {
 			isa = PBXGroup;
 			children = (
-				B086C0B52D21642500855AFE /* Products */,
 				B086C0B62D21642500855AFE /* Tracker */,
 				B086C0CD2D21642600855AFE /* TrackerTests */,
 				B086C0D72D21642600855AFE /* TrackerUITests */,
+				B00D8F712D6B27C500DC3362 /* Tracker.app */,
+				B00D8F722D6B27C500DC3362 /* TrackerTests.xctest */,
+				B00D8F732D6B27C500DC3362 /* TrackerUITests.xctest */,
 			);
-			sourceTree = "<group>";
-		};
-		B086C0B52D21642500855AFE /* Products */ = {
-			isa = PBXGroup;
-			children = (
-				B086C0B42D21642500855AFE /* Tracker.app */,
-				B086C0CA2D21642600855AFE /* TrackerTests.xctest */,
-				B086C0D42D21642600855AFE /* TrackerUITests.xctest */,
-			);
-			name = Products;
 			sourceTree = "<group>";
 		};
 /* End PBXGroup section */
@@ -127,7 +119,7 @@
 			packageProductDependencies = (
 			);
 			productName = Tracker;
-			productReference = B086C0B42D21642500855AFE /* Tracker.app */;
+			productReference = B00D8F712D6B27C500DC3362 /* Tracker.app */;
 			productType = "com.apple.product-type.application";
 		};
 		B086C0C92D21642600855AFE /* TrackerTests */ = {
@@ -150,7 +142,7 @@
 			packageProductDependencies = (
 			);
 			productName = TrackerTests;
-			productReference = B086C0CA2D21642600855AFE /* TrackerTests.xctest */;
+			productReference = B00D8F722D6B27C500DC3362 /* TrackerTests.xctest */;
 			productType = "com.apple.product-type.bundle.unit-test";
 		};
 		B086C0D32D21642600855AFE /* TrackerUITests */ = {
@@ -173,7 +165,7 @@
 			packageProductDependencies = (
 			);
 			productName = TrackerUITests;
-			productReference = B086C0D42D21642600855AFE /* TrackerUITests.xctest */;
+			productReference = B00D8F732D6B27C500DC3362 /* TrackerUITests.xctest */;
 			productType = "com.apple.product-type.bundle.ui-testing";
 		};
 /* End PBXNativeTarget section */
@@ -209,7 +201,7 @@
 			mainGroup = B086C0AB2D21642500855AFE;
 			minimizedProjectReferenceProxies = 1;
 			preferredProjectObjectVersion = 77;
-			productRefGroup = B086C0B52D21642500855AFE /* Products */;
+			productRefGroup = B086C0AB2D21642500855AFE;
 			projectDirPath = "";
 			projectRoot = "";
 			targets = (
