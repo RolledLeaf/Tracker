@@ -27,6 +27,9 @@
 		B00D8F712D6B27C500DC3362 /* Tracker.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = Tracker.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		B00D8F722D6B27C500DC3362 /* TrackerTests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = TrackerTests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
 		B00D8F732D6B27C500DC3362 /* TrackerUITests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = TrackerUITests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
+		B018D77E2D6C87250027471C /* Tracker+CoreDataClass.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; name = "Tracker+CoreDataClass.swift"; path = "Tracker/CoreData/DataModels/Tracker+CoreDataClass.swift"; sourceTree = "<group>"; };
+		B018D7802D6C87250027471C /* TrackerCategory+CoreDataClass.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; name = "TrackerCategory+CoreDataClass.swift"; path = "Tracker/CoreData/DataModels/TrackerCategory+CoreDataClass.swift"; sourceTree = "<group>"; };
+		B018D7822D6C87250027471C /* TrackerRecord+CoreDataClass.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; name = "TrackerRecord+CoreDataClass.swift"; path = "Tracker/CoreData/DataModels/TrackerRecord+CoreDataClass.swift"; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFileSystemSynchronizedBuildFileExceptionSet section */
@@ -88,6 +91,9 @@
 		B086C0AB2D21642500855AFE = {
 			isa = PBXGroup;
 			children = (
+				B018D77E2D6C87250027471C /* Tracker+CoreDataClass.swift */,
+				B018D7802D6C87250027471C /* TrackerCategory+CoreDataClass.swift */,
+				B018D7822D6C87250027471C /* TrackerRecord+CoreDataClass.swift */,
 				B086C0B62D21642500855AFE /* Tracker */,
 				B086C0CD2D21642600855AFE /* TrackerTests */,
 				B086C0D72D21642600855AFE /* TrackerUITests */,

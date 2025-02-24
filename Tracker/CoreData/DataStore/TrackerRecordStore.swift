@@ -22,7 +22,7 @@ final class TrackerRecordStore: NSObject {
     }
 
     // Пример метода для создания новой записи
-    func saveTrackerRecord(trackerID: Int16, date: Date) {
+    func saveTrackerRecord(trackerID: Int, date: Date) {
         let record = TrackerRecord(context: context)
         record.trackerID = trackerID
         record.date = date

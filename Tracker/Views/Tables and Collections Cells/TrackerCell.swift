@@ -161,29 +161,35 @@ final class TrackerCell: UICollectionViewCell {
         trackerID = tracker.id
         emojiLabel.text = tracker.emoji
         habbitLabel.text = tracker.name
-        backgroundContainer.backgroundColor = UIColor.fromCollectionColor(tracker.color) ?? .clear
-        doneButtonContainer.backgroundColor = UIColor.fromCollectionColor(tracker.color) ?? .clear
-        emojiContainer.backgroundColor = lightenColor(UIColor.fromCollectionColor(tracker.color) ?? .clear, by: 0.3)
+        
+        // Преобразуем цвет только один раз
+        let trackerColor = UIColor.fromCollectionColor(tracker.color) ?? .clear
+        
+        // Настроим фоны
+        backgroundContainer.backgroundColor = trackerColor
+        doneButtonContainer.backgroundColor = trackerColor
+        emojiContainer.backgroundColor = lightenColor(trackerColor, by: 0.3)
         
         let currentDate = Date()
         let isCompleted = trackerRecords.contains { $0.trackerID == tracker.id && Calendar.current.isDate($0.date, inSameDayAs: viewController?.selectedDate ?? currentDate) }
-        
+
+        // Настроим кнопку в зависимости от состояния
         doneButton.setImage(UIImage(systemName: isCompleted ? "checkmark" : "plus"), for: .normal)
-        
-        let baseColor = UIColor.fromCollectionColor(currentSelectedTracker?.color ?? .collectionBeige7) ?? .collectionBeige7
+
+        // Цвет фона кнопки в зависимости от состояния
+        let baseColor = trackerColor
         let adjustedColor = isCompleted ? lightenColor(baseColor, by: 0.3) : baseColor
         doneButtonContainer.backgroundColor = adjustedColor
         
+        // Настроим отображение количества дней
         let daysCount = tracker.daysCount
         daysNumberLabel.text = "\(daysCount)"
         daysCountLabel.text = getDayWord(for: daysCount)
     }
     
     @objc func doneButtonTapped() {
-        guard let trackerID = trackerID else {
-            print("Tracker ID is missing!")
-            return
-        }
+        let trackerID = trackerID ?? 0
+       
         guard let selectedDate = viewController?.getSelectedDate() else {
             print("Date Picker is not set!")
             return

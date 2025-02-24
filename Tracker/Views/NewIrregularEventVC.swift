@@ -273,18 +273,26 @@ final class NewIrregularEventViewController: UIViewController, UITableViewDelega
         
         print("Создаём трекер с названием: \(name), цвет: \(selectedColor), эмодзи: \(selectedEmoji), категория: \(selectedCategory), дни недели: \(selectedWeekDays)")
         
-        let tracker = Tracker(
-            id: TrackerIdGenerator.generateId(),
-            name: name,
-            color: selectedColor,
-            emoji: selectedEmoji,
-            daysCount: 0,
-            weekDays: [" "]
-        )
+        let context = CoreDataStack.shared.context
+        let tracker = Tracker(context: context)
+            tracker.id = Int(TrackerIdGenerator.generateId()) // Идентификатор
+            tracker.name = name
+            tracker.color = selectedColor.rawValue // Переводим цвет в строку, если это enum
+            tracker.emoji = selectedEmoji
+            tracker.daysCount = 0 // Или рассчитываем это значение
+            tracker.weekDays = [" "]
         
-        let category = TrackerCategory(title: selectedCategory, tracker: [tracker])
+        let category = TrackerCategory(context: context)
+        category.title = selectedCategory
+       
+        // Сохраняем контекст (т.е. сохраняем все изменения в базу данных)
+            do {
+                try context.save()
+                print("Трекер сохранён в базе данных")
+            } catch {
+                print("Ошибка при сохранении трекера: \(error)")
+            }
         let trackersVC = TrackersViewController()
-        delegate?.didCreateIrregularEvent(tracker, category)
         self.view.window?.rootViewController?.dismiss(animated: true, completion: nil)
         let navigationController = UINavigationController(rootViewController: trackersVC)
         present(navigationController, animated: true)

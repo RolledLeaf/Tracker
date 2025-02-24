@@ -9,13 +9,13 @@ final class TrackerStore: NSObject {
         self.context = context
     }
     
-    func createNewTracker(id: Int16, name: String, color: CollectionColorsTransformer, emoji: String, daysCount: Int16, weekDays: [String]) {
+    func createNewTracker(id: Int, name: String, color: String, emoji: String, daysCount: Int, weekDays: [String]) {
         let tracker = Tracker(context: context)
         tracker.id = id
         tracker.name = name
         tracker.color = color
         tracker.emoji = emoji
         tracker.daysCount = daysCount
-        tracker.weekDays = weekDays as NSObject
+        tracker.weekDays = weekDays
     }
 }
