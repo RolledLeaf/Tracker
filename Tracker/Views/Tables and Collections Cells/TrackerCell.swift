@@ -1,7 +1,7 @@
 import UIKit
 
 protocol TrackerCategoryCellDelegate: AnyObject {
-    func trackerExecution(_ cell: TrackerCell, didTapDoneButtonFor trackerID: Int, selectedDate: Date)
+    func trackerExecution(_ cell: TrackerCell, didTapDoneButtonFor trackerID: Int16, selectedDate: Date)
 }
 
 final class TrackerCell: UICollectionViewCell {
@@ -11,7 +11,7 @@ final class TrackerCell: UICollectionViewCell {
     static let reuseIdentifier = "TrackerCell"
     
     private var currentSelectedTracker: Tracker?
-    private var trackerID: Int?
+    private var trackerID: Int16?
     private var currentDate: Date = Date()
     private var selectedIndexPaths: Set<IndexPath> = []
     
@@ -143,7 +143,7 @@ final class TrackerCell: UICollectionViewCell {
         ])
     }
     
-    private func getDayWord(for count: Int) -> String {
+    private func getDayWord(for count: Int16) -> String {
         let remainder10 = count % 10
         let remainder100 = count % 100
         
@@ -163,7 +163,7 @@ final class TrackerCell: UICollectionViewCell {
         habbitLabel.text = tracker.name
         
         // Преобразуем цвет только один раз
-        let trackerColor = UIColor.fromCollectionColor(tracker.color) ?? .clear
+        let trackerColor = UIColor.fromCollectionColor(tracker.color as! String) ?? .clear
         
         // Настроим фоны
         backgroundContainer.backgroundColor = trackerColor
@@ -171,7 +171,7 @@ final class TrackerCell: UICollectionViewCell {
         emojiContainer.backgroundColor = lightenColor(trackerColor, by: 0.3)
         
         let currentDate = Date()
-        let isCompleted = trackerRecords.contains { $0.trackerID == tracker.id && Calendar.current.isDate($0.date, inSameDayAs: viewController?.selectedDate ?? currentDate) }
+        let isCompleted = trackerRecords.contains { $0.trackerID == tracker.id && Calendar.current.isDate($0.date ?? currentDate, inSameDayAs: viewController?.selectedDate ?? currentDate) }
 
         // Настроим кнопку в зависимости от состояния
         doneButton.setImage(UIImage(systemName: isCompleted ? "checkmark" : "plus"), for: .normal)

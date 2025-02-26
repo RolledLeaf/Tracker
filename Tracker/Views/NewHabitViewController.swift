@@ -283,23 +283,24 @@ final class NewHabitViewController: UIViewController, UITableViewDelegate, UITab
         
         let context = CoreDataStack.shared.context
         let tracker = Tracker(context: context)
-            tracker.id = Int(TrackerIdGenerator.generateId()) // Идентификатор
-            tracker.name = name
-            tracker.color = selectedColor.rawValue // Переводим цвет в строку, если это enum
-            tracker.emoji = selectedEmoji
-            tracker.daysCount = 0 // Или рассчитываем это значение
-            tracker.weekDays = selectedWeekDays
+        tracker.id = Int16(TrackerIdGenerator.generateId()) // Идентификатор
+        tracker.name = name
+        tracker.color = selectedColor.rawValue as NSString
+        tracker.emoji = selectedEmoji
+        tracker.daysCount = 0
+        tracker.weekDays = selectedWeekDays as NSObject
         
         let category = TrackerCategory(context: context)
         category.title = selectedCategory
-       
+        category.addToTracker(tracker)
+        
         // Сохраняем контекст (т.е. сохраняем все изменения в базу данных)
-            do {
-                try context.save()
-                print("Трекер сохранён в базе данных")
-            } catch {
-                print("Ошибка при сохранении трекера: \(error)")
-            }
+        do {
+            try context.save()
+            print("Трекер сохранён в базе данных")
+        } catch {
+            print("Ошибка при сохранении трекера: \(error)")
+        }
         let trackersVC = TrackersViewController()
         self.view.window?.rootViewController?.dismiss(animated: true, completion: nil)
         let navigationController = UINavigationController(rootViewController: trackersVC)

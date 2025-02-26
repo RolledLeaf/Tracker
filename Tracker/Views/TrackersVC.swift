@@ -16,7 +16,7 @@ final class TrackersViewController: UIViewController, UICollectionViewDataSource
     private let emptyFieldStarImage = UIImageView()
     private let emptyFieldLabel = UILabel()
     private let locale = Locale(identifier: "ru_RU")
-    
+    let context = CoreDataStack.shared.persistentContainer.viewContext
     
     private var datePickerHeightConstraint: NSLayoutConstraint?
     private var categoriesCollectionViewHeight: NSLayoutConstraint?
@@ -141,25 +141,18 @@ final class TrackersViewController: UIViewController, UICollectionViewDataSource
     
     }
     
-    //2
-    private func filterCategoryByDate(_ category: TrackerCategory) -> TrackerCategory? {
-        // Предположим, что у вас есть selectedDate, которую вы хотите использовать
-        let calendar = Calendar.current
-        let selectedWeekday = getSelectedWeekday()
-        // Фильтруем трекеры категории, чтобы выбрать те, которые активны на выбранную дату
-        let filteredTrackers = category.tracker.filter { tracker in
-            // Проверяем, есть ли в этом трекере недавний запись, соответствующий selectedDate
-            let isRegular = !tracker.weekDays.contains(" ")
-            let isActiveToday = isRegular
-                ? tracker.weekDays.contains(selectedWeekday) // Проверка на активность для регулярного трекера
-                : trackerRecords.contains { $0.trackerID == tracker.id && !calendar.isDate($0.date, inSameDayAs: selectedDate) } // Для других трекеров
-            
-            return isActiveToday
-        }
+    private func setupDefaultCategories(with context: NSManagedObjectContext) {
         
-        // Если в категории есть хотя бы один активный трекер, возвращаем эту категорию, иначе nil
-        return filteredTrackers.isEmpty ? nil : category
+        
     }
+    
+
+    /*2
+    private func filterCategoryByDate(_ category: TrackerCategory) -> TrackerCategory? {
+        
+    }
+    
+*/
     
     private func removeTime(from date: Date) -> Date {
         let calendar = Calendar.current
@@ -296,23 +289,21 @@ final class TrackersViewController: UIViewController, UICollectionViewDataSource
 
 //3
 extension TrackersViewController: TrackerCategoryCellDelegate {
-  
-    //4
-    func getTrackerByID(_ trackerID: Int) -> Tracker? {
-        for category in categories {
-            if let tracker = category.tracker.first(where: { $0.id == trackerID }) {
-                return tracker
-            }
-        }
-        return nil
+    //5
+    func trackerExecution(_ cell: TrackerCell, didTapDoneButtonFor trackerID: Int16, selectedDate: Date) {
+        let calendar = Calendar.current
     }
     
-    //5
-    func trackerExecution(_ cell: TrackerCell, didTapDoneButtonFor trackerID: Int, selectedDate: Date) {
-        let calendar = Calendar.current
+  
+    /* 4
+    func getTrackerByID(_ trackerID: Int) -> Tracker? {
         
-        
+        let tracker = Tracker(context: CoreData)
+        return tracker
     }
+    */
+   
+   
 }
     
     //6
@@ -329,7 +320,7 @@ extension TrackersViewController {
     
     func collectionView(_ collectionView: UICollectionView, numberOfItemsInSection section: Int) -> Int {
         let category = filteredCategories[section]
-        return  category.tracker.count
+        return  categories.count
     }
     
     func collectionView(_ collectionView: UICollectionView, cellForItemAt indexPath: IndexPath) -> UICollectionViewCell {
@@ -390,7 +381,7 @@ extension TrackersViewController {
             return UICollectionReusableView()
         }
         let category = categories[indexPath.section]
-        header.configure(with: category.title)
+        header.configure(with: category.title ?? "default")
         
         return header
     }
@@ -423,36 +414,10 @@ extension TrackersViewController: UISearchBarDelegate {
         searchBar.resignFirstResponder()
     }
     
+    //??
     private func filterTrackers(for searchText: String) {
-        let calendar = Calendar.current
-        let dateFilteredCategories = categories.compactMap { category in
-            let filteredTrackers = category.tracker.filter { tracker in
-                let isRegular = !tracker.weekDays.contains(" ")
-                let hasExecutionRecord = trackerRecords.contains { record in
-                    record.trackerID == tracker.id && !calendar.isDate(record.date, inSameDayAs: selectedDate)
-                }
-                let isVisibleToday = isRegular
-                ? filterCategoryByDate(category) != nil
-                : !hasExecutionRecord || trackerRecords.contains { $0.trackerID == tracker.id && calendar.isDate($0.date, inSameDayAs: selectedDate) }
-
-                return isVisibleToday
-            }
-            // Возвращаем сам фильтрованный объект TrackerCategory из существующих данных
-            return filteredTrackers.isEmpty ? nil : category
-        }
         
-        if searchText.isEmpty {
-            updateVisibleTrackers(for: selectedDate)
-            reloadCategoryData()
-        } else {
-            // Фильтрация по имени трекера (поиск по строкам)
-            filteredCategories = dateFilteredCategories.compactMap { category in
-                let filteredTrackers = category.tracker.filter { tracker in
-                    tracker.name.lowercased().contains(searchText.lowercased())
-                }
-                return filteredTrackers.isEmpty ? nil : category
-            }
-        }
+        
         reloadCategoryData()
     }
 }

@@ -275,16 +275,16 @@ final class NewIrregularEventViewController: UIViewController, UITableViewDelega
         
         let context = CoreDataStack.shared.context
         let tracker = Tracker(context: context)
-            tracker.id = Int(TrackerIdGenerator.generateId()) // Идентификатор
+            tracker.id = Int16(TrackerIdGenerator.generateId()) // Идентификатор
             tracker.name = name
-            tracker.color = selectedColor.rawValue // Переводим цвет в строку, если это enum
+            tracker.color = selectedColor.rawValue as NSString
             tracker.emoji = selectedEmoji
-            tracker.daysCount = 0 // Или рассчитываем это значение
-            tracker.weekDays = [" "]
+            tracker.daysCount = 0
+            tracker.weekDays = [" "] as NSArray
         
         let category = TrackerCategory(context: context)
         category.title = selectedCategory
-       
+        category.addToTracker(tracker)
         // Сохраняем контекст (т.е. сохраняем все изменения в базу данных)
             do {
                 try context.save()
