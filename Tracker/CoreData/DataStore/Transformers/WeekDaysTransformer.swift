@@ -3,20 +3,17 @@ import Foundation
 @objc(WeekDaysTransformer)
 class WeekDaysTransformer: ValueTransformer {
     override class func transformedValueClass() -> AnyClass {
-        return NSString.self
+        return NSArray.self
     }
-    
-    override class func allowsReverseTransformation() -> Bool {
-        return true
-    }
-    
+
     override func transformedValue(_ value: Any?) -> Any? {
-        guard let daysArray = value as? [String] else { return nil }
-        return daysArray.joined(separator: " ") // Преобразуем в строку через пробел
+        guard let weekDaysString = value as? String else { return nil }
+        // Предполагаем, что строки представляют собой список дней через запятую или другой разделитель
+        return weekDaysString.components(separatedBy: ",") // или другой разделитель
     }
-    
+
     override func reverseTransformedValue(_ value: Any?) -> Any? {
-        guard let daysString = value as? String else { return nil }
-        return daysString.components(separatedBy: " ") // Преобразуем обратно в массив строк
+        guard let weekDaysArray = value as? [String] else { return nil }
+        return weekDaysArray.joined(separator: ",") // Соединяем обратно в строку
     }
 }

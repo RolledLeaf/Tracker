@@ -11,6 +11,8 @@ final class TrackersViewController: UIViewController, UICollectionViewDataSource
     var currentDate: Date = Date()
     var selectedIndexPath: IndexPath?
     
+    
+    private let trackerStore = TrackerStore()
     private let plusButton = UIButton()
     private let trackersLabel = UILabel()
     private let emptyFieldStarImage = UIImageView()
@@ -94,6 +96,7 @@ final class TrackersViewController: UIViewController, UICollectionViewDataSource
         super.viewDidLoad()
         setupInitialUI()
         reloadCategoryData()
+        fetchAllTrackers()
         updateUI()
         updateVisibleTrackers(for: datePicker.date)
         
@@ -132,13 +135,74 @@ final class TrackersViewController: UIViewController, UICollectionViewDataSource
         categoriesCollectionView.reloadData()
     }
     
+    func fetchAllTrackers() {
+        let trackerFetchRequest: NSFetchRequest<Tracker> = Tracker.fetchRequest()
+        
+        do {
+            let trackers = try CoreDataStack.shared.context.fetch(trackerFetchRequest)
+            
+            if trackers.isEmpty {
+                print("Нет трекеров в базе данных.")
+            } else {
+                print("Найдено \(trackers.count) трекеров:")
+                for tracker in trackers {
+                    print("Трекер: \(tracker.name ?? "Без названия"), Цвет: \(tracker.color ?? "Не задан" as NSObject), Эмодзи: \(tracker.emoji ?? "Не задан")")
+                    print("Дни недели: \(tracker.weekDays ?? "Не заданы" as NSObject)")
+                }
+            }
+        } catch {
+            print("Ошибка при извлечении трекеров из базы данных: \(error.localizedDescription)")
+        }
+    }
+    
     //1
     private func updateVisibleTrackers(for selectedDate: Date) {
         let formatter = DateFormatter()
         formatter.locale = locale
         formatter.dateFormat = "EEE"
-       
-    
+        
+        let selectedWeekday = formatter.string(from: selectedDate)
+        
+        let categoryFetchRequest: NSFetchRequest<TrackerCategory> = TrackerCategory.fetchRequest()
+        
+        do {
+            let categories = try CoreDataStack.shared.context.fetch(categoryFetchRequest)
+            
+            var tempCategories: [TrackerCategory] = []
+            
+            for category in categories {
+                let trackers = category.tracker?.allObjects as? [Tracker] ?? []
+                var filteredTrackers: [Tracker] = []
+                
+                for tracker in trackers {
+                    guard let trackerWeekDays = tracker.weekDays else { continue }
+                    
+                    guard let weekDaysArray = WeekDaysTransformer().transformedValue(trackerWeekDays) as? [String] else { continue }
+                    
+                    if weekDaysArray.contains(" ") {
+                        if !trackerRecords.contains(where: { $0.trackerID == tracker.id && !($0.date?.isSameDay(as: selectedDate) ?? true) }) {
+                            filteredTrackers.append(tracker)
+                        }
+                    } else {
+                        if weekDaysArray.contains(selectedWeekday) {
+                            filteredTrackers.append(tracker)
+                        }
+                    }
+                }
+                
+                if !filteredTrackers.isEmpty {
+                    let categoryWithFilteredTrackers = TrackerCategory()
+                    tempCategories.append(categoryWithFilteredTrackers)
+                }
+            }
+            
+            filteredCategories = tempCategories
+            
+            reloadCategoryData()
+            
+        } catch {
+            print("Failed to fetch categories: \(error)")
+        }
     }
     
     private func setupDefaultCategories(with context: NSManagedObjectContext) {
@@ -320,7 +384,8 @@ extension TrackersViewController {
     
     func collectionView(_ collectionView: UICollectionView, numberOfItemsInSection section: Int) -> Int {
         let category = filteredCategories[section]
-        return  categories.count
+        let trackers = category.tracker?.allObjects as? [Tracker] ?? []
+        return trackers.count
     }
     
     func collectionView(_ collectionView: UICollectionView, cellForItemAt indexPath: IndexPath) -> UICollectionViewCell {
