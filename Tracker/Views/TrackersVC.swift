@@ -18,7 +18,7 @@ final class TrackersViewController: UIViewController, UICollectionViewDataSource
     private let emptyFieldStarImage = UIImageView()
     private let emptyFieldLabel = UILabel()
     private let locale = Locale(identifier: "ru_RU")
-    let context = CoreDataStack.shared.persistentContainer.viewContext
+    private let context = CoreDataStack.shared.persistentContainer.viewContext
     
     private var datePickerHeightConstraint: NSLayoutConstraint?
     private var categoriesCollectionViewHeight: NSLayoutConstraint?
@@ -99,7 +99,7 @@ final class TrackersViewController: UIViewController, UICollectionViewDataSource
         fetchAllTrackers()
         updateUI()
         updateVisibleTrackers(for: datePicker.date)
-        
+        print("Количество отображаемых категорий - \(filteredCategories.count)")
     }
     
     override func viewDidAppear(_ animated: Bool) {
@@ -204,12 +204,7 @@ final class TrackersViewController: UIViewController, UICollectionViewDataSource
             print("Failed to fetch categories: \(error)")
         }
     }
-    
-    private func setupDefaultCategories(with context: NSManagedObjectContext) {
-        
-        
-    }
-    
+
 
     /*2
     private func filterCategoryByDate(_ category: TrackerCategory) -> TrackerCategory? {
@@ -283,10 +278,19 @@ final class TrackersViewController: UIViewController, UICollectionViewDataSource
     }
     
     private func updateUI() {
-        let hasTrackers = !(categories.isEmpty)
-        emptyFieldLabel.isHidden = hasTrackers
-        emptyFieldStarImage.isHidden = hasTrackers
-        categoriesCollectionView.isHidden = !hasTrackers
+        let categoryFetchRequest: NSFetchRequest<TrackerCategory> = TrackerCategory.fetchRequest()
+        do {
+            let categoriesFromDataBase = try CoreDataStack.shared.context.fetch(categoryFetchRequest)
+            let hasTrackers = !(categoriesFromDataBase.isEmpty)
+            
+            emptyFieldLabel.isHidden = hasTrackers
+            emptyFieldStarImage.isHidden = hasTrackers
+            categoriesCollectionView.isHidden = !hasTrackers
+            
+            categories = categoriesFromDataBase
+        } catch {
+            print("Ошибка извлечения категорий из БД: \(error.localizedDescription)")
+        }
     }
     
     private func setupInitialUI() {
@@ -378,43 +382,65 @@ extension TrackersViewController: TrackerCategoryCellDelegate {
 extension TrackersViewController {
     
     func numberOfSections(in collectionView: UICollectionView) -> Int {
+        let fetchRequest: NSFetchRequest<TrackerCategory> = TrackerCategory.fetchRequest()
+        do {
+            let categories = try CoreDataStack.shared.context.fetch(fetchRequest)
+            let filteredCategories = categories.filter { category in
+                return category.tracker?.count ?? 0 > 0
+            }
+            return filteredCategories.count
+        } catch {
+            print("error fetching categories: \(error.localizedDescription)")
+            return 0
+        }
         
-        return filteredCategories.count
     }
     
     func collectionView(_ collectionView: UICollectionView, numberOfItemsInSection section: Int) -> Int {
-        let category = filteredCategories[section]
-        let trackers = category.tracker?.allObjects as? [Tracker] ?? []
-        return trackers.count
+        let fetchRequest: NSFetchRequest<TrackerCategory> = TrackerCategory.fetchRequest()
+           
+        do {
+            let categories = try CoreDataStack.shared.context.fetch(fetchRequest)
+            let category = categories[section]
+            return category.tracker?.count ?? 0
+        } catch {
+            print("error in fetching categories: \(error.localizedDescription)")
+            return 0
+        }
     }
     
     func collectionView(_ collectionView: UICollectionView, cellForItemAt indexPath: IndexPath) -> UICollectionViewCell {
-        // Получаем категорию
-        let category = filteredCategories[indexPath.section]
-        
-        // Создаем запрос для фильтрации трекеров по нужным критериям
-        let trackerFetchRequest: NSFetchRequest<Tracker> = Tracker.fetchRequest()
-        trackerFetchRequest.predicate = NSPredicate(format: "category == %@", category)
+        // Извлекаем все категории из базы данных
+        let fetchRequest: NSFetchRequest<TrackerCategory> = TrackerCategory.fetchRequest()
         
         do {
-            // Загружаем только нужные трекеры
+            let categories = try CoreDataStack.shared.context.fetch(fetchRequest)
+            
+            // Получаем нужную категорию по индексу секции
+            let category = categories[indexPath.section]
+            
+            // Загружаем трекеры для этой категории
+            let trackerFetchRequest: NSFetchRequest<Tracker> = Tracker.fetchRequest()
+            trackerFetchRequest.predicate = NSPredicate(format: "category == %@", category)
+            
+            // Загружаем только нужные трекеры для данной категории
             let trackers = try CoreDataStack.shared.context.fetch(trackerFetchRequest)
             
-            // Получаем нужный трекер по индексу
+            // Получаем трекер, соответствующий текущей строке
             let tracker = trackers[indexPath.row]
             
-            // Фильтруем записи для трекера
+            // Фильтруем записи для трекера, если это необходимо
             let filteredRecords = trackerRecords.filter { $0.trackerID == tracker.id }
             
             // Делаем dequeue ячейки
-            let cell = categoriesCollectionView.dequeueReusableCell(withReuseIdentifier: TrackerCell.reuseIdentifier, for: indexPath) as! TrackerCell
+            let cell = collectionView.dequeueReusableCell(withReuseIdentifier: TrackerCell.reuseIdentifier, for: indexPath) as! TrackerCell
             
-            // Настроим ячейку, используя метод configure
+            // Конфигурируем ячейку с трекером и его записями
             cell.configure(with: tracker, trackerRecords: filteredRecords)
             
             return cell
         } catch {
-            print("Failed to fetch trackers: \(error)")
+            print("Ошибка при получении категорий или трекеров: \(error)")
             return UICollectionViewCell()
         }
     }
