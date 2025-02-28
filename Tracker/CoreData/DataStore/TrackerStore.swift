@@ -1,8 +1,8 @@
 import CoreData
 
 struct TrackerStoreUpdate {
-    let insertedIndexes: IndexSet
-    let deletedIndexes: IndexSet
+    let insertedIndexPaths: [IndexPath]
+    let deletedIndexPaths: [IndexPath]
 }
 
 protocol TrackerStoreDelegate: AnyObject {
@@ -37,7 +37,8 @@ final class TrackerStore: NSObject, NSFetchedResultsControllerDelegate {
         let fetchRequest = NSFetchRequest<Tracker>(entityName: "Tracker")
         fetchRequest.sortDescriptors = [NSSortDescriptor(key: "name", ascending: true)]
         
-        let fetchedResultsController = NSFetchedResultsController(fetchRequest: fetchRequest, managedObjectContext: context, sectionNameKeyPath: nil, cacheName: nil)
+        
+        let fetchedResultsController = NSFetchedResultsController(fetchRequest: fetchRequest, managedObjectContext: context, sectionNameKeyPath: "category.title", cacheName: nil)
         
         fetchedResultsController.delegate = self
         try? fetchedResultsController.performFetch()
@@ -75,6 +76,22 @@ final class TrackerStore: NSObject, NSFetchedResultsControllerDelegate {
             
             try context.save()
         }
+    
+    func addNewIrregularTracker(name: String, selectedColor: CollectionColors, selectedEmoji: String, selectedDates: [Date], selectedCategory: String) throws {
+        let tracker = Tracker(context: context)
+        tracker.id = UUID()
+        tracker.name = name
+        tracker.color = selectedColor.rawValue as NSString
+        tracker.emoji = selectedEmoji
+        tracker.daysCount = 0
+        tracker.weekDays = [" "] as NSArray
+        
+        let category = TrackerCategory(context: context)
+        category.title = selectedCategory
+        category.addToTracker(tracker)
+        
+        try context.save()
+    }
        
        func getTracker(by id: UUID) -> Tracker? {
            let fetchRequest: NSFetchRequest<Tracker> = Tracker.fetchRequest()
@@ -89,11 +106,24 @@ final class TrackerStore: NSObject, NSFetchedResultsControllerDelegate {
            }
        }
        
-       func controllerDidChangeContent(_ controller: NSFetchedResultsController<NSFetchRequestResult>) {
-           if let insertedIndexes = insertedIndexes, let deletedIndexes = deletedIndexes {
-               delegate?.didUpdate(TrackerStoreUpdate(insertedIndexes: insertedIndexes, deletedIndexes: deletedIndexes))
-           }
-           insertedIndexes = nil
-           deletedIndexes = nil
-       }
-   }
+    func controller(_ controller: NSFetchedResultsController<NSFetchRequestResult>, didChange anObject: Any, at indexPath: IndexPath?, for type: NSFetchedResultsChangeType, newIndexPath: IndexPath?) {
+            var insertedIndexPaths: [IndexPath] = []
+            var deletedIndexPaths: [IndexPath] = []
+
+            switch type {
+            case .insert:
+                if let newIndexPath = newIndexPath {
+                    insertedIndexPaths.append(newIndexPath)
+                }
+            case .delete:
+                if let indexPath = indexPath {
+                    deletedIndexPaths.append(indexPath)
+                }
+            default:
+                break
+            }
+
+            let update = TrackerStoreUpdate(insertedIndexPaths: insertedIndexPaths, deletedIndexPaths: deletedIndexPaths)
+            delegate?.didUpdate(update)
+        }
+    }

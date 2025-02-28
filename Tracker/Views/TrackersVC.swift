@@ -16,7 +16,9 @@ final class TrackersViewController: UIViewController, UICollectionViewDataSource
     var selectedIndexPath: IndexPath?
     
     
+    private let trackerCategoryStore =  TrackerCategoryStore()
    
+    private var trackerRecordStore = TrackerRecordStore()
     private let plusButton = UIButton()
     private let trackersLabel = UILabel()
     private let emptyFieldStarImage = UIImageView()
@@ -34,6 +36,12 @@ final class TrackersViewController: UIViewController, UICollectionViewDataSource
         formatter.dateFormat = "dd.MM.yy"
         formatter.locale = Locale(identifier: "ru_RU")
         return formatter
+    }()
+    
+    private lazy var trackerStore: TrackerStore = {
+        let store = TrackerStore()
+        store.delegate = self
+        return store
     }()
     
     private lazy var categoriesCollectionView: UICollectionView = {
@@ -164,21 +172,8 @@ final class TrackersViewController: UIViewController, UICollectionViewDataSource
     }
     
     func loadCategoriesAndTrackers() {
-        let fetchRequest: NSFetchRequest<TrackerCategory> = TrackerCategory.fetchRequest()
-        do {
-            let categories = try CoreDataStack.shared.context.fetch(fetchRequest)
-            
-            // Группируем трекеры по категориям
-            for category in categories {
-                let trackerFetchRequest: NSFetchRequest<Tracker> = Tracker.fetchRequest()
-                trackerFetchRequest.predicate = NSPredicate(format: "category == %@", category)
-                
-                let trackers = try CoreDataStack.shared.context.fetch(trackerFetchRequest)
-                groupedTrackers[category.title ?? "Unknown"] = trackers
-            }
-        } catch {
-            print("Ошибка при получении категорий и трекеров: \(error)")
-        }
+        categories = trackerCategoryStore.fetchAllTrackerCategories()
+        print("Fetched categories: \(categories.count)")
     }
     
     /*
@@ -410,27 +405,15 @@ extension TrackersViewController: TrackerCategoryCellDelegate {
 extension TrackersViewController {
     
     func didChangeContent() {
-        categoriesCollectionView.reloadData()
+        reloadCategoryData()
     }
     
     func numberOfSections(in collectionView: UICollectionView) -> Int {
-        let fetchRequest: NSFetchRequest<TrackerCategory> = TrackerCategory.fetchRequest()
-        
-        do {
-            let categories = try CoreDataStack.shared.context.fetch(fetchRequest)
-            let groupedCategories = Dictionary(grouping: categories, by: { $0.title ?? "" })
-            return groupedCategories.keys.count
-        } catch {
-            print("Ошибка при получении категорий: \(error)")
-            return 0
-        }
+        trackerStore.numberOfSections
     }
 
     func collectionView(_ collectionView: UICollectionView, numberOfItemsInSection section: Int) -> Int {
-        let categoryTitle = Array(groupedTrackers.keys)[section] // Получаем заголовок категории для секции
-        guard let trackers = groupedTrackers[categoryTitle] else { return 0 }
-        
-        return trackers.count
+        trackerStore.numberOfRowsInSection(section)
     }
     
     func collectionView(_ collectionView: UICollectionView, cellForItemAt indexPath: IndexPath) -> UICollectionViewCell {
@@ -543,5 +526,16 @@ extension Date {
     func isSameDay(as otherDate: Date) -> Bool {
         let calendar = Calendar.current
         return calendar.isDate(self, inSameDayAs: otherDate)
+    }
+}
+
+extension TrackersViewController: TrackerStoreDelegate {
+    func didUpdate(_ update: TrackerStoreUpdate) {
+        categoriesCollectionView.performBatchUpdates {
+            categoriesCollectionView.insertItems(at: update.insertedIndexPaths)
+            categoriesCollectionView.deleteItems(at: update.deletedIndexPaths)
+        } completion: { _ in
+            self.categoriesCollectionView.reloadData()
+        }
     }
 }

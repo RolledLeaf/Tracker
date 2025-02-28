@@ -19,7 +19,18 @@ final class TrackerCategoryStore: NSObject {
         }
     }
     
-    
+   func getCategory(by index: Int) -> TrackerCategory? {
+            let fetchRequest: NSFetchRequest<TrackerCategory> = TrackerCategory.fetchRequest()
+            fetchRequest.sortDescriptors = [NSSortDescriptor(key: "title", ascending: true)]
+            
+            do {
+                let categories = try CoreDataStack.shared.context.fetch(fetchRequest)
+                return categories.indices.contains(index) ? categories[index] : nil
+            } catch {
+                print("Failed to fetch categories: \(error)")
+                return nil
+            }
+        }
     
     func createTrackerCategory(title: String) {
         let category = TrackerCategory(context: context)
