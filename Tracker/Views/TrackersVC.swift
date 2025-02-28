@@ -66,7 +66,6 @@ final class TrackersViewController: UIViewController, UICollectionViewDataSource
             textField.backgroundColor = UIColor.custom(.backgroundGray)
             textField.layer.cornerRadius = 10
             textField.clipsToBounds = true
-            
         }
         
         let toolbar = UIToolbar()
@@ -409,47 +408,20 @@ extension TrackersViewController {
     }
     
     func numberOfSections(in collectionView: UICollectionView) -> Int {
-        trackerStore.numberOfSections
+        print("Number of sections: \(trackerStore.numberOfSections)")
+        return  trackerStore.numberOfSections
+        
     }
 
     func collectionView(_ collectionView: UICollectionView, numberOfItemsInSection section: Int) -> Int {
-        trackerStore.numberOfRowsInSection(section)
+        print("Number of trackers: \(trackerStore.numberOfRowsInSection(section))")
+        return trackerStore.numberOfRowsInSection(section)
     }
     
     func collectionView(_ collectionView: UICollectionView, cellForItemAt indexPath: IndexPath) -> UICollectionViewCell {
-        // Извлекаем все категории из базы данных
-        let fetchRequest: NSFetchRequest<TrackerCategory> = TrackerCategory.fetchRequest()
-        
-        do {
-            let categories = try CoreDataStack.shared.context.fetch(fetchRequest)
-            
-            // Получаем нужную категорию по индексу секции
-            let category = categories[indexPath.section]
-            
-            // Загружаем трекеры для этой категории
-            let trackerFetchRequest: NSFetchRequest<Tracker> = Tracker.fetchRequest()
-            trackerFetchRequest.predicate = NSPredicate(format: "category == %@", category)
-            
-            // Загружаем только нужные трекеры для данной категории
-            let trackers = try CoreDataStack.shared.context.fetch(trackerFetchRequest)
-            
-            // Получаем трекер, соответствующий текущей строке
-            let tracker = trackers[indexPath.row]
-            
-            // Фильтруем записи для трекера, если это необходимо
-            let filteredRecords = trackerRecords.filter { $0.trackerID == tracker.id }
-            
-            // Делаем dequeue ячейки
-            let cell = collectionView.dequeueReusableCell(withReuseIdentifier: TrackerCell.reuseIdentifier, for: indexPath) as! TrackerCell
-            
-            // Конфигурируем ячейку с трекером и его записями
-            cell.configure(with: tracker, trackerRecords: filteredRecords)
-            
-            return cell
-        } catch {
-            print("Ошибка при получении категорий или трекеров: \(error)")
-            return UICollectionViewCell()
-        }
+       
+        let tracker = trackerStore.getTrackerByIndex(at: indexPath)
+        let trackerRecords = 
     }
     
     func collectionView(_ collectionView: UICollectionView, didSelectItemAt indexPath: IndexPath) {
@@ -531,9 +503,12 @@ extension Date {
 
 extension TrackersViewController: TrackerStoreDelegate {
     func didUpdate(_ update: TrackerStoreUpdate) {
+        print("Вызван метод делегата didUpdate")
         categoriesCollectionView.performBatchUpdates {
-            categoriesCollectionView.insertItems(at: update.insertedIndexPaths)
-            categoriesCollectionView.deleteItems(at: update.deletedIndexPaths)
+            let insertedIndexPaths = update.insertedIndexes.map { IndexPath(item: $0, section: 0) }
+            let deletedIndexPaths = update.deletedIndexes.map { IndexPath(item: $0, section: 0) }
+            self.categoriesCollectionView.insertItems(at: insertedIndexPaths)
+            self.categoriesCollectionView.deleteItems(at: deletedIndexPaths)
         } completion: { _ in
             self.categoriesCollectionView.reloadData()
         }
