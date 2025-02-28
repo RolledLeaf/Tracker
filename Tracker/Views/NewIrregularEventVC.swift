@@ -275,7 +275,7 @@ final class NewIrregularEventViewController: UIViewController, UITableViewDelega
         
         let context = CoreDataStack.shared.context
         let tracker = Tracker(context: context)
-            tracker.id = Int16(TrackerIdGenerator.generateId()) // Идентификатор
+            tracker.id = TrackerIdGenerator.generateId() // Идентификатор
             tracker.name = name
             tracker.color = selectedColor.rawValue as NSString
             tracker.emoji = selectedEmoji

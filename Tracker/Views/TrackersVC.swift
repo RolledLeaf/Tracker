@@ -1,7 +1,11 @@
 import UIKit
 import CoreData
 
+
+
 final class TrackersViewController: UIViewController, UICollectionViewDataSource, UICollectionViewDelegateFlowLayout, UICollectionViewDelegate {
+   
+    
     
     var selectedDate: Date = Date()
     var categories: [TrackerCategory] = []
@@ -12,7 +16,7 @@ final class TrackersViewController: UIViewController, UICollectionViewDataSource
     var selectedIndexPath: IndexPath?
     
     
-    private let trackerStore = TrackerStore()
+   
     private let plusButton = UIButton()
     private let trackersLabel = UILabel()
     private let emptyFieldStarImage = UIImageView()
@@ -20,6 +24,9 @@ final class TrackersViewController: UIViewController, UICollectionViewDataSource
     private let locale = Locale(identifier: "ru_RU")
     private let context = CoreDataStack.shared.persistentContainer.viewContext
     
+    var groupedTrackers: [String: [Tracker]] = [:]
+    
+  
     private var datePickerHeightConstraint: NSLayoutConstraint?
     private var categoriesCollectionViewHeight: NSLayoutConstraint?
     private let dateFormatter: DateFormatter = {
@@ -98,13 +105,15 @@ final class TrackersViewController: UIViewController, UICollectionViewDataSource
         reloadCategoryData()
         fetchAllTrackers()
         updateUI()
-        updateVisibleTrackers(for: datePicker.date)
-        print("Количество отображаемых категорий - \(filteredCategories.count)")
+        loadCategoriesAndTrackers()
+        print("Grouped trackers: \(groupedTrackers)")
+      //updateVisibleTrackers(for: datePicker.date)
+    
     }
     
     override func viewDidAppear(_ animated: Bool) {
         super.viewDidAppear(animated)
-        
+        loadCategoriesAndTrackers()
         if let navView = navigationController?.view {
             navView.addSubview(plusButton)
             navView.addSubview(dateButton)
@@ -129,8 +138,6 @@ final class TrackersViewController: UIViewController, UICollectionViewDataSource
         }
     }
     
-    
-    
     private func reloadCategoryData() {
         categoriesCollectionView.reloadData()
     }
@@ -148,6 +155,7 @@ final class TrackersViewController: UIViewController, UICollectionViewDataSource
                 for tracker in trackers {
                     print("Трекер: \(tracker.name ?? "Без названия"), Цвет: \(tracker.color ?? "Не задан" as NSObject), Эмодзи: \(tracker.emoji ?? "Не задан")")
                     print("Дни недели: \(tracker.weekDays ?? "Не заданы" as NSObject)")
+                    print("Категория: \(tracker.category?.title ?? "Не задана" as NSObject as! String)")
                 }
             }
         } catch {
@@ -155,7 +163,25 @@ final class TrackersViewController: UIViewController, UICollectionViewDataSource
         }
     }
     
-    //1
+    func loadCategoriesAndTrackers() {
+        let fetchRequest: NSFetchRequest<TrackerCategory> = TrackerCategory.fetchRequest()
+        do {
+            let categories = try CoreDataStack.shared.context.fetch(fetchRequest)
+            
+            // Группируем трекеры по категориям
+            for category in categories {
+                let trackerFetchRequest: NSFetchRequest<Tracker> = Tracker.fetchRequest()
+                trackerFetchRequest.predicate = NSPredicate(format: "category == %@", category)
+                
+                let trackers = try CoreDataStack.shared.context.fetch(trackerFetchRequest)
+                groupedTrackers[category.title ?? "Unknown"] = trackers
+            }
+        } catch {
+            print("Ошибка при получении категорий и трекеров: \(error)")
+        }
+    }
+    
+    /*
     private func updateVisibleTrackers(for selectedDate: Date) {
         let formatter = DateFormatter()
         formatter.locale = locale
@@ -204,7 +230,7 @@ final class TrackersViewController: UIViewController, UICollectionViewDataSource
             print("Failed to fetch categories: \(error)")
         }
     }
-
+*/
 
     /*2
     private func filterCategoryByDate(_ category: TrackerCategory) -> TrackerCategory? {
@@ -226,7 +252,7 @@ final class TrackersViewController: UIViewController, UICollectionViewDataSource
     }
     
     @objc private func datePickerValueChanged(_ sender: UIDatePicker) {
-        updateVisibleTrackers(for: sender.date)
+    //    updateVisibleTrackers(for: sender.date)
     }
     
     private func getDayWord(for count: Int) -> String {
@@ -353,12 +379,14 @@ final class TrackersViewController: UIViewController, UICollectionViewDataSource
         navigationController.modalPresentationStyle = .automatic
         present(navigationController, animated: true)
     }
+    
+    
 }
 
 //3
 extension TrackersViewController: TrackerCategoryCellDelegate {
     //5
-    func trackerExecution(_ cell: TrackerCell, didTapDoneButtonFor trackerID: Int16, selectedDate: Date) {
+    func trackerExecution(_ cell: TrackerCell, didTapDoneButtonFor trackerID: UUID, selectedDate: Date) {
         let calendar = Calendar.current
     }
     
@@ -381,32 +409,28 @@ extension TrackersViewController: TrackerCategoryCellDelegate {
 
 extension TrackersViewController {
     
-    func numberOfSections(in collectionView: UICollectionView) -> Int {
-        let fetchRequest: NSFetchRequest<TrackerCategory> = TrackerCategory.fetchRequest()
-        do {
-            let categories = try CoreDataStack.shared.context.fetch(fetchRequest)
-            let filteredCategories = categories.filter { category in
-                return category.tracker?.count ?? 0 > 0
-            }
-            return filteredCategories.count
-        } catch {
-            print("error fetching categories: \(error.localizedDescription)")
-            return 0
-        }
-        
+    func didChangeContent() {
+        categoriesCollectionView.reloadData()
     }
     
-    func collectionView(_ collectionView: UICollectionView, numberOfItemsInSection section: Int) -> Int {
+    func numberOfSections(in collectionView: UICollectionView) -> Int {
         let fetchRequest: NSFetchRequest<TrackerCategory> = TrackerCategory.fetchRequest()
-           
+        
         do {
             let categories = try CoreDataStack.shared.context.fetch(fetchRequest)
-            let category = categories[section]
-            return category.tracker?.count ?? 0
+            let groupedCategories = Dictionary(grouping: categories, by: { $0.title ?? "" })
+            return groupedCategories.keys.count
         } catch {
-            print("error in fetching categories: \(error.localizedDescription)")
+            print("Ошибка при получении категорий: \(error)")
             return 0
         }
+    }
+
+    func collectionView(_ collectionView: UICollectionView, numberOfItemsInSection section: Int) -> Int {
+        let categoryTitle = Array(groupedTrackers.keys)[section] // Получаем заголовок категории для секции
+        guard let trackers = groupedTrackers[categoryTitle] else { return 0 }
+        
+        return trackers.count
     }
     
     func collectionView(_ collectionView: UICollectionView, cellForItemAt indexPath: IndexPath) -> UICollectionViewCell {
@@ -471,8 +495,10 @@ extension TrackersViewController {
               ) as? CategoriesCollectionHeaderView else {
             return UICollectionReusableView()
         }
-        let category = categories[indexPath.section]
-        header.configure(with: category.title ?? "default")
+        // Группируем категории по названию
+        let groupedCategories = Dictionary(grouping: categories, by: { $0.title ?? "" })
+        let categoryName = Array(groupedCategories.keys)[indexPath.section] // Извлекаем имя категории для заголовка
+        header.configure(with: categoryName)
         
         return header
     }

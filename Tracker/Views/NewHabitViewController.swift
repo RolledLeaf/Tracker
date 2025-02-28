@@ -283,7 +283,7 @@ final class NewHabitViewController: UIViewController, UITableViewDelegate, UITab
         
         let context = CoreDataStack.shared.context
         let tracker = Tracker(context: context)
-        tracker.id = Int16(TrackerIdGenerator.generateId()) // Идентификатор
+        tracker.id = TrackerIdGenerator.generateId() // Идентификатор
         tracker.name = name
         tracker.color = selectedColor.rawValue as NSString
         tracker.emoji = selectedEmoji
@@ -298,6 +298,7 @@ final class NewHabitViewController: UIViewController, UITableViewDelegate, UITab
         do {
             try context.save()
             print("Трекер сохранён в базе данных")
+            print("Tracker: \(tracker.name), Category: \(tracker.category?.title ?? "None")")
         } catch {
             print("Ошибка при сохранении трекера: \(error)")
         }

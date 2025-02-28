@@ -40,6 +40,11 @@
 /* End PBXFileSystemSynchronizedBuildFileExceptionSet section */
 
 /* Begin PBXFileSystemSynchronizedRootGroup section */
+		B0139A1E2D71AAED003F9C97 /* Domain */ = {
+			isa = PBXFileSystemSynchronizedRootGroup;
+			path = Domain;
+			sourceTree = "<group>";
+		};
 		B086C0B62D21642500855AFE /* Tracker */ = {
 			isa = PBXFileSystemSynchronizedRootGroup;
 			exceptions = (
@@ -88,6 +93,7 @@
 		B086C0AB2D21642500855AFE = {
 			isa = PBXGroup;
 			children = (
+				B0139A1E2D71AAED003F9C97 /* Domain */,
 				B086C0B62D21642500855AFE /* Tracker */,
 				B086C0CD2D21642600855AFE /* TrackerTests */,
 				B086C0D72D21642600855AFE /* TrackerUITests */,

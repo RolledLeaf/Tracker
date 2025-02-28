@@ -18,7 +18,7 @@ final class TrackerRecordStore: NSObject {
             }
         }
         
-        func createNewTrackerRecord(trackerID: Int16, date: Date) {
+        func createNewTrackerRecord(trackerID: UUID, date: Date) {
             let trackerRecord = TrackerRecord(context: context)
             trackerRecord.trackerID = trackerID
             trackerRecord.date = date
@@ -37,7 +37,7 @@ final class TrackerRecordStore: NSObject {
         }
         
         
-        func saveTrackerRecord(trackerID: Int16, date: Date) {
+        func saveTrackerRecord(trackerID: UUID, date: Date) {
             let record = TrackerRecord(context: context)
             record.trackerID = trackerID
             record.date = date

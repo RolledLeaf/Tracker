@@ -1,7 +1,7 @@
 import UIKit
 
 protocol TrackerCategoryCellDelegate: AnyObject {
-    func trackerExecution(_ cell: TrackerCell, didTapDoneButtonFor trackerID: Int16, selectedDate: Date)
+    func trackerExecution(_ cell: TrackerCell, didTapDoneButtonFor trackerID: UUID, selectedDate: Date)
 }
 
 final class TrackerCell: UICollectionViewCell {
@@ -11,7 +11,7 @@ final class TrackerCell: UICollectionViewCell {
     static let reuseIdentifier = "TrackerCell"
     
     private var currentSelectedTracker: Tracker?
-    private var trackerID: Int16?
+    private var trackerID: UUID?
     private var currentDate: Date = Date()
     private var selectedIndexPaths: Set<IndexPath> = []
     
@@ -188,7 +188,9 @@ final class TrackerCell: UICollectionViewCell {
     }
     
     @objc func doneButtonTapped() {
-        let trackerID = trackerID ?? 0
+        guard let trackerID = trackerID else {
+            return
+        }
        
         guard let selectedDate = viewController?.getSelectedDate() else {
             print("Date Picker is not set!")
