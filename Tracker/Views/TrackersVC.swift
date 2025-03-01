@@ -18,7 +18,7 @@ final class TrackersViewController: UIViewController, UICollectionViewDataSource
     
     private let trackerCategoryStore =  TrackerCategoryStore()
    
-    private var trackerRecordStore = TrackerRecordStore()
+ 
     private let plusButton = UIButton()
     private let trackersLabel = UILabel()
     private let emptyFieldStarImage = UIImageView()
@@ -41,6 +41,11 @@ final class TrackersViewController: UIViewController, UICollectionViewDataSource
     private lazy var trackerStore: TrackerStore = {
         let store = TrackerStore()
         store.delegate = self
+        return store
+    }()
+    
+    private lazy var trackerRecordStore: TrackerRecordStore = {
+        let store = TrackerRecordStore()
         return store
     }()
     
@@ -369,6 +374,7 @@ final class TrackersViewController: UIViewController, UICollectionViewDataSource
     @objc private func plusButtonTapped() {
         view.endEditing(true)
         let createHabitVC = CreateHabitTypeViewController()
+        createHabitVC.delegate = self
         let navigationController = UINavigationController(rootViewController: createHabitVC)
         navigationController.modalPresentationStyle = .automatic
         present(navigationController, animated: true)
@@ -418,11 +424,24 @@ extension TrackersViewController {
         return trackerStore.numberOfRowsInSection(section)
     }
     
-    func collectionView(_ collectionView: UICollectionView, cellForItemAt indexPath: IndexPath) -> UICollectionViewCell {
-       
-        let tracker = trackerStore.getTrackerByIndex(at: indexPath)
-        let trackerRecords = 
-    }
+  
+        func collectionView(_ collectionView: UICollectionView, cellForItemAt indexPath: IndexPath) -> UICollectionViewCell {
+            guard let cell = collectionView.dequeueReusableCell(withReuseIdentifier: "TrackerCell", for: indexPath) as? TrackerCell else {
+                fatalError("Cannot dequeue TrackerCell")
+            }
+
+            guard let tracker = trackerStore.getTrackerByIndex(at: indexPath) else {
+                print("Tracker not found at index \(indexPath)")
+                return UICollectionViewCell()
+            }
+            
+           
+            let trackerRecords = trackerRecordStore.getTrackerRecords(for: tracker.id ?? UUID())
+               cell.configure(with: tracker, trackerRecords: trackerRecords)
+
+            return cell
+        }
+    
     
     func collectionView(_ collectionView: UICollectionView, didSelectItemAt indexPath: IndexPath) {
         let section = indexPath.section
@@ -450,12 +469,14 @@ extension TrackersViewController {
               ) as? CategoriesCollectionHeaderView else {
             return UICollectionReusableView()
         }
-        // Группируем категории по названию
-        let groupedCategories = Dictionary(grouping: categories, by: { $0.title ?? "" })
-        let categoryName = Array(groupedCategories.keys)[indexPath.section] // Извлекаем имя категории для заголовка
-        header.configure(with: categoryName)
-        
-        return header
+        // Получаем категорию по indexPath.section
+        if let category = trackerStore.fetchedResultsController.sections?[indexPath.section].name {
+               header.configure(with: category)
+           } else {
+               header.configure(with: "Без категории")
+           }
+           
+           return header
     }
     
     
@@ -512,5 +533,16 @@ extension TrackersViewController: TrackerStoreDelegate {
         } completion: { _ in
             self.categoriesCollectionView.reloadData()
         }
+    }
+}
+
+extension TrackersViewController: newTrackerDelegate {
+    func didCreateTracker(_ tracker: Tracker, _ category: TrackerCategory) {
+        reloadCategoryData()
+    }
+    
+    func didCreateTracker() {
+        print("Трекер создан, обновляем коллекцию")
+        reloadCategoryData()
     }
 }

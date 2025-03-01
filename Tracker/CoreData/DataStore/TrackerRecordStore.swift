@@ -1,13 +1,36 @@
 import CoreData
 import UIKit
 
-final class TrackerRecordStore: NSObject {
+
+protocol TrackerRecordStoreProtocol {
+    func getTrackerRecords(for trackerID: UUID) -> [TrackerRecord]
+}
+
+
+final class TrackerRecordStore: NSObject, NSFetchedResultsControllerDelegate {
     private let context: NSManagedObjectContext
     
     // Инициализатор, который принимает контекст из CoreDataStack
     init(context: NSManagedObjectContext = CoreDataStack.shared.context) {
         self.context = context
     }
+    
+    private lazy var fetchedResultsController: NSFetchedResultsController<TrackerRecord> = {
+        let fetchRequest: NSFetchRequest<TrackerRecord> = TrackerRecord.fetchRequest()
+        fetchRequest.sortDescriptors = [NSSortDescriptor(key: "date", ascending: true)]
+        
+        let fetchedResultsController = NSFetchedResultsController(
+            fetchRequest: fetchRequest,
+            managedObjectContext: context,
+            sectionNameKeyPath: nil,
+            cacheName: nil
+        )
+        
+        fetchedResultsController.delegate = self
+        try? fetchedResultsController.performFetch()
+        return fetchedResultsController
+    }()
+
     
     func saveContext() {
         if context.hasChanges {
@@ -37,6 +60,8 @@ final class TrackerRecordStore: NSObject {
         }
         
         
+        
+        
         func saveTrackerRecord(trackerID: UUID, date: Date) {
             let record = TrackerRecord(context: context)
             record.trackerID = trackerID
@@ -61,3 +86,13 @@ final class TrackerRecordStore: NSObject {
         }
     }
 }
+
+extension TrackerRecordStore: TrackerRecordStoreProtocol {
+    func getTrackerRecords(for trackerID: UUID) -> [TrackerRecord] {
+           guard let records = fetchedResultsController.fetchedObjects else { return [] }
+           return records.filter { $0.trackerID == trackerID }
+       }
+    }
+    
+    
+

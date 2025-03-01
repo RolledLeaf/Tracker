@@ -1,12 +1,10 @@
 import UIKit
 
-protocol NewIrregularEventViewControllerDelegate: AnyObject {
-    func didCreateIrregularEvent(_ tracker: Tracker,_ category: TrackerCategory)
-}
+
 
 final class NewIrregularEventViewController: UIViewController, UITableViewDelegate, UITableViewDataSource, UICollectionViewDataSource, UICollectionViewDelegateFlowLayout, UITextFieldDelegate {
     
-    weak var delegate: NewIrregularEventViewControllerDelegate?
+    weak var delegate: newTrackerDelegate?
     
     private lazy var titleLabel: UILabel = {
         let label = UILabel()
@@ -289,6 +287,7 @@ final class NewIrregularEventViewController: UIViewController, UITableViewDelega
             do {
                 try context.save()
                 print("Трекер сохранён в базе данных")
+                delegate?.didCreateTracker(tracker, category)
             } catch {
                 print("Ошибка при сохранении трекера: \(error)")
             }

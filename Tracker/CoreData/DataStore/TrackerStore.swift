@@ -32,7 +32,7 @@ final class TrackerStore: NSObject, NSFetchedResultsControllerDelegate {
     private var insertedIndexes: IndexSet?
     private var deletedIndexes: IndexSet?
     
-    private lazy var fetchedResultsController: NSFetchedResultsController<Tracker> = {
+     lazy var fetchedResultsController: NSFetchedResultsController<Tracker> = {
         
         let fetchRequest = NSFetchRequest<Tracker>(entityName: "Tracker")
         fetchRequest.sortDescriptors = [NSSortDescriptor(key: "name", ascending: true)]
@@ -77,9 +77,11 @@ final class TrackerStore: NSObject, NSFetchedResultsControllerDelegate {
     
     
     func controllerWillChangeContent(_ controller: NSFetchedResultsController<NSFetchRequestResult>) {
-        insertedIndexes = IndexSet()
-        deletedIndexes = IndexSet()
-    }
+        delegate?.didUpdate(TrackerStoreUpdate(
+               insertedIndexes: IndexSet(),
+               deletedIndexes: IndexSet()
+           ))
+       }
     
     func controllerDidChangeContent(_ controller: NSFetchedResultsController<NSFetchRequestResult>) {
         guard let inserted = insertedIndexes, let deleted = deletedIndexes else { return }

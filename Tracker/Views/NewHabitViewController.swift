@@ -1,8 +1,12 @@
 import UIKit
 
+protocol newTrackerDelegate: AnyObject {
+    func didCreateTracker(_ tracker: Tracker,_ category: TrackerCategory)
+}
 
 final class NewHabitViewController: UIViewController, UITableViewDelegate, UITableViewDataSource, UICollectionViewDataSource, UICollectionViewDelegateFlowLayout, UITextFieldDelegate {
     
+    weak var delegate: newTrackerDelegate?
     
     private lazy var titleLabel: UILabel = {
         let label = UILabel()
@@ -299,13 +303,12 @@ final class NewHabitViewController: UIViewController, UITableViewDelegate, UITab
             try context.save()
             print("Трекер сохранён в базе данных")
             print("Tracker: \(tracker.name), Category: \(tracker.category?.title ?? "None")")
+            delegate?.didCreateTracker(tracker, category)
+               dismiss(animated: true)
         } catch {
             print("Ошибка при сохранении трекера: \(error)")
         }
-        let trackersVC = TrackersViewController()
-        self.view.window?.rootViewController?.dismiss(animated: true, completion: nil)
-        let navigationController = UINavigationController(rootViewController: trackersVC)
-        present(navigationController, animated: true)
+       
         
     }
     
