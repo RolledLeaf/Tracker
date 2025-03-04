@@ -116,10 +116,8 @@ final class TrackersViewController: UIViewController, UICollectionViewDataSource
         super.viewDidLoad()
         setupInitialUI()
         reloadCategoryData()
-        fetchAllTrackers()
         updateUI()
-        loadCategoriesAndTrackers()
-        print("Grouped trackers: \(groupedTrackers)")
+ 
       //updateVisibleTrackers(for: datePicker.date)
     
     }
@@ -455,24 +453,15 @@ extension TrackersViewController {
     }
     
     func numberOfSections(in collectionView: UICollectionView) -> Int {
-      print("numberOfSections = \(trackerStore.numberOfSections)")
-        return  trackerStore.numberOfSections
-        
+        let sections = trackerStore.numberOfSections
+        print("📌 Количество секций в коллекции: \(sections)")
+        return sections
     }
 
     func collectionView(_ collectionView: UICollectionView, numberOfItemsInSection section: Int) -> Int {
-        // 1. Получаем категорию по секции
-        guard let category = trackerCategoryStore.getCategory(at: IndexPath(row: 0, section: section)) else {
-            print("❌ Категория не найдена для секции \(section)")
-            return 0
-        }
-        
-        // 2. Получаем количество трекеров в этой категории
-        let trackersCount = category.tracker?.count ?? 0
-        
-        print("✅ Категория '\(category.title ?? "Без названия")' содержит \(trackersCount) трекеров")
-        
-        return trackersCount
+        let count = trackerStore.numberOfRowsInSection(section)
+        print("📌 В секции \(section) должно быть \(count) трекеров")
+        return count
     }
     
   
@@ -484,24 +473,7 @@ extension TrackersViewController {
             fatalError("Cannot dequeue TrackerCell")
         }
 
-        guard let category = trackerCategoryStore.getCategory(at: indexPath) else {
-            print("❌ Категория не найдена для секции \(indexPath.section)")
-            return UICollectionViewCell()
-        }
-        
-        guard let trackers = category.tracker?.allObjects as? [TrackerCoreData] else {
-            print("❌ В категории \(category.title ?? "Без названия") нет трекеров")
-            return UICollectionViewCell()
-        }
-
-       
-
-        guard indexPath.item < trackers.count else {
-            print("❌ Ошибка индекса: \(indexPath.item) для секции \(indexPath.section)")
-            return UICollectionViewCell()
-        }
-
-        let tracker = trackers[indexPath.item]
+        let tracker = trackerStore.tracker(at: indexPath) 
         
         let trackerRecordsForTracker = trackerRecords.filter { $0.trackerID == tracker.id }
         
@@ -590,22 +562,25 @@ extension Date {
 
 extension TrackersViewController: TrackerStoreDelegate {
     func didUpdate(_ update: TrackerStoreUpdate) {
-        print("Вызван метод делегата didUpdate")
-        categoriesCollectionView.performBatchUpdates {
-            let insertedIndexPaths = update.insertedIndexes.map { IndexPath(item: $0, section: 0) }
-            let deletedIndexPaths = update.deletedIndexes.map { IndexPath(item: $0, section: 0) }
-            self.categoriesCollectionView.insertItems(at: insertedIndexPaths)
-            self.categoriesCollectionView.deleteItems(at: deletedIndexPaths)
-        } completion: { _ in
-            self.categoriesCollectionView.reloadData()
+        print("📌 Вызван метод didUpdate — обновляем данные")
+        do {
+            try trackerCategoryStore.fetchedResultsController.performFetch() // Принудительно обновляем FRC
+            reloadCategoryData() // Полностью обновляем список
+        } catch {
+            print("❌ Ошибка обновления данных: \(error)")
         }
     }
 }
 
 extension TrackersViewController: newTrackerDelegate {
     func didCreateTracker(_ tracker: TrackerCoreData, _ category: TrackerCategoryCoreData) {
-        try? trackerCategoryStore.fetchedResultsController.performFetch()
-        print("Трекер создан, обновляем коллекцию")
-        reloadCategoryData()
+        do {
+            try trackerCategoryStore.fetchedResultsController.performFetch() // Принудительно обновляем данные
+            loadCategoriesAndTrackers() // Перезапрашиваем категории и трекеры
+            print("📌 Трекер создан, обновляем коллекцию")
+            reloadCategoryData() // Полностью перерисовываем список
+        } catch {
+            print("❌ Ошибка обновления FRC: \(error)")
+        }
     }
 }
