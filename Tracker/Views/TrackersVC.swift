@@ -15,11 +15,8 @@ final class TrackersViewController: UIViewController, UICollectionViewDataSource
     var currentDate: Date = Date()
     var selectedIndexPath: IndexPath?
     
-    
-    
     private let trackerCategoryStore =  TrackerCategoryStore()
    
- 
     private let plusButton = UIButton()
     private let trackersLabel = UILabel()
     private let emptyFieldStarImage = UIImageView()
@@ -163,36 +160,11 @@ final class TrackersViewController: UIViewController, UICollectionViewDataSource
  
     
     func groupTrackersByCategory() {
-        // Очищаем старую группу перед группировкой
+     
         groupedTrackers.removeAll()
+    }
+    
 
-        // Проходим по всем категориям и получаем трекеры для каждой категории
-       
-    }
-    
-    func fetchAllTrackers() {
-        let trackerFetchRequest: NSFetchRequest<TrackerCoreData> = TrackerCoreData.fetchRequest()
-        
-        do {
-            let trackers = try CoreDataStack.shared.context.fetch(trackerFetchRequest)
-            
-            if trackers.isEmpty {
-                print("Нет трекеров в базе данных.")
-            } else {
-                print("Найдено \(trackers.count) трекеров:")
-                for tracker in trackers {
-                    print("Трекер: \(tracker.name ?? "Без названия"), Цвет: \(tracker.color ?? "Не задан" as NSObject), Эмодзи: \(tracker.emoji ?? "Не задан")")
-                    print("Дни недели: \(tracker.weekDays ?? "Не заданы" as NSObject)")
-                    print("Категория: \(tracker.category?.title ?? "Не задана" as NSObject as! String)")
-                    
-                }
-            }
-        } catch {
-            print("Ошибка при извлечении трекеров из базы данных: \(error.localizedDescription)")
-        }
-    }
-    
-    
     func loadCategoriesAndTrackers() {
         categories = trackerCategoryStore.fetchAllTrackerCategories()
         print("Fetched categories: \(categories.count)")
@@ -473,7 +445,7 @@ extension TrackersViewController {
             fatalError("Cannot dequeue TrackerCell")
         }
 
-        let tracker = trackerStore.tracker(at: indexPath) 
+        let tracker = trackerStore.tracker(at: indexPath)
         
         let trackerRecordsForTracker = trackerRecords.filter { $0.trackerID == tracker.id }
         
@@ -547,8 +519,6 @@ extension TrackersViewController: UISearchBarDelegate {
     
     //??
     private func filterTrackers(for searchText: String) {
-        
-        
         reloadCategoryData()
     }
 }
@@ -562,6 +532,7 @@ extension Date {
 
 extension TrackersViewController: TrackerStoreDelegate {
     func didUpdate(_ update: TrackerStoreUpdate) {
+        updateUI()
         print("📌 Вызван метод didUpdate — обновляем данные")
         do {
             try trackerCategoryStore.fetchedResultsController.performFetch() // Принудительно обновляем FRC

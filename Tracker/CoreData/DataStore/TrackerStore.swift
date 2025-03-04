@@ -84,8 +84,12 @@ final class TrackerStore: NSObject, NSFetchedResultsControllerDelegate {
        }
     
     func controllerDidChangeContent(_ controller: NSFetchedResultsController<NSFetchRequestResult>) {
-        guard let inserted = insertedIndexes, let deleted = deletedIndexes else { return }
-        
+        guard  (insertedIndexes != nil),  (deletedIndexes != nil) else { return }
+        print("📌 controllerDidChangeContent вызван")
+           guard let inserted = insertedIndexes, let deleted = deletedIndexes else { return }
+           
+           print("🔹 Вставленные индексы: \(inserted)")
+           print("🔹 Удалённые индексы: \(deleted)")
         delegate?.didUpdate(TrackerStoreUpdate(
             insertedIndexes: inserted,
             deletedIndexes: deleted
