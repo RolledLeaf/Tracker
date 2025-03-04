@@ -3,7 +3,7 @@ import UIKit
 
 
 protocol TrackerRecordStoreProtocol {
-    func getTrackerRecords(for trackerID: UUID) -> [TrackerRecord]
+    func getTrackerRecords(for trackerID: UUID) -> [TrackerRecordCoreData]
 }
 
 
@@ -15,8 +15,9 @@ final class TrackerRecordStore: NSObject, NSFetchedResultsControllerDelegate {
         self.context = context
     }
     
-    private lazy var fetchedResultsController: NSFetchedResultsController<TrackerRecord> = {
-        let fetchRequest: NSFetchRequest<TrackerRecord> = TrackerRecord.fetchRequest()
+    private lazy var fetchedResultsController: NSFetchedResultsController<TrackerRecordCoreData> = {
+        
+        let fetchRequest: NSFetchRequest<TrackerRecordCoreData> = TrackerRecordCoreData.fetchRequest()
         fetchRequest.sortDescriptors = [NSSortDescriptor(key: "date", ascending: true)]
         
         let fetchedResultsController = NSFetchedResultsController(
@@ -42,14 +43,14 @@ final class TrackerRecordStore: NSObject, NSFetchedResultsControllerDelegate {
         }
         
         func createNewTrackerRecord(trackerID: UUID, date: Date) {
-            let trackerRecord = TrackerRecord(context: context)
+            let trackerRecord = TrackerRecordCoreData(context: context)
             trackerRecord.trackerID = trackerID
             trackerRecord.date = date
             saveContext()
         }
         
-        func fetchAllTrackerRecords() -> [TrackerRecord] {
-            let fetchRequest: NSFetchRequest<TrackerRecord> = TrackerRecord.fetchRequest()
+        func fetchAllTrackerRecords() -> [TrackerRecordCoreData] {
+            let fetchRequest: NSFetchRequest<TrackerRecordCoreData> = TrackerRecordCoreData.fetchRequest()
             do {
                 let records = try context.fetch(fetchRequest)
                 return records
@@ -63,7 +64,7 @@ final class TrackerRecordStore: NSObject, NSFetchedResultsControllerDelegate {
         
         
         func saveTrackerRecord(trackerID: UUID, date: Date) {
-            let record = TrackerRecord(context: context)
+            let record = TrackerRecordCoreData(context: context)
             record.trackerID = trackerID
             record.date = date
             
@@ -76,7 +77,7 @@ final class TrackerRecordStore: NSObject, NSFetchedResultsControllerDelegate {
         }
         
         
-        func deleteTrackerRecord(_ record: TrackerRecord) {
+        func deleteTrackerRecord(_ record: TrackerRecordCoreData) {
             context.delete(record)
             do {
                 try context.save()
@@ -88,7 +89,7 @@ final class TrackerRecordStore: NSObject, NSFetchedResultsControllerDelegate {
 }
 
 extension TrackerRecordStore: TrackerRecordStoreProtocol {
-    func getTrackerRecords(for trackerID: UUID) -> [TrackerRecord] {
+    func getTrackerRecords(for trackerID: UUID) -> [TrackerRecordCoreData] {
            guard let records = fetchedResultsController.fetchedObjects else { return [] }
            return records.filter { $0.trackerID == trackerID }
        }

@@ -1,12 +1,10 @@
 import UIKit
 
-protocol NewCategoryDelegate: AnyObject {
-    func didAddCategory(_ category: String)
-}
+
 
 final class NewCategoryViewController: UIViewController {
     
-    weak var delegate: NewCategoryDelegate?
+
     
     private lazy var titleLabel: UILabel = {
         let label = UILabel()
@@ -92,13 +90,27 @@ final class NewCategoryViewController: UIViewController {
         }
     }
     
+    private func saveCategoryToCoreData(_ categoryName: String) {
+        let context = CoreDataStack.shared.context
+        let newCategory = TrackerCategoryCoreData(context: context)
+        newCategory.title = categoryName
+        
+        do {
+            try context.save()
+            print("Категория \(categoryName) сохранена в базу данных")
+            NotificationCenter.default.post(name: NSNotification.Name("NewCategoryAdded"), object: nil)
+        } catch {
+            print("Ошибка сохранения категории: \(error)")
+        }
+    }
+    
     @objc func textFieldDidChange() {
         updateDoneButtonColor()
     }
     
     @objc func doneButtonTapped() {
         guard let categoryName = categoryNameTextField.text, !categoryName.isEmpty else { return }
-        delegate?.didAddCategory(categoryName)
+        saveCategoryToCoreData(categoryName)
         dismiss(animated: true, completion: nil)
         
     }

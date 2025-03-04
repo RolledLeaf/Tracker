@@ -1,7 +1,7 @@
 import UIKit
 
 protocol newTrackerDelegate: AnyObject {
-    func didCreateTracker(_ tracker: Tracker,_ category: TrackerCategory)
+    func didCreateTracker(_ tracker: TrackerCoreData,_ category: TrackerCategoryCoreData)
 }
 
 final class NewHabitViewController: UIViewController, UITableViewDelegate, UITableViewDataSource, UICollectionViewDataSource, UICollectionViewDelegateFlowLayout, UITextFieldDelegate {
@@ -141,7 +141,7 @@ final class NewHabitViewController: UIViewController, UITableViewDelegate, UITab
         }
     }
     
-    var selectedCategory: String? {
+    var selectedCategory: TrackerCategoryCoreData? {
         didSet {
             updateCreateCategoryButtonColor()
         }
@@ -286,7 +286,7 @@ final class NewHabitViewController: UIViewController, UITableViewDelegate, UITab
         print("Создаём трекер с названием: \(name), цвет: \(selectedColor), эмодзи: \(selectedEmoji), категория: \(selectedCategory), дни недели: \(selectedWeekDays.joined(separator: ", "))")
         
         let context = CoreDataStack.shared.context
-        let tracker = Tracker(context: context)
+        let tracker = TrackerCoreData(context: context)
         tracker.id = TrackerIdGenerator.generateId() // Идентификатор
         tracker.name = name
         tracker.color = selectedColor.rawValue as NSString
@@ -294,22 +294,20 @@ final class NewHabitViewController: UIViewController, UITableViewDelegate, UITab
         tracker.daysCount = 0
         tracker.weekDays = selectedWeekDays as NSObject
         
-        let category = TrackerCategory(context: context)
-        category.title = selectedCategory
-        category.addToTracker(tracker)
+        let category = selectedCategory
+        
+        tracker.category = selectedCategory
+        category.addToTracker(tracker) // Убедись, что метод действительно существует!
         
         // Сохраняем контекст (т.е. сохраняем все изменения в базу данных)
         do {
             try context.save()
-            print("Трекер сохранён в базе данных")
-            print("Tracker: \(tracker.name), Category: \(tracker.category?.title ?? "None")")
+            print("📌 Создаём трекер '\(tracker.name)' для категории '\(category.title ?? "Без названия")'")
             delegate?.didCreateTracker(tracker, category)
-               dismiss(animated: true)
+            presentingViewController?.presentingViewController?.dismiss(animated: true)
         } catch {
             print("Ошибка при сохранении трекера: \(error)")
         }
-       
-        
     }
     
     @objc private func cancelButtonTapped(_ sender: UIButton) {
@@ -485,11 +483,11 @@ extension NewHabitViewController: ScheduleViewControllerDelegate {
 //let russianSelectedWeekDays = ["Пн", "Вт", "Ср", "Чт", "Пт", "Сб", "Вс"]
 //let engSelectedWeekDays = ["Mon", "Tue", "Wed", "Thu", "Fri", "Sat", "Sun"]
 extension NewHabitViewController: CategoriesListViewControllerDelegate {
-    func updateCategory(with category: String) {
+    func updateCategory(with category: TrackerCategoryCoreData) {
         if let index = tableViewOptions.firstIndex(where: { $0.title == "Категория" }) {
-            tableViewOptions[index].subtitle = category
+            tableViewOptions[index].subtitle = category.title // Используем title категории
         }
-        selectedCategory = category
+        selectedCategory = category // Теперь сохраняем объект категории
         categoryAndScheduleTableView.reloadData()
     }
 }

@@ -8,12 +8,13 @@ final class TrackersViewController: UIViewController, UICollectionViewDataSource
     
     
     var selectedDate: Date = Date()
-    var categories: [TrackerCategory] = []
-    var filteredCategories: [TrackerCategory] = []
-    var trackerRecords: [TrackerRecord] = []
-    var currentSelectedTracker: Tracker?
+    var categories: [TrackerCategoryCoreData] = []
+    var filteredCategories: [TrackerCategoryCoreData] = []
+    var trackerRecords: [TrackerRecordCoreData] = []
+    var currentSelectedTracker: TrackerCoreData?
     var currentDate: Date = Date()
     var selectedIndexPath: IndexPath?
+    
     
     
     private let trackerCategoryStore =  TrackerCategoryStore()
@@ -26,7 +27,7 @@ final class TrackersViewController: UIViewController, UICollectionViewDataSource
     private let locale = Locale(identifier: "ru_RU")
     private let context = CoreDataStack.shared.persistentContainer.viewContext
     
-    var groupedTrackers: [String: [Tracker]] = [:]
+    var groupedTrackers: [String: [TrackerCoreData]] = [:]
     
   
     private var datePickerHeightConstraint: NSLayoutConstraint?
@@ -125,7 +126,7 @@ final class TrackersViewController: UIViewController, UICollectionViewDataSource
     
     override func viewDidAppear(_ animated: Bool) {
         super.viewDidAppear(animated)
-        loadCategoriesAndTrackers()
+        fetchAllCategories()
         if let navView = navigationController?.view {
             navView.addSubview(plusButton)
             navView.addSubview(dateButton)
@@ -154,8 +155,25 @@ final class TrackersViewController: UIViewController, UICollectionViewDataSource
         categoriesCollectionView.reloadData()
     }
     
+    func fetchAllCategories() {
+        let fetchedCategoies = trackerCategoryStore.fetchAllTrackerCategories()
+        print("Запрошены категории. Получены следующие категории: \(fetchedCategoies)")
+         filteredCategories = fetchedCategoies
+        
+    }
+    
+ 
+    
+    func groupTrackersByCategory() {
+        // Очищаем старую группу перед группировкой
+        groupedTrackers.removeAll()
+
+        // Проходим по всем категориям и получаем трекеры для каждой категории
+       
+    }
+    
     func fetchAllTrackers() {
-        let trackerFetchRequest: NSFetchRequest<Tracker> = Tracker.fetchRequest()
+        let trackerFetchRequest: NSFetchRequest<TrackerCoreData> = TrackerCoreData.fetchRequest()
         
         do {
             let trackers = try CoreDataStack.shared.context.fetch(trackerFetchRequest)
@@ -168,12 +186,14 @@ final class TrackersViewController: UIViewController, UICollectionViewDataSource
                     print("Трекер: \(tracker.name ?? "Без названия"), Цвет: \(tracker.color ?? "Не задан" as NSObject), Эмодзи: \(tracker.emoji ?? "Не задан")")
                     print("Дни недели: \(tracker.weekDays ?? "Не заданы" as NSObject)")
                     print("Категория: \(tracker.category?.title ?? "Не задана" as NSObject as! String)")
+                    
                 }
             }
         } catch {
             print("Ошибка при извлечении трекеров из базы данных: \(error.localizedDescription)")
         }
     }
+    
     
     func loadCategoriesAndTrackers() {
         categories = trackerCategoryStore.fetchAllTrackerCategories()
@@ -303,7 +323,7 @@ final class TrackersViewController: UIViewController, UICollectionViewDataSource
     }
     
     private func updateUI() {
-        let categoryFetchRequest: NSFetchRequest<TrackerCategory> = TrackerCategory.fetchRequest()
+        let categoryFetchRequest: NSFetchRequest<TrackerCategoryCoreData> = TrackerCategoryCoreData.fetchRequest()
         do {
             let categoriesFromDataBase = try CoreDataStack.shared.context.fetch(categoryFetchRequest)
             let hasTrackers = !(categoriesFromDataBase.isEmpty)
@@ -409,39 +429,88 @@ extension TrackersViewController: TrackerCategoryCellDelegate {
 
 extension TrackersViewController {
     
+    
+    func getTrackers(for indexPath: IndexPath) -> [TrackerCoreData] {
+        guard let category = trackerCategoryStore.getCategory(at: indexPath) else {
+            print("❌ Категория не найдена для секции \(indexPath.section)")
+            return []
+        }
+
+        let fetchRequest: NSFetchRequest<TrackerCoreData> = TrackerCoreData.fetchRequest()
+        fetchRequest.predicate = NSPredicate(format: "category == %@", category)
+        
+        do {
+            let trackers = try context.fetch(fetchRequest)
+            print("📌 Загружены трекеры для категории '\(category.title ?? "Без названия")': \(trackers.map { $0.name })")
+            return trackers
+        } catch {
+            print("❌ Ошибка загрузки трекеров: \(error)")
+            return []
+        }
+    }
+    
+    
     func didChangeContent() {
         reloadCategoryData()
     }
     
     func numberOfSections(in collectionView: UICollectionView) -> Int {
-        print("Number of sections: \(trackerStore.numberOfSections)")
+      print("numberOfSections = \(trackerStore.numberOfSections)")
         return  trackerStore.numberOfSections
         
     }
 
     func collectionView(_ collectionView: UICollectionView, numberOfItemsInSection section: Int) -> Int {
-        print("Number of trackers: \(trackerStore.numberOfRowsInSection(section))")
-        return trackerStore.numberOfRowsInSection(section)
+        // 1. Получаем категорию по секции
+        guard let category = trackerCategoryStore.getCategory(at: IndexPath(row: 0, section: section)) else {
+            print("❌ Категория не найдена для секции \(section)")
+            return 0
+        }
+        
+        // 2. Получаем количество трекеров в этой категории
+        let trackersCount = category.tracker?.count ?? 0
+        
+        print("✅ Категория '\(category.title ?? "Без названия")' содержит \(trackersCount) трекеров")
+        
+        return trackersCount
     }
     
   
-        func collectionView(_ collectionView: UICollectionView, cellForItemAt indexPath: IndexPath) -> UICollectionViewCell {
-            guard let cell = collectionView.dequeueReusableCell(withReuseIdentifier: "TrackerCell", for: indexPath) as? TrackerCell else {
-                fatalError("Cannot dequeue TrackerCell")
-            }
-
-            guard let tracker = trackerStore.getTrackerByIndex(at: indexPath) else {
-                print("Tracker not found at index \(indexPath)")
-                return UICollectionViewCell()
-            }
-            
-           
-            let trackerRecords = trackerRecordStore.getTrackerRecords(for: tracker.id ?? UUID())
-               cell.configure(with: tracker, trackerRecords: trackerRecords)
-
-            return cell
+    func collectionView(_ collectionView: UICollectionView, cellForItemAt indexPath: IndexPath) -> UICollectionViewCell {
+        guard let cell = categoriesCollectionView.dequeueReusableCell(
+            withReuseIdentifier: TrackerCell.reuseIdentifier,
+            for: indexPath
+        ) as? TrackerCell else {
+            fatalError("Cannot dequeue TrackerCell")
         }
-    
+
+        guard let category = trackerCategoryStore.getCategory(at: indexPath) else {
+            print("❌ Категория не найдена для секции \(indexPath.section)")
+            return UICollectionViewCell()
+        }
+        
+        guard let trackers = category.tracker?.allObjects as? [TrackerCoreData] else {
+            print("❌ В категории \(category.title ?? "Без названия") нет трекеров")
+            return UICollectionViewCell()
+        }
+
+       
+
+        guard indexPath.item < trackers.count else {
+            print("❌ Ошибка индекса: \(indexPath.item) для секции \(indexPath.section)")
+            return UICollectionViewCell()
+        }
+
+        let tracker = trackers[indexPath.item]
+        
+        let trackerRecordsForTracker = trackerRecords.filter { $0.trackerID == tracker.id }
+        
+        cell.delegate = self
+        cell.viewController = self
+        cell.configure(with: tracker, trackerRecords: trackerRecordsForTracker)
+
+        return cell
+    }
     
     func collectionView(_ collectionView: UICollectionView, didSelectItemAt indexPath: IndexPath) {
         let section = indexPath.section
@@ -469,14 +538,11 @@ extension TrackersViewController {
               ) as? CategoriesCollectionHeaderView else {
             return UICollectionReusableView()
         }
-        // Получаем категорию по indexPath.section
-        if let category = trackerStore.fetchedResultsController.sections?[indexPath.section].name {
-               header.configure(with: category)
-           } else {
-               header.configure(with: "Без категории")
-           }
-           
-           return header
+
+        let category = trackerCategoryStore.getCategory(at: indexPath)
+        header.configure(with: category?.title ?? "Без категории")
+
+        return header
     }
     
     
@@ -537,11 +603,8 @@ extension TrackersViewController: TrackerStoreDelegate {
 }
 
 extension TrackersViewController: newTrackerDelegate {
-    func didCreateTracker(_ tracker: Tracker, _ category: TrackerCategory) {
-        reloadCategoryData()
-    }
-    
-    func didCreateTracker() {
+    func didCreateTracker(_ tracker: TrackerCoreData, _ category: TrackerCategoryCoreData) {
+        try? trackerCategoryStore.fetchedResultsController.performFetch()
         print("Трекер создан, обновляем коллекцию")
         reloadCategoryData()
     }

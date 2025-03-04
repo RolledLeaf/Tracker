@@ -10,7 +10,7 @@ final class TrackerCell: UICollectionViewCell {
     
     static let reuseIdentifier = "TrackerCell"
     
-    private var currentSelectedTracker: Tracker?
+    private var currentSelectedTracker: TrackerCoreData?
     private var trackerID: UUID?
     private var currentDate: Date = Date()
     private var selectedIndexPaths: Set<IndexPath> = []
@@ -156,7 +156,7 @@ final class TrackerCell: UICollectionViewCell {
         }
     }
     
-    func configure(with tracker: Tracker, trackerRecords: [TrackerRecord]) {
+    func configure(with tracker: TrackerCoreData, trackerRecords: [TrackerRecordCoreData]) {
         currentSelectedTracker = tracker
         trackerID = tracker.id
         emojiLabel.text = tracker.emoji

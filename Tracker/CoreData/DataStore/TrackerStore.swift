@@ -15,8 +15,8 @@ protocol TrackerStoreProtocol {
     var numberOfTrackers: Int { get }
     func numberOfRowsInSection(_ section: Int) -> Int
     func addNewTracker(name: String, selectedColor: CollectionColors, selectedEmoji: String, selectedWeekDays: [String], selectedCategory: String) throws
-    func getTracker(by id: UUID) -> Tracker?
-  
+    func getTracker(by id: UUID) -> TrackerCoreData?
+    func getSectionTitle(for section: Int) -> String
 }
 
 final class TrackerStore: NSObject, NSFetchedResultsControllerDelegate {
@@ -32,9 +32,9 @@ final class TrackerStore: NSObject, NSFetchedResultsControllerDelegate {
     private var insertedIndexes: IndexSet?
     private var deletedIndexes: IndexSet?
     
-     lazy var fetchedResultsController: NSFetchedResultsController<Tracker> = {
+     lazy var fetchedResultsController: NSFetchedResultsController<TrackerCoreData> = {
         
-        let fetchRequest = NSFetchRequest<Tracker>(entityName: "Tracker")
+        let fetchRequest = NSFetchRequest<TrackerCoreData>(entityName: "TrackerCoreData")
         fetchRequest.sortDescriptors = [NSSortDescriptor(key: "name", ascending: true)]
         
         
@@ -109,8 +109,12 @@ extension TrackerStore: TrackerStoreProtocol {
         return fetchedResultsController.sections?[section].numberOfObjects ?? 0
     }
     
+    func getSectionTitle(for section: Int) -> String {
+        return fetchedResultsController.sections?[section].name ?? "Без категории"
+    }
+    
     func addNewTracker(name: String, selectedColor: CollectionColors, selectedEmoji: String, selectedWeekDays: [String], selectedCategory: String) throws {
-        let tracker = Tracker(context: context)
+        let tracker = TrackerCoreData(context: context)
         tracker.id = UUID()
         tracker.name = name
         tracker.color = selectedColor.rawValue as NSString
@@ -118,7 +122,7 @@ extension TrackerStore: TrackerStoreProtocol {
         tracker.daysCount = 0
         tracker.weekDays = selectedWeekDays as NSObject
         
-        let category = TrackerCategory(context: context)
+        let category = TrackerCategoryCoreData(context: context)
         category.title = selectedCategory
         category.addToTracker(tracker)
         
@@ -126,7 +130,7 @@ extension TrackerStore: TrackerStoreProtocol {
     }
     
     func addNewIrregularTracker(name: String, selectedColor: CollectionColors, selectedEmoji: String, selectedDates: [Date], selectedCategory: String) throws {
-        let tracker = Tracker(context: context)
+        let tracker = TrackerCoreData(context: context)
         tracker.id = UUID()
         tracker.name = name
         tracker.color = selectedColor.rawValue as NSString
@@ -134,26 +138,26 @@ extension TrackerStore: TrackerStoreProtocol {
         tracker.daysCount = 0
         tracker.weekDays = [" "] as NSArray
         
-        let category = TrackerCategory(context: context)
+        let category = TrackerCategoryCoreData(context: context)
         category.title = selectedCategory
         category.addToTracker(tracker)
         
         try context.save()
     }
     
-    func tracker(at indexPath: IndexPath) -> Tracker {
+    func tracker(at indexPath: IndexPath) -> TrackerCoreData {
         return fetchedResultsController.object(at: indexPath)
     }
     
     
-    func getTrackerByIndex(at indexPath: IndexPath) -> Tracker? {
+    func getTrackerByIndex(at indexPath: IndexPath) -> TrackerCoreData? {
         let objects = fetchedResultsController.fetchedObjects ?? []
         guard indexPath.row < objects.count else { return nil }
         return objects[indexPath.row]
     }
     
-    func getTracker(by id: UUID) -> Tracker? {
-        let fetchRequest: NSFetchRequest<Tracker> = Tracker.fetchRequest()
+    func getTracker(by id: UUID) -> TrackerCoreData? {
+        let fetchRequest: NSFetchRequest<TrackerCoreData> = TrackerCoreData.fetchRequest()
         fetchRequest.predicate = NSPredicate(format: "id == %@", id as CVarArg)
         fetchRequest.fetchLimit = 1
         
@@ -164,4 +168,18 @@ extension TrackerStore: TrackerStoreProtocol {
             return nil
         }
     }
+    
+    func getTrackersForCategory(_ category: TrackerCategoryCoreData) -> [TrackerCoreData] {
+        let fetchRequest: NSFetchRequest<TrackerCoreData> = TrackerCoreData.fetchRequest()
+        fetchRequest.predicate = NSPredicate(format: "category == %@", category.title!)
+        
+        do {
+            let trackers = try context.fetch(fetchRequest)
+            return trackers
+        } catch {
+            print("Failed to fetch trackers for category \(category.title): \(error)")
+            return []
+        }
+    }
+    
 }
