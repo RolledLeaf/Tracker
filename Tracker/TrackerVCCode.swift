@@ -134,36 +134,25 @@ final class TrackersViewController: UIViewController, UICollectionViewDataSource
         categoriesCollectionView.reloadData()
     }
     
-    private func updateVisibleTrackers(for selectedDate: Date) {
+ private func updateVisibleTrackers(for selectedDate: Date) {
         let formatter = DateFormatter()
         formatter.locale = locale
         formatter.dateFormat = "EEE"
         
-        let selectedWeekday = formatter.string(from: selectedDate)
-        let categoryFetchRequest: NSFetchRequest<TrackerCategory> = TrackerCategory.fetchRequest()
+        let selectedWeekday = formatter.string(from: selectedDate) //
         
-        do {
-            let categories = try CoreDataStack.shared.context.fetch(categoryFetchRequest)
-            filteredCategories = categories.map { category in
-                let trackers = category.tracker ?? [] // Получаем Set<Tracker>
-                
-                let filteredTrackers = trackers.filter { tracker in
-                    guard let trackerWeekDays = tracker.weekDays else { return false }
-                    
-                    if trackerWeekDays.contains(" ") {
-                        return !trackerRecords.contains { $0.trackerID == tracker.id && !($0.date?.isSameDay(as: selectedDate) ?? true) }
-                    } else {
-                        return trackerWeekDays.contains(selectedWeekday)
-                    }
+        filteredCategories = categories.map { category in
+            let filteredTrackers = category.tracker.filter { tracker in
+                if tracker.weekDays.contains(" ") {
+                    return !trackerRecords.contains { $0.trackerID == tracker.id && !$0.date.isSameDay(as: selectedDate) }
+                } else {
+                    return tracker.weekDays.contains(selectedWeekday)
                 }
-                
-                return TrackerCategory(title: category.title ?? "", tracker: Set(filteredTrackers)) // Используем Set
-            }.filter { (($0.tracker?.isEmpty) == nil) ?? true } // Убираем пустые категории
-            
-            reloadCategoryData()
-        } catch {
-            print("Failed to fetch categories: \(error)")
-        }
+            }
+            return TrackerCategory(title: category.title, tracker: filteredTrackers)
+        }.filter { !$0.tracker.isEmpty }
+        
+        reloadCategoryData()
     }
     
     private func filterCategoryByDate(_ category: TrackerCategory) -> TrackerCategory? {
