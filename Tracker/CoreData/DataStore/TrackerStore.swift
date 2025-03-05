@@ -74,7 +74,17 @@ final class TrackerStore: NSObject, NSFetchedResultsControllerDelegate {
         delegate?.didUpdate(update)
     }
     
-    
+    func fetchAllTrackers() -> [TrackerCoreData] {
+            let fetchRequest: NSFetchRequest<TrackerCoreData> = TrackerCoreData.fetchRequest()
+            do {
+                let trackers = try context.fetch(fetchRequest)
+                return trackers
+            } catch {
+                print("Error fetching trackers: \(error)")
+                return []
+            }
+        }
+
     
     func controllerWillChangeContent(_ controller: NSFetchedResultsController<NSFetchRequestResult>) {
         delegate?.didUpdate(TrackerStoreUpdate(
