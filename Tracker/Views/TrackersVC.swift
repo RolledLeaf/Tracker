@@ -113,6 +113,7 @@ final class TrackersViewController: UIViewController, UICollectionViewDataSource
         super.viewDidLoad()
         setupInitialUI()
         loadCategories()
+        loadTrackerRecords()
         reloadCategoryData()
         updateUI()
         updateVisibleTrackers(for: datePicker.date)
@@ -168,6 +169,17 @@ final class TrackersViewController: UIViewController, UICollectionViewDataSource
         groupedTrackers.removeAll()
     }
     
+    private func loadTrackerRecords() {
+        let fetchRequest: NSFetchRequest<TrackerRecordCoreData> = TrackerRecordCoreData.fetchRequest()
+
+        do {
+            trackerRecords = try context.fetch(fetchRequest)
+            print("📌 Загружено \(trackerRecords.count) выполненных трекеров из Core Data")
+        } catch {
+            print("❌ Ошибка загрузки выполненных трекеров: \(error)")
+            trackerRecords = []
+        }
+    }
     
     func loadCategoriesAndTrackers() {
         categories = trackerCategoryStore.fetchAllTrackerCategories()
@@ -176,27 +188,36 @@ final class TrackersViewController: UIViewController, UICollectionViewDataSource
     
     
     private func updateVisibleTrackers(for selectedDate: Date) {
-        print("📌 Вызван метод updateVisibleTrackers")
-        
+        print("📌 Вызван метод updateVisibleTrackers для даты \(selectedDate)")
+
         let formatter = DateFormatter()
         formatter.locale = locale
         formatter.dateFormat = "EEE"
         let selectedWeekday = formatter.string(from: selectedDate)
-        
+
         let allTrackers = trackerStore.fetchAllTrackers()
-        
+
         let filteredTrackers = allTrackers.filter { tracker in
             guard let weekDays = tracker.weekDays as? [String] else { return false }
-            return weekDays.contains(" ") || weekDays.contains(selectedWeekday)
+
+            let isCompleted = trackerRecords.contains { $0.trackerID == tracker.id && $0.date?.isSameDay(as: selectedDate) == true }
+            let hasEverBeenCompleted = trackerRecords.contains { $0.trackerID == tracker.id }
+
+            print("🔹 Трекер \(tracker.name ?? "Без имени") – выполнен в этот день? \(isCompleted ? "✅ Да" : "❌ Нет"), когда-либо выполнялся? \(hasEverBeenCompleted ? "📅 Да" : "📅 Нет")")
+
+            if weekDays.contains(" ") {
+                return !hasEverBeenCompleted || isCompleted  // ✅ Показываем всегда, пока не выполнен, затем только в день выполнения
+            } else {
+                return weekDays.contains(selectedWeekday)
+            }
         }
-        
+
         filteredCategories = trackerCategoryStore.fetchAllTrackerCategories().compactMap { category in
             let trackersInCategory = filteredTrackers.filter { $0.category == category }
             return trackersInCategory.isEmpty ? nil : category
         }
-        
+
         print("📌 Отфильтрованных категорий: \(filteredCategories.count)")
-        
         reloadCategoryData()
     }
     
@@ -355,31 +376,53 @@ final class TrackersViewController: UIViewController, UICollectionViewDataSource
 
 //3
 extension TrackersViewController: TrackerCategoryCellDelegate {
-    //5
     func trackerExecution(_ cell: TrackerCell, didTapDoneButtonFor trackerID: UUID, selectedDate: Date) {
-        let calendar = Calendar.current
+        let context = CoreDataStack.shared.context
+
+        guard let tracker = getTrackerByID(trackerID) else {
+            print("❌ Ошибка: не найден трекер \(trackerID)")
+            return
+        }
+
+        // ✅ Проверяем в `trackerRecords`, есть ли уже запись выполнения
+        if let existingRecordIndex = trackerRecords.firstIndex(where: { $0.trackerID == trackerID && $0.date?.isSameDay(as: selectedDate) == true }) {
+            // ✅ Если запись найдена, удаляем её
+            let existingRecord = trackerRecords[existingRecordIndex]
+            context.delete(existingRecord)
+            trackerRecords.remove(at: existingRecordIndex)
+            tracker.daysCount -= 1
+            print("🗑 Удалена запись выполнения для трекера \(trackerID) на \(selectedDate)")
+        } else {
+            // ✅ Если записи нет, создаём новую
+            let newRecord = TrackerRecordCoreData(context: context)
+            newRecord.trackerID = trackerID
+            newRecord.date = selectedDate
+            trackerRecords.append(newRecord) // Добавляем в массив
+            tracker.daysCount += 1
+            print("✅ Добавлена запись выполнения для трекера \(trackerID) на \(selectedDate)")
+        }
+
+        do {
+            try context.save()
+            updateVisibleTrackers(for: selectedDate) // Обновляем список трекеров
+        } catch {
+            print("❌ Ошибка при обновлении записи выполнения: \(error)")
+        }
     }
     
+    func getTrackerByID(_ trackerID: UUID) -> TrackerCoreData? {
+        for category in filteredCategories {
+            if let tracker = category.tracker?.first(where: { ($0 as AnyObject).id == trackerID }) {
+                return tracker as? TrackerCoreData
+            }
+        }
+        return nil
+    }
     
-    /* 4
-     func getTrackerByID(_ trackerID: Int) -> Tracker? {
-     
-     let tracker = Tracker(context: CoreData)
-     return tracker
-     }
-     */
-    
-    
-}
-
-//6
-private func updateTrackerDaysCount(for trackerID: Int, isChecked: Bool) {
     
 }
 
 extension TrackersViewController {
-    
-    
     func getTrackers(for indexPath: IndexPath) -> [TrackerCoreData] {
         guard let category = trackerCategoryStore.getCategory(at: indexPath) else {
             print("❌ Категория не найдена для секции \(indexPath.section)")
@@ -528,7 +571,7 @@ extension TrackersViewController: newTrackerDelegate {
     func didCreateTracker(_ tracker: TrackerCoreData, _ category: TrackerCategoryCoreData) {
         do {
             try trackerCategoryStore.fetchedResultsController.performFetch() // Принудительно обновляем данные
-            loadCategories()
+            updateVisibleTrackers(for: datePicker.date)
             updateUI()
              // Перезапрашиваем категории и трекеры
             print("📌 Трекер создан, обновляем коллекцию")

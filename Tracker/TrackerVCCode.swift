@@ -128,8 +128,6 @@ final class TrackersViewController: UIViewController, UICollectionViewDataSource
         }
     }
     
-    
-    
     private func reloadCategoryData() {
         categoriesCollectionView.reloadData()
     }
