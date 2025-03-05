@@ -193,7 +193,6 @@ final class NewHabitViewController: UIViewController, UITableViewDelegate, UITab
             contentView.widthAnchor.constraint(equalTo: scrollView.widthAnchor),
             contentView.heightAnchor.constraint(equalToConstant: 962),
             
-            
             titleLabel.topAnchor.constraint(equalTo: contentView.topAnchor, constant: -33),
             titleLabel.centerXAnchor.constraint(equalTo: contentView.centerXAnchor),
             
@@ -202,12 +201,10 @@ final class NewHabitViewController: UIViewController, UITableViewDelegate, UITab
             trackerNameTextField.leadingAnchor.constraint(equalTo: contentView.leadingAnchor, constant: 16),
             trackerNameTextField.trailingAnchor.constraint(equalTo: contentView.trailingAnchor, constant: -16),
             
-            
             characterLimitLabel.heightAnchor.constraint(equalToConstant: 22),
             characterLimitLabel.leadingAnchor.constraint(equalTo: view.leadingAnchor, constant: 44),
             characterLimitLabel.trailingAnchor.constraint(equalTo: view.trailingAnchor, constant: -44),
             characterLimitLabel.topAnchor.constraint(equalTo: trackerNameTextField.bottomAnchor, constant: 8),
-            
             
             categoryAndScheduleTableView.topAnchor.constraint(equalTo: trackerNameTextField.bottomAnchor, constant: 24),
             categoryAndScheduleTableView.leadingAnchor.constraint(equalTo: contentView.leadingAnchor, constant: 16),
@@ -287,7 +284,7 @@ final class NewHabitViewController: UIViewController, UITableViewDelegate, UITab
         
         let context = CoreDataStack.shared.context
         let tracker = TrackerCoreData(context: context)
-        tracker.id = TrackerIdGenerator.generateId() // Идентификатор
+        tracker.id = TrackerIdGenerator.generateId()
         tracker.name = name
         tracker.color = selectedColor.rawValue as NSString
         tracker.emoji = selectedEmoji
@@ -295,11 +292,9 @@ final class NewHabitViewController: UIViewController, UITableViewDelegate, UITab
         tracker.weekDays = selectedWeekDays as NSObject
         
         let category = selectedCategory
-        
         tracker.category = selectedCategory
-        category.addToTracker(tracker) // Убедись, что метод действительно существует!
+        category.addToTracker(tracker)
         
-        // Сохраняем контекст (т.е. сохраняем все изменения в базу данных)
         do {
             try context.save()
             print("📌 Создаём трекер '\(tracker.name)' для категории '\(category.title ?? "Без названия")'")
@@ -347,7 +342,6 @@ final class NewHabitViewController: UIViewController, UITableViewDelegate, UITab
         
         print("Successfully dequeued CollectionHeaderView for section \(indexPath.section)")
         
-        // Configure header
         if collectionView == emojiCollectionView {
             header.configure(with: "Emoji")
         } else if collectionView == colorsCollectionView {
@@ -480,14 +474,13 @@ extension NewHabitViewController: ScheduleViewControllerDelegate {
         }
     }
 }
-//let russianSelectedWeekDays = ["Пн", "Вт", "Ср", "Чт", "Пт", "Сб", "Вс"]
-//let engSelectedWeekDays = ["Mon", "Tue", "Wed", "Thu", "Fri", "Sat", "Sun"]
+
 extension NewHabitViewController: CategoriesListViewControllerDelegate {
     func updateCategory(with category: TrackerCategoryCoreData) {
         if let index = tableViewOptions.firstIndex(where: { $0.title == "Категория" }) {
-            tableViewOptions[index].subtitle = category.title // Используем title категории
+            tableViewOptions[index].subtitle = category.title
         }
-        selectedCategory = category // Теперь сохраняем объект категории
+        selectedCategory = category 
         categoryAndScheduleTableView.reloadData()
     }
 }

@@ -12,11 +12,11 @@ class WeekDaysTransformer: ValueTransformer {
     
     override func transformedValue(_ value: Any?) -> Any? {
         guard let daysArray = value as? [String] else { return nil }
-        return daysArray.joined(separator: " ") // Преобразуем в строку через пробел
+        return daysArray.joined(separator: " ")
     }
     
     override func reverseTransformedValue(_ value: Any?) -> Any? {
         guard let daysString = value as? String else { return nil }
-        return daysString.components(separatedBy: " ") // Преобразуем обратно в массив строк
+        return daysString.components(separatedBy: " ") 
     }
 }

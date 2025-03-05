@@ -9,13 +9,10 @@ protocol TrackerStoreDelegate: AnyObject {
     func didUpdate(_ update: TrackerStoreUpdate)
 }
 
-
 protocol TrackerStoreProtocol {
     var numberOfSections: Int { get }
     var numberOfTrackers: Int { get }
     func numberOfRowsInSection(_ section: Int) -> Int
-    func addNewTracker(name: String, selectedColor: CollectionColors, selectedEmoji: String, selectedWeekDays: [String], selectedCategory: String) throws
-    func getTracker(by id: UUID) -> TrackerCoreData?
     func getSectionTitle(for section: Int) -> String
 }
 
@@ -32,28 +29,43 @@ final class TrackerStore: NSObject, NSFetchedResultsControllerDelegate {
     private var insertedIndexes: IndexSet?
     private var deletedIndexes: IndexSet?
     
-     lazy var fetchedResultsController: NSFetchedResultsController<TrackerCoreData> = {
-        
+    lazy var fetchedResultsController: NSFetchedResultsController<TrackerCoreData> = {
         let fetchRequest = NSFetchRequest<TrackerCoreData>(entityName: "TrackerCoreData")
         fetchRequest.sortDescriptors = [NSSortDescriptor(key: "name", ascending: true)]
         
+        let controller = NSFetchedResultsController(
+            fetchRequest: fetchRequest,
+            managedObjectContext: context,
+            sectionNameKeyPath: "category.title",
+            cacheName: nil
+        )
         
-        let fetchedResultsController = NSFetchedResultsController(fetchRequest: fetchRequest, managedObjectContext: context, sectionNameKeyPath: "category.title", cacheName: nil)
-        
-        fetchedResultsController.delegate = self
-        try? fetchedResultsController.performFetch()
-        return fetchedResultsController
+        controller.delegate = self
+        try? controller.performFetch()
+        return controller
     }()
     
     init(context: NSManagedObjectContext = CoreDataStack.shared.context) {
         self.context = context
     }
     
+    func fetchAllTrackers() -> [TrackerCoreData] {
+        let fetchRequest: NSFetchRequest<TrackerCoreData> = TrackerCoreData.fetchRequest()
+        do {
+            return try context.fetch(fetchRequest)
+        } catch {
+            print("❌ Ошибка загрузки трекеров: \(error)")
+            return []
+        }
+    }
     
+    // MARK: - NSFetchedResultsControllerDelegate
     
-    func controller(_ controller: NSFetchedResultsController<NSFetchRequestResult>, didChange anObject: Any, at indexPath: IndexPath?, for type: NSFetchedResultsChangeType, newIndexPath: IndexPath?) {
-        
-        
+    func controllerWillChangeContent(_ controller: NSFetchedResultsController<NSFetchRequestResult>) {
+        delegate?.didUpdate(TrackerStoreUpdate(insertedIndexes: IndexSet(), deletedIndexes: IndexSet()))
+    }
+    
+   func controller(_ controller: NSFetchedResultsController<NSFetchRequestResult>, didChange anObject: Any, at indexPath: IndexPath?, for type: NSFetchedResultsChangeType, newIndexPath: IndexPath?) {
         switch type {
         case .insert:
             if let newIndexPath = newIndexPath {
@@ -66,49 +78,26 @@ final class TrackerStore: NSObject, NSFetchedResultsControllerDelegate {
         default:
             break
         }
-        guard let inserted = insertedIndexes, let deleted = deletedIndexes else {
-            return
-        }
         
-        let update = TrackerStoreUpdate(insertedIndexes: inserted, deletedIndexes: deleted)
-        delegate?.didUpdate(update)
+        guard let inserted = insertedIndexes, let deleted = deletedIndexes else { return }
+        delegate?.didUpdate(TrackerStoreUpdate(insertedIndexes: inserted, deletedIndexes: deleted))
     }
     
-    func fetchAllTrackers() -> [TrackerCoreData] {
-            let fetchRequest: NSFetchRequest<TrackerCoreData> = TrackerCoreData.fetchRequest()
-            do {
-                let trackers = try context.fetch(fetchRequest)
-                return trackers
-            } catch {
-                print("Error fetching trackers: \(error)")
-                return []
-            }
-        }
-
-    
-    func controllerWillChangeContent(_ controller: NSFetchedResultsController<NSFetchRequestResult>) {
-        delegate?.didUpdate(TrackerStoreUpdate(
-               insertedIndexes: IndexSet(),
-               deletedIndexes: IndexSet()
-           ))
-       }
-    
     func controllerDidChangeContent(_ controller: NSFetchedResultsController<NSFetchRequestResult>) {
-        guard  (insertedIndexes != nil),  (deletedIndexes != nil) else { return }
+        guard let inserted = insertedIndexes, let deleted = deletedIndexes else { return }
+        
         print("📌 controllerDidChangeContent вызван")
-           guard let inserted = insertedIndexes, let deleted = deletedIndexes else { return }
-           
-           print("🔹 Вставленные индексы: \(inserted)")
-           print("🔹 Удалённые индексы: \(deleted)")
-        delegate?.didUpdate(TrackerStoreUpdate(
-            insertedIndexes: inserted,
-            deletedIndexes: deleted
-        )
-        )
+        print("🔹 Вставленные индексы: \(inserted)")
+        print("🔹 Удалённые индексы: \(deleted)")
+        
+        delegate?.didUpdate(TrackerStoreUpdate(insertedIndexes: inserted, deletedIndexes: deleted))
+        
         insertedIndexes = nil
         deletedIndexes = nil
     }
 }
+
+// MARK: - TrackerStoreProtocol
 
 extension TrackerStore: TrackerStoreProtocol {
     var numberOfSections: Int {
@@ -126,74 +115,4 @@ extension TrackerStore: TrackerStoreProtocol {
     func getSectionTitle(for section: Int) -> String {
         return fetchedResultsController.sections?[section].name ?? "Без категории"
     }
-    
-    func addNewTracker(name: String, selectedColor: CollectionColors, selectedEmoji: String, selectedWeekDays: [String], selectedCategory: String) throws {
-        let tracker = TrackerCoreData(context: context)
-        tracker.id = UUID()
-        tracker.name = name
-        tracker.color = selectedColor.rawValue as NSString
-        tracker.emoji = selectedEmoji
-        tracker.daysCount = 0
-        tracker.weekDays = selectedWeekDays as NSObject
-        
-        let category = TrackerCategoryCoreData(context: context)
-        category.title = selectedCategory
-        category.addToTracker(tracker)
-        
-        try context.save()
-    }
-    
-    func addNewIrregularTracker(name: String, selectedColor: CollectionColors, selectedEmoji: String, selectedDates: [Date], selectedCategory: String) throws {
-        let tracker = TrackerCoreData(context: context)
-        tracker.id = UUID()
-        tracker.name = name
-        tracker.color = selectedColor.rawValue as NSString
-        tracker.emoji = selectedEmoji
-        tracker.daysCount = 0
-        tracker.weekDays = [" "] as NSArray
-        
-        let category = TrackerCategoryCoreData(context: context)
-        category.title = selectedCategory
-        category.addToTracker(tracker)
-        
-        try context.save()
-    }
-    
-    func tracker(at indexPath: IndexPath) -> TrackerCoreData {
-        return fetchedResultsController.object(at: indexPath)
-    }
-    
-    
-    func getTrackerByIndex(at indexPath: IndexPath) -> TrackerCoreData? {
-        let objects = fetchedResultsController.fetchedObjects ?? []
-        guard indexPath.row < objects.count else { return nil }
-        return objects[indexPath.row]
-    }
-    
-    func getTracker(by id: UUID) -> TrackerCoreData? {
-        let fetchRequest: NSFetchRequest<TrackerCoreData> = TrackerCoreData.fetchRequest()
-        fetchRequest.predicate = NSPredicate(format: "id == %@", id as CVarArg)
-        fetchRequest.fetchLimit = 1
-        
-        do {
-            return try context.fetch(fetchRequest).first
-        } catch {
-            print("Failed to fetch tracker by id: \(error)")
-            return nil
-        }
-    }
-    
-    func getTrackersForCategory(_ category: TrackerCategoryCoreData) -> [TrackerCoreData] {
-        let fetchRequest: NSFetchRequest<TrackerCoreData> = TrackerCoreData.fetchRequest()
-        fetchRequest.predicate = NSPredicate(format: "category == %@", category.title!)
-        
-        do {
-            let trackers = try context.fetch(fetchRequest)
-            return trackers
-        } catch {
-            print("Failed to fetch trackers for category \(category.title): \(error)")
-            return []
-        }
-    }
-    
 }

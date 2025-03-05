@@ -162,10 +162,8 @@ final class TrackerCell: UICollectionViewCell {
         emojiLabel.text = tracker.emoji
         habbitLabel.text = tracker.name
         
-        // Преобразуем цвет только один раз
         let trackerColor = UIColor.fromCollectionColor(tracker.color as! String) ?? .clear
         
-        // Настроим фоны
         backgroundContainer.backgroundColor = trackerColor
         doneButtonContainer.backgroundColor = trackerColor
         emojiContainer.backgroundColor = lightenColor(trackerColor, by: 0.3)
@@ -173,15 +171,12 @@ final class TrackerCell: UICollectionViewCell {
         let currentDate = Date()
         let isCompleted = trackerRecords.contains { $0.trackerID == tracker.id && Calendar.current.isDate($0.date ?? currentDate, inSameDayAs: viewController?.selectedDate ?? currentDate) }
 
-        // Настроим кнопку в зависимости от состояния
         doneButton.setImage(UIImage(systemName: isCompleted ? "checkmark" : "plus"), for: .normal)
 
-        // Цвет фона кнопки в зависимости от состояния
         let baseColor = trackerColor
         let adjustedColor = isCompleted ? lightenColor(baseColor, by: 0.3) : baseColor
         doneButtonContainer.backgroundColor = adjustedColor
         
-        // Настроим отображение количества дней
         let daysCount = tracker.daysCount
         daysNumberLabel.text = "\(daysCount)"
         daysCountLabel.text = getDayWord(for: daysCount)
