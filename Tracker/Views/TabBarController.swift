@@ -23,7 +23,7 @@ final class TabBarController: UITabBarController {
     
     private func addSeparatorLine() {
         let separatorLine = UIView()
-        separatorLine.backgroundColor = UIColor.custom(.tabBarSeparateLineColor) // Цвет линии (можно настроить по желанию)
+        separatorLine.backgroundColor = UIColor.custom(.tabBarSeparateLineColor)
         separatorLine.translatesAutoresizingMaskIntoConstraints = false
         tabBar.addSubview(separatorLine)
         

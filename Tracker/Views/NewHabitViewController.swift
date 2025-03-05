@@ -1,12 +1,12 @@
 import UIKit
 
-protocol NewHabitViewControllerDelegate: AnyObject {
-    func didCreateTracker(_ tracker: Tracker,_ category: TrackerCategory)
+protocol newTrackerDelegate: AnyObject {
+    func didCreateTracker(_ tracker: TrackerCoreData,_ category: TrackerCategoryCoreData)
 }
 
 final class NewHabitViewController: UIViewController, UITableViewDelegate, UITableViewDataSource, UICollectionViewDataSource, UICollectionViewDelegateFlowLayout, UITextFieldDelegate {
     
-    weak var delegate: NewHabitViewControllerDelegate?
+    weak var delegate: newTrackerDelegate?
     
     private lazy var titleLabel: UILabel = {
         let label = UILabel()
@@ -141,7 +141,7 @@ final class NewHabitViewController: UIViewController, UITableViewDelegate, UITab
         }
     }
     
-    var selectedCategory: String? {
+    var selectedCategory: TrackerCategoryCoreData? {
         didSet {
             updateCreateCategoryButtonColor()
         }
@@ -193,7 +193,6 @@ final class NewHabitViewController: UIViewController, UITableViewDelegate, UITab
             contentView.widthAnchor.constraint(equalTo: scrollView.widthAnchor),
             contentView.heightAnchor.constraint(equalToConstant: 962),
             
-            
             titleLabel.topAnchor.constraint(equalTo: contentView.topAnchor, constant: -33),
             titleLabel.centerXAnchor.constraint(equalTo: contentView.centerXAnchor),
             
@@ -202,12 +201,10 @@ final class NewHabitViewController: UIViewController, UITableViewDelegate, UITab
             trackerNameTextField.leadingAnchor.constraint(equalTo: contentView.leadingAnchor, constant: 16),
             trackerNameTextField.trailingAnchor.constraint(equalTo: contentView.trailingAnchor, constant: -16),
             
-            
             characterLimitLabel.heightAnchor.constraint(equalToConstant: 22),
             characterLimitLabel.leadingAnchor.constraint(equalTo: view.leadingAnchor, constant: 44),
             characterLimitLabel.trailingAnchor.constraint(equalTo: view.trailingAnchor, constant: -44),
             characterLimitLabel.topAnchor.constraint(equalTo: trackerNameTextField.bottomAnchor, constant: 8),
-            
             
             categoryAndScheduleTableView.topAnchor.constraint(equalTo: trackerNameTextField.bottomAnchor, constant: 24),
             categoryAndScheduleTableView.leadingAnchor.constraint(equalTo: contentView.leadingAnchor, constant: 16),
@@ -285,22 +282,27 @@ final class NewHabitViewController: UIViewController, UITableViewDelegate, UITab
         }
         print("Создаём трекер с названием: \(name), цвет: \(selectedColor), эмодзи: \(selectedEmoji), категория: \(selectedCategory), дни недели: \(selectedWeekDays.joined(separator: ", "))")
         
-        let tracker = Tracker(
-            id: TrackerIdGenerator.generateId(),
-            name: name,
-            color: selectedColor,
-            emoji: selectedEmoji,
-            daysCount: 0,
-            weekDays: selectedWeekDays
-        )
+        let context = CoreDataStack.shared.context
+        let tracker = TrackerCoreData(context: context)
+        tracker.id = TrackerIdGenerator.generateId()
+        tracker.name = name
+        tracker.color = selectedColor.rawValue as NSString
+        tracker.emoji = selectedEmoji
+        tracker.daysCount = 0
+        tracker.weekDays = selectedWeekDays as NSObject
         
-        let category = TrackerCategory(title: selectedCategory, tracker: [tracker])
-        let trackersVC = TrackersViewController()
-        delegate?.didCreateTracker(tracker, category)
-        self.view.window?.rootViewController?.dismiss(animated: true, completion: nil)
-        let navigationController = UINavigationController(rootViewController: trackersVC)
-        present(navigationController, animated: true)
+        let category = selectedCategory
+        tracker.category = selectedCategory
+        category.addToTracker(tracker)
         
+        do {
+            try context.save()
+            print("📌 Создаём трекер '\(tracker.name)' для категории '\(category.title ?? "Без названия")'")
+            delegate?.didCreateTracker(tracker, category)
+            presentingViewController?.presentingViewController?.dismiss(animated: true)
+        } catch {
+            print("Ошибка при сохранении трекера: \(error)")
+        }
     }
     
     @objc private func cancelButtonTapped(_ sender: UIButton) {
@@ -340,7 +342,6 @@ final class NewHabitViewController: UIViewController, UITableViewDelegate, UITab
         
         print("Successfully dequeued CollectionHeaderView for section \(indexPath.section)")
         
-        // Configure header
         if collectionView == emojiCollectionView {
             header.configure(with: "Emoji")
         } else if collectionView == colorsCollectionView {
@@ -473,14 +474,13 @@ extension NewHabitViewController: ScheduleViewControllerDelegate {
         }
     }
 }
-//let russianSelectedWeekDays = ["Пн", "Вт", "Ср", "Чт", "Пт", "Сб", "Вс"]
-//let engSelectedWeekDays = ["Mon", "Tue", "Wed", "Thu", "Fri", "Sat", "Sun"]
+
 extension NewHabitViewController: CategoriesListViewControllerDelegate {
-    func updateCategory(with category: String) {
+    func updateCategory(with category: TrackerCategoryCoreData) {
         if let index = tableViewOptions.firstIndex(where: { $0.title == "Категория" }) {
-            tableViewOptions[index].subtitle = category
+            tableViewOptions[index].subtitle = category.title
         }
-        selectedCategory = category
+        selectedCategory = category 
         categoryAndScheduleTableView.reloadData()
     }
 }
