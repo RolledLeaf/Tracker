@@ -5,7 +5,6 @@ final class CreateHabitTypeViewController: UIViewController {
     
     weak var delegate: newTrackerDelegate?
     
-    
     private lazy var titleLabel: UILabel = {
         let label = UILabel()
         label.text = "Создание трекера"

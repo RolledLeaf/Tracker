@@ -1,4 +1,3 @@
-
 import UIKit
 import CoreData
 
@@ -116,14 +115,11 @@ final class CategoriesListViewController: UIViewController, UITableViewDataSourc
         self.contentViewHeightConstraint = contentViewHeightConstraint
         
         NSLayoutConstraint.activate([
-            // Настройка scrollView
             scrollView.topAnchor.constraint(equalTo: view.topAnchor, constant: -50),
             scrollView.leadingAnchor.constraint(equalTo: view.leadingAnchor),
             scrollView.trailingAnchor.constraint(equalTo: view.trailingAnchor),
             scrollView.bottomAnchor.constraint(equalTo: view.bottomAnchor),
             
-            
-            // Настройка contentStackView
             contentView.topAnchor.constraint(equalTo: scrollView.topAnchor),
             contentView.leadingAnchor.constraint(equalTo: scrollView.leadingAnchor),
             contentView.trailingAnchor.constraint(equalTo: scrollView.trailingAnchor),
@@ -136,7 +132,6 @@ final class CategoriesListViewController: UIViewController, UITableViewDataSourc
             titleLabel.widthAnchor.constraint(equalToConstant: 200),
             titleLabel.heightAnchor.constraint(equalToConstant: 40),
             
-            // Настройка categoriesListTableView
             categoriesListTableView.trailingAnchor.constraint(equalTo: contentView.trailingAnchor, constant: -16),
             categoriesListTableView.leadingAnchor.constraint(equalTo: contentView.leadingAnchor, constant: 16),
             categoriesListTableView.topAnchor.constraint(equalTo: titleLabel.bottomAnchor, constant: 24),
@@ -160,8 +155,6 @@ final class CategoriesListViewController: UIViewController, UITableViewDataSourc
         ])
         categoriesListTableView.dataSource = self
         categoriesListTableView.delegate = self
-        
-        
     }
     
     private func updateTableHeight() {
@@ -195,61 +188,49 @@ final class CategoriesListViewController: UIViewController, UITableViewDataSourc
     }
     
     private func editItem(at indexPath: IndexPath) {
-        guard let cell = categoriesListTableView.cellForRow(at: indexPath) as? CategoriesListTableCell else { return }
+        guard categoriesListTableView.cellForRow(at: indexPath) is CategoriesListTableCell else { return }
         
         let category = categoriesList[indexPath.row] // Получаем объект Core Data
         let currentText = category.title ?? ""
-
+        
         let alert = UIAlertController(title: "Редактировать", message: "Введите новое название категории", preferredStyle: .alert)
         alert.addTextField { textField in
             textField.text = currentText
             textField.placeholder = "Название категории"
         }
-
+        
         let saveAction = UIAlertAction(title: "Сохранить", style: .default) { [weak self] _ in
             guard let newText = alert.textFields?.first?.text, !newText.isEmpty else { return }
-
-            // Обновляем Core Data
             category.title = newText
             
             do {
                 try CoreDataStack.shared.context.save() // Сохраняем изменения
-                self?.categoriesListTableView.reloadRows(at: [indexPath], with: .automatic) // Обновляем ячейку
+                self?.categoriesListTableView.reloadRows(at: [indexPath], with: .automatic)
             } catch {
                 print("❌ Ошибка при обновлении категории: \(error)")
             }
         }
-
+        
         let cancelAction = UIAlertAction(title: "Отменить", style: .cancel, handler: nil)
-
+        
         alert.addAction(saveAction)
         alert.addAction(cancelAction)
-
         present(alert, animated: true, completion: nil)
     }
     
     private func deleteItem(at indexPath: IndexPath) {
-        let category = categoriesList[indexPath.row] // Получаем объект Core Data
-        trackerCategoryStore.deleteTrackerCategory(category) // Удаляем из базы
+        let category = categoriesList[indexPath.row]
+        trackerCategoryStore.deleteTrackerCategory(category)
         
-        categoriesList.remove(at: indexPath.row) // Удаляем из массива
-        categoriesListTableView.deleteRows(at: [indexPath], with: .automatic) // Обновляем UI
+        categoriesList.remove(at: indexPath.row)
+        categoriesListTableView.deleteRows(at: [indexPath], with: .automatic)
         updateUI()
     }
-    
-    @objc private func addCategoryButtonTapped() {
-        let newCategoryVC = NewCategoryViewController()
-        let navigationController = UINavigationController(rootViewController: newCategoryVC)
-        navigationController.modalPresentationStyle = .automatic
-        present(navigationController, animated: true)
-    }
-    
-  
     
     private func fetchCategories() {
         let fetchRequest: NSFetchRequest<TrackerCategoryCoreData> = TrackerCategoryCoreData.fetchRequest()
         fetchRequest.sortDescriptors = [NSSortDescriptor(key: "title", ascending: true)] // Сортируем по названию
-
+        
         do {
             let categories = try CoreDataStack.shared.context.fetch(fetchRequest)
             categoriesList = categories // Сохраняем категории в массив
@@ -319,5 +300,13 @@ final class CategoriesListViewController: UIViewController, UITableViewDataSourc
     @objc private func handleNewCategoryAdded() {
         fetchCategories()
     }
+    
+    @objc private func addCategoryButtonTapped() {
+        let newCategoryVC = NewCategoryViewController()
+        let navigationController = UINavigationController(rootViewController: newCategoryVC)
+        navigationController.modalPresentationStyle = .automatic
+        present(navigationController, animated: true)
+    }
+    
 }
 

@@ -13,11 +13,11 @@ class StringArrayTransformer: ValueTransformer {
     
     override func transformedValue(_ value: Any?) -> Any? {
         guard let value = value as? [String] else { return nil }
-        return value.joined(separator: " ") // Преобразуем массив в строку
+        return value.joined(separator: " ")
     }
     
     override func reverseTransformedValue(_ value: Any?) -> Any? {
         guard let value = value as? String else { return nil }
-        return value.components(separatedBy: " ") // Преобразуем строку в массив
+        return value.components(separatedBy: " ") 
     }
 }

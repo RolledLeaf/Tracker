@@ -1,10 +1,6 @@
 import UIKit
 
-
-
 final class NewCategoryViewController: UIViewController {
-    
-
     
     private lazy var titleLabel: UILabel = {
         let label = UILabel()

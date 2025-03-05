@@ -26,8 +26,6 @@ final class TrackerCategoryStore: NSObject, NSFetchedResultsControllerDelegate {
     }
     
     
-    
-    
     func fetchAllTrackerCategories() -> [TrackerCategoryCoreData] {
         let request: NSFetchRequest<TrackerCategoryCoreData> = TrackerCategoryCoreData.fetchRequest()
         do {
@@ -39,61 +37,9 @@ final class TrackerCategoryStore: NSObject, NSFetchedResultsControllerDelegate {
         }
     }
     
-    func getTrackerByIndex(at indexPath: IndexPath) -> TrackerCoreData? {
-        guard let category = self.getCategory(at: indexPath) else {
-            print("❌ Категория не найдена для секции \(indexPath.section)")
-            return nil
-        }
-        
-        let trackers = category.tracker?.allObjects as? [TrackerCoreData] ?? []
-        
-        guard indexPath.item < trackers.count else {
-            print("❌ Ошибка индекса: \(indexPath.item) для секции \(indexPath.section)")
-            return nil
-        }
-        
-        return trackers[indexPath.item]
-    }
-    
-    
     func getCategory(at indexPath: IndexPath) -> TrackerCategoryCoreData? {
         let category = fetchedResultsController.object(at: indexPath)
         return category
-    }
-    
-    func getTrackers(for indexPath: IndexPath) -> [TrackerCoreData]? {
-        guard let category = getCategory(at: indexPath) else {
-            return nil
-        }
-        
-        // Преобразуем NSSet в массив трекеров
-        let trackers = category.tracker?.allObjects as? [TrackerCoreData] ?? []
-        return trackers
-    }
-    
-    func getCategory(by index: Int) -> TrackerCategoryCoreData? {
-            let fetchRequest: NSFetchRequest<TrackerCategoryCoreData> = TrackerCategoryCoreData.fetchRequest()
-            fetchRequest.sortDescriptors = [NSSortDescriptor(key: "title", ascending: true)]
-            
-            do {
-                let categories = try CoreDataStack.shared.context.fetch(fetchRequest)
-                return categories.indices.contains(index) ? categories[index] : nil
-            } catch {
-                print("Failed to fetch categories: \(error)")
-                return nil
-            }
-        }
-    
-    func createTrackerCategory(title: String) {
-        let category = TrackerCategoryCoreData(context: context)
-        category.title = title
-    
-        
-        do {
-            try context.save()
-        } catch {
-            print("error saving new category: \(error)")
-        }
     }
     
     func deleteTrackerCategory(_ category: TrackerCategoryCoreData) {
