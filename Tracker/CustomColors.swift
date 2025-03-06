@@ -75,8 +75,11 @@ extension UIColor {
         return UIColor(named: color.rawValue) ?? .clear
     }
     
-        static func fromCollectionColor(_ color: CollectionColors) -> UIColor? {
-            return UIColor(named: color.rawValue)
+    static func fromCollectionColor(_ color: String) -> UIColor? {
+        if let collectionColor = CollectionColors(rawValue: color) {
+            return UIColor(named: collectionColor.rawValue)
         }
+        return nil
+    }
     }
 

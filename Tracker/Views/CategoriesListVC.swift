@@ -1,11 +1,11 @@
-
 import UIKit
+import CoreData
 
 protocol CategoriesListViewControllerDelegate: AnyObject {
-    func updateCategory(with category: String)
+    func updateCategory(with category: TrackerCategoryCoreData)
 }
 
-final class CategoriesListViewController: UIViewController, UITableViewDataSource, UITableViewDelegate, NewCategoryDelegate {
+final class CategoriesListViewController: UIViewController, UITableViewDataSource, UITableViewDelegate {
     
     weak var delegate: CategoriesListViewControllerDelegate?
     
@@ -60,10 +60,12 @@ final class CategoriesListViewController: UIViewController, UITableViewDataSourc
     let scrollView = UIScrollView()
     let contentView = UIView()
     
+    private let trackerCategoryStore = TrackerCategoryStore()
     private let categoriesKey = "categoriesListKey"
+    private let notificationKey = "NewCategoryAdded"
     private var tableHeightConstraint: NSLayoutConstraint?
     private var contentViewHeightConstraint: NSLayoutConstraint?
-    private var categoriesList: [String] = []
+    private var categoriesList: [TrackerCategoryCoreData] = []
     private var tableHeight: CGFloat = 75
     private var contentViewHeight: CGFloat = 260
     
@@ -71,6 +73,8 @@ final class CategoriesListViewController: UIViewController, UITableViewDataSourc
         super.viewDidLoad()
         setupUI()
         updateUI()
+        fetchCategories()
+        NotificationCenter.default.addObserver(self, selector: #selector(handleNewCategoryAdded), name: NSNotification.Name(notificationKey), object: nil)
     }
     
     private func updateUI() {
@@ -112,14 +116,11 @@ final class CategoriesListViewController: UIViewController, UITableViewDataSourc
         self.contentViewHeightConstraint = contentViewHeightConstraint
         
         NSLayoutConstraint.activate([
-            // Настройка scrollView
             scrollView.topAnchor.constraint(equalTo: view.topAnchor, constant: -50),
             scrollView.leadingAnchor.constraint(equalTo: view.leadingAnchor),
             scrollView.trailingAnchor.constraint(equalTo: view.trailingAnchor),
             scrollView.bottomAnchor.constraint(equalTo: view.bottomAnchor),
             
-            
-            // Настройка contentStackView
             contentView.topAnchor.constraint(equalTo: scrollView.topAnchor),
             contentView.leadingAnchor.constraint(equalTo: scrollView.leadingAnchor),
             contentView.trailingAnchor.constraint(equalTo: scrollView.trailingAnchor),
@@ -132,7 +133,6 @@ final class CategoriesListViewController: UIViewController, UITableViewDataSourc
             titleLabel.widthAnchor.constraint(equalToConstant: 200),
             titleLabel.heightAnchor.constraint(equalToConstant: 40),
             
-            // Настройка categoriesListTableView
             categoriesListTableView.trailingAnchor.constraint(equalTo: contentView.trailingAnchor, constant: -16),
             categoriesListTableView.leadingAnchor.constraint(equalTo: contentView.leadingAnchor, constant: 16),
             categoriesListTableView.topAnchor.constraint(equalTo: titleLabel.bottomAnchor, constant: 24),
@@ -156,8 +156,6 @@ final class CategoriesListViewController: UIViewController, UITableViewDataSourc
         ])
         categoriesListTableView.dataSource = self
         categoriesListTableView.delegate = self
-        
-        
     }
     
     private func updateTableHeight() {
@@ -191,8 +189,10 @@ final class CategoriesListViewController: UIViewController, UITableViewDataSourc
     }
     
     private func editItem(at indexPath: IndexPath) {
-        guard let cell = categoriesListTableView.cellForRow(at: indexPath) as? CategoriesListTableCell else { return }
-        let currentText = cell.categoryNameLabel.text ?? ""
+        guard categoriesListTableView.cellForRow(at: indexPath) is CategoriesListTableCell else { return }
+        
+        let category = categoriesList[indexPath.row] // Получаем объект Core Data
+        let currentText = category.title ?? ""
         
         let alert = UIAlertController(title: "Редактировать", message: "Введите новое название категории", preferredStyle: .alert)
         alert.addTextField { textField in
@@ -202,44 +202,44 @@ final class CategoriesListViewController: UIViewController, UITableViewDataSourc
         
         let saveAction = UIAlertAction(title: "Сохранить", style: .default) { [weak self] _ in
             guard let newText = alert.textFields?.first?.text, !newText.isEmpty else { return }
+            category.title = newText
             
-            cell.categoryNameLabel.text = newText
-            self?.categoriesList[indexPath.row] = newText
-            self?.categoriesListTableView.reloadData()
+            do {
+                try CoreDataStack.shared.context.save() // Сохраняем изменения
+                self?.categoriesListTableView.reloadRows(at: [indexPath], with: .automatic)
+            } catch {
+                print("❌ Ошибка при обновлении категории: \(error)")
+            }
         }
+        
         let cancelAction = UIAlertAction(title: "Отменить", style: .cancel, handler: nil)
         
         alert.addAction(saveAction)
         alert.addAction(cancelAction)
-        
         present(alert, animated: true, completion: nil)
-        print("Редактировать элемент: \(categoriesList[indexPath.row])")
     }
     
     private func deleteItem(at indexPath: IndexPath) {
+        let category = categoriesList[indexPath.row]
+        trackerCategoryStore.deleteTrackerCategory(category)
+        
         categoriesList.remove(at: indexPath.row)
         categoriesListTableView.deleteRows(at: [indexPath], with: .automatic)
-        self.updateTableHeight()
-        self.categoriesListTableView.reloadData()
         updateUI()
     }
     
-    @objc private func addCategoryButtonTapped() {
-        let newCategoryVC = NewCategoryViewController()
-        newCategoryVC.delegate = self
-        let navigationController = UINavigationController(rootViewController: newCategoryVC)
-        navigationController.modalPresentationStyle = .automatic
-        present(navigationController, animated: true)
-    }
-    
-    func didAddCategory(_ category: String) {
-        print("Вызван метод didAddCategory")
-        categoriesList.append(category)
-        print("Добавлена новая категория \(category)")
-        print("Массив категорий categoriesList теперь содержит: \(categoriesList)")
-        categoriesListTableView.reloadData()
-        updateUI()
+    private func fetchCategories() {
+        let fetchRequest: NSFetchRequest<TrackerCategoryCoreData> = TrackerCategoryCoreData.fetchRequest()
+        fetchRequest.sortDescriptors = [NSSortDescriptor(key: "title", ascending: true)] // Сортируем по названию
         
+        do {
+            let categories = try CoreDataStack.shared.context.fetch(fetchRequest)
+            categoriesList = categories // Сохраняем категории в массив
+            categoriesListTableView.reloadData() // Обновляем таблицу
+            updateUI() // Скрываем/показываем пустые состояния
+        } catch {
+            print("❌ Ошибка при получении категорий: \(error)")
+        }
     }
     
     func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
@@ -252,8 +252,10 @@ final class CategoriesListViewController: UIViewController, UITableViewDataSourc
             print("CategoriesTableView wasn't able to dequeue cell")
             return UITableViewCell()
         }
+        
+        
         let category = categoriesList[indexPath.row]
-        cell.configure(with: category)
+        cell.configure(with: category.title ?? "Без названия")
         return cell
     }
     
@@ -295,5 +297,17 @@ final class CategoriesListViewController: UIViewController, UITableViewDataSourc
             cell.separatorInset = UIEdgeInsets(top: 0, left: 0, bottom: 0, right: UIScreen.main.bounds.width)
         }
     }
+    
+    @objc private func handleNewCategoryAdded() {
+        fetchCategories()
+    }
+    
+    @objc private func addCategoryButtonTapped() {
+        let newCategoryVC = NewCategoryViewController()
+        let navigationController = UINavigationController(rootViewController: newCategoryVC)
+        navigationController.modalPresentationStyle = .automatic
+        present(navigationController, animated: true)
+    }
+    
 }
 

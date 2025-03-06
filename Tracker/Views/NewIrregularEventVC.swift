@@ -1,12 +1,10 @@
 import UIKit
 
-protocol NewIrregularEventViewControllerDelegate: AnyObject {
-    func didCreateIrregularEvent(_ tracker: Tracker,_ category: TrackerCategory)
-}
+
 
 final class NewIrregularEventViewController: UIViewController, UITableViewDelegate, UITableViewDataSource, UICollectionViewDataSource, UICollectionViewDelegateFlowLayout, UITextFieldDelegate {
     
-    weak var delegate: NewIrregularEventViewControllerDelegate?
+    weak var delegate: NewTrackerDelegate?
     
     private lazy var titleLabel: UILabel = {
         let label = UILabel()
@@ -132,7 +130,7 @@ final class NewIrregularEventViewController: UIViewController, UITableViewDelega
         }
     }
     
-    var selectedCategory: String? {
+    var selectedCategory: TrackerCategoryCoreData? {
         didSet {
             updateCreateCategoryButtonColor()
         }
@@ -273,21 +271,27 @@ final class NewIrregularEventViewController: UIViewController, UITableViewDelega
         
         print("Создаём трекер с названием: \(name), цвет: \(selectedColor), эмодзи: \(selectedEmoji), категория: \(selectedCategory), дни недели: \(selectedWeekDays)")
         
-        let tracker = Tracker(
-            id: TrackerIdGenerator.generateId(),
-            name: name,
-            color: selectedColor,
-            emoji: selectedEmoji,
-            daysCount: 0,
-            weekDays: [" "]
-        )
+        let context = CoreDataStack.shared.context
+        let tracker = TrackerCoreData(context: context)
+        tracker.id = TrackerIdGenerator.generateId()
+        tracker.name = name
+        tracker.color = selectedColor.rawValue as NSString
+        tracker.emoji = selectedEmoji
+        tracker.daysCount = 0
+        tracker.weekDays = [" "] as NSArray
         
-        let category = TrackerCategory(title: selectedCategory, tracker: [tracker])
-        let trackersVC = TrackersViewController()
-        delegate?.didCreateIrregularEvent(tracker, category)
-        self.view.window?.rootViewController?.dismiss(animated: true, completion: nil)
-        let navigationController = UINavigationController(rootViewController: trackersVC)
-        present(navigationController, animated: true)
+        let category = selectedCategory
+        tracker.category = selectedCategory
+        category.addToTracker(tracker)
+        
+        do {
+            try context.save()
+            print("Трекер сохранён в базе данных")
+            delegate?.didCreateTracker(tracker, category)
+            presentingViewController?.presentingViewController?.dismiss(animated: true)
+        } catch {
+            print("Ошибка при сохранении трекера: \(error)")
+        }
     }
     
     @objc private func cancelButtonTapped(_ sender: UIButton) {
@@ -417,7 +421,6 @@ final class NewIrregularEventViewController: UIViewController, UITableViewDelega
     func tableView(_ tableView: UITableView, willDisplay cell: UITableViewCell, forRowAt indexPath: IndexPath) {
         let cornerRadius: CGFloat = 16
         
-        // Сброс настроек для всех ячеек
         cell.layer.cornerRadius = 0
         cell.layer.maskedCorners = []
         cell.clipsToBounds = true
@@ -427,16 +430,14 @@ final class NewIrregularEventViewController: UIViewController, UITableViewDelega
         cell.layer.cornerRadius = cornerRadius
         cell.layer.maskedCorners = [.layerMinXMaxYCorner, .layerMaxXMaxYCorner]
         cell.separatorInset = UIEdgeInsets(top: 0, left: 0, bottom: 0, right: UIScreen.main.bounds.width)
-        
     }
 }
 
 extension NewIrregularEventViewController: CategoriesListViewControllerDelegate {
-    func updateCategory(with category: String) {
+    func updateCategory(with category: TrackerCategoryCoreData) {
         if let index = tableViewOptions.firstIndex(where: { $0.title == "Категория" }) {
-            tableViewOptions[index].subtitle = category
+            tableViewOptions[index].subtitle = category.title 
         }
-        
         selectedCategory = category
         categoryTableView.reloadData()
     }

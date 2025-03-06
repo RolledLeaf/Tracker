@@ -1,9 +1,8 @@
-
 import UIKit
 
 final class CreateHabitTypeViewController: UIViewController {
     
-    weak var delegate: NewHabitViewControllerDelegate?
+    weak var delegate: NewTrackerDelegate?
     
     private lazy var titleLabel: UILabel = {
         let label = UILabel()
@@ -66,17 +65,17 @@ final class CreateHabitTypeViewController: UIViewController {
     }
     
     @objc private func habitButtonTapped() {
-        let habitCreationVC = NewHabitViewController()
-        habitCreationVC.delegate = delegate
-        let navigationController = UINavigationController(rootViewController: habitCreationVC)
+        let newHabitVC = NewHabitViewController()
+        newHabitVC.delegate = delegate
+        let navigationController = UINavigationController(rootViewController: newHabitVC)
         navigationController.modalPresentationStyle = .automatic
         present(navigationController, animated: true)
     }
     
     @objc private func irregularEventButtonTapped() {
-        let eventSettingsVC = NewIrregularEventViewController()
-        eventSettingsVC.delegate = delegate as? any NewIrregularEventViewControllerDelegate
-        let navigationController = UINavigationController(rootViewController: eventSettingsVC)
+        let newIrregularEventVC = NewIrregularEventViewController()
+        newIrregularEventVC.delegate = delegate
+        let navigationController = UINavigationController(rootViewController: newIrregularEventVC)
         navigationController.modalPresentationStyle = .automatic
         present(navigationController, animated: true)
     }

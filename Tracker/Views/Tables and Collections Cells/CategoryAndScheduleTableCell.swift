@@ -1,6 +1,6 @@
 import UIKit
 
-class CategoryAndScheduleTableViewCell: UITableViewCell {
+final class CategoryAndScheduleTableViewCell: UITableViewCell {
     
     static let identifier = "CategoryAndScheduleTableViewCell"
     

@@ -1,6 +1,6 @@
 import UIKit
 
-class CategoriesListTableCell: UITableViewCell {
+final class CategoriesListTableCell: UITableViewCell {
     
     static let identifier = "CategoriesListTableCell" //
     
