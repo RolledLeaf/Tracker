@@ -4,7 +4,7 @@ protocol ScheduleTableCellDelegate: AnyObject {
     func didChangeSwitchState(isOn: Bool, forDay day: String)
 }
 
-class ScheduleTableCell: UITableViewCell {
+final class ScheduleTableCell: UITableViewCell {
     
     // MARK: - UI Elements
     

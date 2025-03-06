@@ -1,7 +1,7 @@
 import Foundation
 
 @objc(StringArrayTransformer)
-class StringArrayTransformer: ValueTransformer {
+final class StringArrayTransformer: ValueTransformer {
     
     override class func transformedValueClass() -> AnyClass {
         return NSArray.self

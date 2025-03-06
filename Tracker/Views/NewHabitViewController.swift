@@ -1,12 +1,12 @@
 import UIKit
 
-protocol newTrackerDelegate: AnyObject {
+protocol NewTrackerDelegate: AnyObject {
     func didCreateTracker(_ tracker: TrackerCoreData,_ category: TrackerCategoryCoreData)
 }
 
 final class NewHabitViewController: UIViewController, UITableViewDelegate, UITableViewDataSource, UICollectionViewDataSource, UICollectionViewDelegateFlowLayout, UITextFieldDelegate {
     
-    weak var delegate: newTrackerDelegate?
+    weak var delegate: NewTrackerDelegate?
     
     private lazy var titleLabel: UILabel = {
         let label = UILabel()

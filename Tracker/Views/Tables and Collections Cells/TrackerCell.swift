@@ -162,7 +162,8 @@ final class TrackerCell: UICollectionViewCell {
         emojiLabel.text = tracker.emoji
         habbitLabel.text = tracker.name
         
-        let trackerColor = UIColor.fromCollectionColor(tracker.color as! String) ?? .clear
+        let defaultColor = "collectionPalePurple17"
+        let trackerColor = UIColor.fromCollectionColor(tracker.color as? String ?? defaultColor) ?? .clear
         
         backgroundContainer.backgroundColor = trackerColor
         doneButtonContainer.backgroundColor = trackerColor

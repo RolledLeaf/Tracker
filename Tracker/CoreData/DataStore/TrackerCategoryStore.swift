@@ -1,5 +1,4 @@
 import CoreData
-import UIKit
 
 final class TrackerCategoryStore: NSObject, NSFetchedResultsControllerDelegate {
     

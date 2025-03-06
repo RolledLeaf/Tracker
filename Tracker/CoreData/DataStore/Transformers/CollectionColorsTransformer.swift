@@ -1,7 +1,7 @@
-import CoreData
+import Foundation
 
 @objc(CollectionColorsTransformer)
-class CollectionColorsTransformer: ValueTransformer {
+final class CollectionColorsTransformer: ValueTransformer {
     override class func transformedValueClass() -> AnyClass {
         return NSString.self
     }

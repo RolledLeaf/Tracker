@@ -1,7 +1,7 @@
 import Foundation
 
 @objc(WeekDaysTransformer)
-class WeekDaysTransformer: ValueTransformer {
+final class WeekDaysTransformer: ValueTransformer {
     override class func transformedValueClass() -> AnyClass {
         return NSString.self
     }

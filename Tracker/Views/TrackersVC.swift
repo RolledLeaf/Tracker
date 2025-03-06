@@ -22,7 +22,7 @@ final class TrackersViewController: UIViewController, UICollectionViewDataSource
     private var categoriesCollectionViewHeight: NSLayoutConstraint?
     private let dateFormatter: DateFormatter = {
         let formatter = DateFormatter()
-        formatter.dateFormat = "dd.MM.yy"
+        formatter.dateFormat = "dd.MM.YY"
         formatter.locale = Locale(identifier: "ru_RU")
         return formatter
     }()
@@ -132,7 +132,7 @@ final class TrackersViewController: UIViewController, UICollectionViewDataSource
                 plusButton.heightAnchor.constraint(equalToConstant: 19),
                 plusButton.widthAnchor.constraint(equalToConstant: 18),
                 plusButton.leadingAnchor.constraint(equalTo: navView.safeAreaLayoutGuide.leadingAnchor, constant: 18),
-                plusButton.topAnchor.constraint(equalTo: navView.safeAreaLayoutGuide.topAnchor, constant: 13),
+                plusButton.topAnchor.constraint(equalTo: navView.safeAreaLayoutGuide.topAnchor, constant: 5),
             ])
         }
     }
@@ -147,9 +147,9 @@ final class TrackersViewController: UIViewController, UICollectionViewDataSource
     }
     
     private func fetchAllCategories() {
-        let fetchedCategoies = trackerCategoryStore.fetchAllTrackerCategories()
-        print("Запрошены категории. Получены следующие категории: \(fetchedCategoies)")
-        filteredCategories = fetchedCategoies
+        let fetchedCategories = trackerCategoryStore.fetchAllTrackerCategories()
+        print("Запрошены категории. Получены следующие категории: \(fetchedCategories)")
+        filteredCategories = fetchedCategories
     }
     
     private func loadCategoriesAndTrackers() {
@@ -270,7 +270,7 @@ final class TrackersViewController: UIViewController, UICollectionViewDataSource
         let categoryFetchRequest: NSFetchRequest<TrackerCategoryCoreData> = TrackerCategoryCoreData.fetchRequest()
         do {
             let categoriesFromDataBase = try CoreDataStack.shared.context.fetch(categoryFetchRequest)
-            let hasTrackers = !(categoriesFromDataBase.isEmpty)
+            let hasTrackers = !categoriesFromDataBase.isEmpty
             
             emptyFieldLabel.isHidden = hasTrackers
             emptyFieldStarImage.isHidden = hasTrackers
@@ -496,7 +496,7 @@ extension TrackersViewController: TrackerStoreDelegate {
     }
 }
 
-extension TrackersViewController: newTrackerDelegate {
+extension TrackersViewController: NewTrackerDelegate {
     func didCreateTracker(_ tracker: TrackerCoreData, _ category: TrackerCategoryCoreData) {
         do {
             try trackerCategoryStore.fetchedResultsController.performFetch()

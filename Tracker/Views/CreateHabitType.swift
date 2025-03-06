@@ -1,9 +1,8 @@
-
 import UIKit
 
 final class CreateHabitTypeViewController: UIViewController {
     
-    weak var delegate: newTrackerDelegate?
+    weak var delegate: NewTrackerDelegate?
     
     private lazy var titleLabel: UILabel = {
         let label = UILabel()

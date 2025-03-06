@@ -62,6 +62,7 @@ final class CategoriesListViewController: UIViewController, UITableViewDataSourc
     
     private let trackerCategoryStore = TrackerCategoryStore()
     private let categoriesKey = "categoriesListKey"
+    private let notificationKey = "NewCategoryAdded"
     private var tableHeightConstraint: NSLayoutConstraint?
     private var contentViewHeightConstraint: NSLayoutConstraint?
     private var categoriesList: [TrackerCategoryCoreData] = []
@@ -73,7 +74,7 @@ final class CategoriesListViewController: UIViewController, UITableViewDataSourc
         setupUI()
         updateUI()
         fetchCategories()
-        NotificationCenter.default.addObserver(self, selector: #selector(handleNewCategoryAdded), name: NSNotification.Name("NewCategoryAdded"), object: nil)
+        NotificationCenter.default.addObserver(self, selector: #selector(handleNewCategoryAdded), name: NSNotification.Name(notificationKey), object: nil)
     }
     
     private func updateUI() {

@@ -1,5 +1,4 @@
 import CoreData
-import UIKit
 
 protocol TrackerRecordStoreProtocol {
     func getTrackerRecords(for trackerID: UUID) -> [TrackerRecordCoreData]
