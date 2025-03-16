@@ -1,7 +1,7 @@
 import UIKit
 
 protocol TrackerCategoryCellDelegate: AnyObject {
-    func trackerExecution(_ cell: TrackerCell, didTapDoneButtonFor trackerID: Int, selectedDate: Date)
+    func trackerExecution(_ cell: TrackerCell, didTapDoneButtonFor trackerID: UUID, selectedDate: Date)
 }
 
 final class TrackerCell: UICollectionViewCell {
@@ -10,8 +10,8 @@ final class TrackerCell: UICollectionViewCell {
     
     static let reuseIdentifier = "TrackerCell"
     
-    private var currentSelectedTracker: Tracker?
-    private var trackerID: Int?
+    private var currentSelectedTracker: TrackerCoreData?
+    private var trackerID: UUID?
     private var currentDate: Date = Date()
     private var selectedIndexPaths: Set<IndexPath> = []
     
@@ -143,7 +143,7 @@ final class TrackerCell: UICollectionViewCell {
         ])
     }
     
-    private func getDayWord(for count: Int) -> String {
+    private func getDayWord(for count: Int16) -> String {
         let remainder10 = count % 10
         let remainder100 = count % 100
         
@@ -156,21 +156,25 @@ final class TrackerCell: UICollectionViewCell {
         }
     }
     
-    func configure(with tracker: Tracker, trackerRecords: [TrackerRecord]) {
+    func configure(with tracker: TrackerCoreData, trackerRecords: [TrackerRecordCoreData]) {
         currentSelectedTracker = tracker
         trackerID = tracker.id
         emojiLabel.text = tracker.emoji
         habbitLabel.text = tracker.name
-        backgroundContainer.backgroundColor = UIColor.fromCollectionColor(tracker.color) ?? .clear
-        doneButtonContainer.backgroundColor = UIColor.fromCollectionColor(tracker.color) ?? .clear
-        emojiContainer.backgroundColor = lightenColor(UIColor.fromCollectionColor(tracker.color) ?? .clear, by: 0.3)
+        
+        let defaultColor = "collectionPalePurple17"
+        let trackerColor = UIColor.fromCollectionColor(tracker.color as? String ?? defaultColor) ?? .clear
+        
+        backgroundContainer.backgroundColor = trackerColor
+        doneButtonContainer.backgroundColor = trackerColor
+        emojiContainer.backgroundColor = lightenColor(trackerColor, by: 0.3)
         
         let currentDate = Date()
-        let isCompleted = trackerRecords.contains { $0.trackerID == tracker.id && Calendar.current.isDate($0.date, inSameDayAs: viewController?.selectedDate ?? currentDate) }
-        
+        let isCompleted = trackerRecords.contains { $0.trackerID == tracker.id && Calendar.current.isDate($0.date ?? currentDate, inSameDayAs: viewController?.selectedDate ?? currentDate) }
+
         doneButton.setImage(UIImage(systemName: isCompleted ? "checkmark" : "plus"), for: .normal)
-        
-        let baseColor = UIColor.fromCollectionColor(currentSelectedTracker?.color ?? .collectionBeige7) ?? .collectionBeige7
+
+        let baseColor = trackerColor
         let adjustedColor = isCompleted ? lightenColor(baseColor, by: 0.3) : baseColor
         doneButtonContainer.backgroundColor = adjustedColor
         
@@ -181,9 +185,9 @@ final class TrackerCell: UICollectionViewCell {
     
     @objc func doneButtonTapped() {
         guard let trackerID = trackerID else {
-            print("Tracker ID is missing!")
             return
         }
+       
         guard let selectedDate = viewController?.getSelectedDate() else {
             print("Date Picker is not set!")
             return

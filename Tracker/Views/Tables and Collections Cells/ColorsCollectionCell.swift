@@ -1,6 +1,6 @@
 import UIKit
 
-class ColorsCollectionViewCell: UICollectionViewCell {
+final class ColorsCollectionViewCell: UICollectionViewCell {
     
     // MARK: - Identifier
     static let identifier = "ColorsCollectionViewCell"
