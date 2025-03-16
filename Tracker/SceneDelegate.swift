@@ -23,10 +23,12 @@ final class SceneDelegate: UIResponder, UIWindowSceneDelegate {
         window = UIWindow(windowScene: windowScene)
 
         // Устанавливаем initial view controller
-        let initialViewController = TabBarController() // Ваш контроллер
+        let initialViewController = OnboardingViewController(
+            transitionStyle: .scroll, navigationOrientation: .horizontal
+        ) 
         window?.rootViewController = initialViewController
 
-        // Отображаем окно
+        
         window?.makeKeyAndVisible()
     }
 
