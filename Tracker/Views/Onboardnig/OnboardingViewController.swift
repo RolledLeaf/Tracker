@@ -8,6 +8,14 @@ final class OnboardingViewController: UIPageViewController, UIPageViewController
         let firstPage = UIViewController()
         firstPage.view.backgroundColor = .systemBlue
         
+        let imageView1: UIImageView = {
+            let imageView = UIImageView(image: UIImage(named: OnbordingImage.firstPage.rawValue))
+            imageView.contentMode = .scaleAspectFill
+            imageView.translatesAutoresizingMaskIntoConstraints = false
+            firstPage.view.addSubview(imageView)
+            return imageView
+        }()
+        
         let textLabel: UILabel = {
             let label = UILabel()
             label.text = "Отслеживайте только \n то, что хотите"
@@ -22,6 +30,11 @@ final class OnboardingViewController: UIPageViewController, UIPageViewController
         }()
         
         NSLayoutConstraint.activate([
+            imageView1.topAnchor.constraint(equalTo: firstPage.view.topAnchor),
+            imageView1.bottomAnchor.constraint(equalTo: firstPage.view.bottomAnchor),
+            imageView1.trailingAnchor.constraint(equalTo: firstPage.view.safeAreaLayoutGuide.trailingAnchor),
+            imageView1.leadingAnchor.constraint(equalTo: firstPage.view.safeAreaLayoutGuide.leadingAnchor),
+            
             textLabel.trailingAnchor.constraint(equalTo: firstPage.view.safeAreaLayoutGuide.trailingAnchor, constant: -16),
             textLabel.leadingAnchor.constraint(equalTo: firstPage.view.safeAreaLayoutGuide.leadingAnchor, constant: 16),
             textLabel.bottomAnchor.constraint(equalTo: firstPage.view.bottomAnchor, constant: -270)
@@ -30,6 +43,14 @@ final class OnboardingViewController: UIPageViewController, UIPageViewController
         
         let secondPage = UIViewController()
         secondPage.view.backgroundColor = .systemRed
+        
+        let imageView2: UIImageView = {
+            let imageView = UIImageView(image: UIImage(named: OnbordingImage.secondPage.rawValue))
+            imageView.contentMode = .scaleAspectFill
+            imageView.translatesAutoresizingMaskIntoConstraints = false
+            secondPage.view.addSubview(imageView)
+            return imageView
+        }()
         
         let textLabel2: UILabel = {
             let label = UILabel()
@@ -45,6 +66,11 @@ final class OnboardingViewController: UIPageViewController, UIPageViewController
         }()
         
         NSLayoutConstraint.activate([
+            imageView2.topAnchor.constraint(equalTo: secondPage.view.topAnchor),
+            imageView2.bottomAnchor.constraint(equalTo: secondPage.view.bottomAnchor),
+            imageView2.trailingAnchor.constraint(equalTo: secondPage.view.safeAreaLayoutGuide.trailingAnchor),
+            imageView2.leadingAnchor.constraint(equalTo: secondPage.view.safeAreaLayoutGuide.leadingAnchor),
+            
             textLabel2.trailingAnchor.constraint(equalTo: secondPage.view.safeAreaLayoutGuide.trailingAnchor, constant: -16),
             textLabel2.leadingAnchor.constraint(equalTo: secondPage.view.safeAreaLayoutGuide.leadingAnchor, constant: 16),
             textLabel2.bottomAnchor.constraint(equalTo: secondPage.view.bottomAnchor, constant: -270)
@@ -81,7 +107,7 @@ final class OnboardingViewController: UIPageViewController, UIPageViewController
         view.addSubview(pageControl)
                 
                 NSLayoutConstraint.activate([
-                    pageControl.bottomAnchor.constraint(equalTo: view.safeAreaLayoutGuide.bottomAnchor, constant: -134),
+                    pageControl.bottomAnchor.constraint(equalTo: view.bottomAnchor, constant: -161),
                     pageControl.centerXAnchor.constraint(equalTo: view.centerXAnchor)
                 ])
     }
@@ -103,6 +129,7 @@ final class OnboardingViewController: UIPageViewController, UIPageViewController
             finishButton.heightAnchor.constraint(equalToConstant: 60),
             finishButton.bottomAnchor.constraint(equalTo: view.safeAreaLayoutGuide.bottomAnchor, constant: -50),
             finishButton.centerXAnchor.constraint(equalTo: view.centerXAnchor)
+            
         ])
     }
     

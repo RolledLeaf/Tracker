@@ -25,7 +25,7 @@ final class SceneDelegate: UIResponder, UIWindowSceneDelegate {
         // Устанавливаем initial view controller
         let initialViewController = OnboardingViewController(
             transitionStyle: .scroll, navigationOrientation: .horizontal
-        ) 
+        )
         window?.rootViewController = initialViewController
 
         
