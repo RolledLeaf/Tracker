@@ -49,5 +49,26 @@ final class TrackerCategoryStore: NSObject, NSFetchedResultsControllerDelegate {
             print("Failed to delete category: \(error)")
         }
     }
+    
+    func fetchCategories() -> [TrackerCategoryCoreData] {
+            let request: NSFetchRequest<TrackerCategoryCoreData> = TrackerCategoryCoreData.fetchRequest()
+            do {
+                return try context.fetch(request)
+            } catch {
+                print("Failed to fetch categories: \(error)")
+                return []
+            }
+        }
+
+    func saveCategory(name: String) {
+        let newCategory = TrackerCategoryCoreData(context: context)
+        newCategory.title = name
+            do {
+                try context.save()
+            } catch {
+                print("Failed to save category: \(error)")
+            }
+        }
+    
 }
 

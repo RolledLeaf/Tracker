@@ -35,8 +35,8 @@ final class OnboardingViewController: UIPageViewController, UIPageViewController
             imageView1.trailingAnchor.constraint(equalTo: firstPage.view.safeAreaLayoutGuide.trailingAnchor),
             imageView1.leadingAnchor.constraint(equalTo: firstPage.view.safeAreaLayoutGuide.leadingAnchor),
             
-            textLabel.trailingAnchor.constraint(equalTo: firstPage.view.safeAreaLayoutGuide.trailingAnchor, constant: -16),
-            textLabel.leadingAnchor.constraint(equalTo: firstPage.view.safeAreaLayoutGuide.leadingAnchor, constant: 16),
+            textLabel.trailingAnchor.constraint(equalTo: firstPage.view.trailingAnchor, constant: -16),
+            textLabel.leadingAnchor.constraint(equalTo: firstPage.view.leadingAnchor, constant: 16),
             textLabel.bottomAnchor.constraint(equalTo: firstPage.view.bottomAnchor, constant: -270)
         ])
             
@@ -178,6 +178,4 @@ final class OnboardingViewController: UIPageViewController, UIPageViewController
             }
         }
     }
-        
-    
 
