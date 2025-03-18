@@ -21,12 +21,15 @@ final class SceneDelegate: UIResponder, UIWindowSceneDelegate {
 
         // Создаём окно
         window = UIWindow(windowScene: windowScene)
-
-        // Устанавливаем initial view controller
-        let initialViewController = OnboardingViewController(
-            transitionStyle: .scroll, navigationOrientation: .horizontal
-        )
-        window?.rootViewController = initialViewController
+        
+        let hasSeenOnboarding = UserDefaults.standard.bool(forKey: UserDefaultsKeys.hasSeenOnboarding)
+        
+        if hasSeenOnboarding {
+            window?.rootViewController = TrackersViewController()
+            } else {
+                window?.rootViewController = OnboardingViewController(transitionStyle: .scroll, navigationOrientation: .horizontal, options: nil)
+            }
+        
 
         
         window?.makeKeyAndVisible()
