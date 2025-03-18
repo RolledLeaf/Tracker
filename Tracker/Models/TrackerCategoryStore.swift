@@ -11,7 +11,7 @@ final class TrackerCategoryStore: NSObject, NSFetchedResultsControllerDelegate {
         let fetchedResultsController = NSFetchedResultsController(
             fetchRequest: fetchRequest,
             managedObjectContext: context,
-            sectionNameKeyPath: "title", // группируем по названию категории
+            sectionNameKeyPath: "title",
             cacheName: nil
         )
         
@@ -23,7 +23,6 @@ final class TrackerCategoryStore: NSObject, NSFetchedResultsControllerDelegate {
     init(context: NSManagedObjectContext = CoreDataStack.shared.context) {
         self.context = context
     }
-    
     
     func fetchAllTrackerCategories() -> [TrackerCategoryCoreData] {
         let request: NSFetchRequest<TrackerCategoryCoreData> = TrackerCategoryCoreData.fetchRequest()
@@ -51,24 +50,31 @@ final class TrackerCategoryStore: NSObject, NSFetchedResultsControllerDelegate {
     }
     
     func fetchCategories() -> [TrackerCategoryCoreData] {
-            let request: NSFetchRequest<TrackerCategoryCoreData> = TrackerCategoryCoreData.fetchRequest()
-            do {
-                return try context.fetch(request)
-            } catch {
-                print("Failed to fetch categories: \(error)")
-                return []
-            }
+        let request: NSFetchRequest<TrackerCategoryCoreData> = TrackerCategoryCoreData.fetchRequest()
+        do {
+            return try context.fetch(request)
+        } catch {
+            print("Failed to fetch categories: \(error)")
+            return []
         }
-
+    }
+    
     func saveCategory(name: String) {
         let newCategory = TrackerCategoryCoreData(context: context)
         newCategory.title = name
-            do {
-                try context.save()
-            } catch {
-                print("Failed to save category: \(error)")
-            }
+        do {
+            try context.save()
+        } catch {
+            print("Failed to save category: \(error)")
         }
+    }
+    
+    func saveChanges() {
+        do {
+            try context.save()
+        } catch {
+            print("Failed to save changes: \(error)")
+        }
+    }
     
 }
-
