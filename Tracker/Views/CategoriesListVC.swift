@@ -61,26 +61,52 @@ final class CategoriesListViewController: UIViewController, UITableViewDataSourc
     let contentView = UIView()
     
     private let trackerCategoryStore = TrackerCategoryStore()
-    private let categoriesKey = "categoriesListKey"
     private let notificationKey = "NewCategoryAdded"
     private var tableHeightConstraint: NSLayoutConstraint?
     private var contentViewHeightConstraint: NSLayoutConstraint?
-    private var categoriesList: [TrackerCategoryCoreData] = []
-    private var tableHeight: CGFloat = 75
-    private var contentViewHeight: CGFloat = 260
+    
+    private lazy var viewModel = CategoriesViewModel(categoryStore: trackerCategoryStore)
     
     override func viewDidLoad() {
         super.viewDidLoad()
         setupUI()
         updateUI()
-        fetchCategories()
+        
+        viewModel.onCategoriesUpdate = { [weak self] _ in
+            self?.categoriesListTableView.reloadData()
+        }
+        viewModel.onCategorySelected = { [weak self] category in
+            self?.delegate?.updateCategory(with: category)
+        }
+        
+        viewModel.onEditCategoryRequest = { [weak self] category, currentText in
+            let alert = UIAlertController(title: "Редактировать", message: "Введите новое название категории", preferredStyle: .alert)
+            alert.addTextField { textField in
+                textField.text = currentText
+                textField.placeholder = "Название категории"
+            }
+            
+            let saveAction = UIAlertAction(title: "Сохранить", style: .default) { _ in
+                guard let newText = alert.textFields?.first?.text, !newText.isEmpty else { return }
+                if let index = self?.viewModel.categories.firstIndex(where: { $0 == category }) {
+                    self?.viewModel.updateCategoryName(at: index, newName: newText)
+                }
+            }
+            
+            let cancelAction = UIAlertAction(title: "Отменить", style: .cancel, handler: nil)
+            
+            alert.addAction(saveAction)
+            alert.addAction(cancelAction)
+            self?.present(alert, animated: true, completion: nil)
+        }
+        
         NotificationCenter.default.addObserver(self, selector: #selector(handleNewCategoryAdded), name: NSNotification.Name(notificationKey), object: nil)
     }
     
     private func updateUI() {
-        let isEmpty = categoriesList.isEmpty
-        emptyFieldLabel.isHidden = !isEmpty
-        emptyFieldStarImage.isHidden = !isEmpty
+        let isEmpty = viewModel.categories.isEmpty
+        emptyFieldLabel.isHidden = !(isEmpty)
+        emptyFieldStarImage.isHidden = !(isEmpty)
         categoriesListTableView.isHidden = isEmpty
         updateTableHeight()
         updateContentViewHeight()
@@ -91,7 +117,6 @@ final class CategoriesListViewController: UIViewController, UITableViewDataSourc
         let stackView = UIStackView(arrangedSubviews: [emptyFieldStarImage, emptyFieldLabel])
         stackView.axis = .vertical
         stackView.spacing = 8
-        
         
         let uiElements = [titleLabel, emptyFieldLabel, emptyFieldStarImage, categoriesListTableView]
         uiElements.forEach { $0.translatesAutoresizingMaskIntoConstraints = false }
@@ -106,13 +131,12 @@ final class CategoriesListViewController: UIViewController, UITableViewDataSourc
         scrollView.translatesAutoresizingMaskIntoConstraints = false
         contentView.translatesAutoresizingMaskIntoConstraints = false
         
-        
         categoriesListTableView.register(CategoriesListTableCell.self, forCellReuseIdentifier: CategoriesListTableCell.identifier)
         
-        let tableHeightConstraint = categoriesListTableView.heightAnchor.constraint(equalToConstant: tableHeight)
+        let tableHeightConstraint = categoriesListTableView.heightAnchor.constraint(equalToConstant: 75)
         self.tableHeightConstraint = tableHeightConstraint
         
-        let contentViewHeightConstraint = contentView.heightAnchor.constraint(equalToConstant: contentViewHeight)
+        let contentViewHeightConstraint = contentView.heightAnchor.constraint(equalToConstant: 260)
         self.contentViewHeightConstraint = contentViewHeightConstraint
         
         NSLayoutConstraint.activate([
@@ -160,91 +184,35 @@ final class CategoriesListViewController: UIViewController, UITableViewDataSourc
     
     private func updateTableHeight() {
         let rowHeight: CGFloat = 75
-        let newHeight = rowHeight * CGFloat(categoriesList.count)
+        let newHeight = rowHeight * CGFloat(viewModel.categories.count)
         tableHeightConstraint?.constant = newHeight
         view.layoutIfNeeded()
         print("Table height updated to \(newHeight)")
     }
     
-    
     private func updateContentViewHeight() {
-        let rowHeight: CGFloat = contentViewHeight
+        let rowHeight: CGFloat = 260
         let newHeight = rowHeight + CGFloat(tableHeightConstraint?.constant ?? 500)
         contentViewHeightConstraint?.constant = newHeight
         view.layoutIfNeeded()
         print("Content view height updated to \(newHeight)")
     }
     
-    
     private func createContextMenu(for indexPath: IndexPath) -> UIMenu {
-        // Пункт "Редактировать"
+        
         let editAction = UIAction(title: "Редактировать", image: UIImage(systemName: "pencil")) { _ in
-            self.editItem(at: indexPath)
+            self.viewModel.editCategory(at: indexPath.row, newName: self.viewModel.categories[indexPath.row].title ?? "")
         }
         
         let deleteAction = UIAction(title: "Удалить", image: UIImage(systemName: "trash"), attributes: .destructive) { _ in
-            self.deleteItem(at: indexPath)
+            self.viewModel.deleteCategory(at: indexPath.row)
+            self.updateTableHeight()
         }
         return UIMenu(title: "", children: [editAction, deleteAction])
     }
     
-    private func editItem(at indexPath: IndexPath) {
-        guard categoriesListTableView.cellForRow(at: indexPath) is CategoriesListTableCell else { return }
-        
-        let category = categoriesList[indexPath.row] // Получаем объект Core Data
-        let currentText = category.title ?? ""
-        
-        let alert = UIAlertController(title: "Редактировать", message: "Введите новое название категории", preferredStyle: .alert)
-        alert.addTextField { textField in
-            textField.text = currentText
-            textField.placeholder = "Название категории"
-        }
-        
-        let saveAction = UIAlertAction(title: "Сохранить", style: .default) { [weak self] _ in
-            guard let newText = alert.textFields?.first?.text, !newText.isEmpty else { return }
-            category.title = newText
-            
-            do {
-                try CoreDataStack.shared.context.save() // Сохраняем изменения
-                self?.categoriesListTableView.reloadRows(at: [indexPath], with: .automatic)
-            } catch {
-                print("❌ Ошибка при обновлении категории: \(error)")
-            }
-        }
-        
-        let cancelAction = UIAlertAction(title: "Отменить", style: .cancel, handler: nil)
-        
-        alert.addAction(saveAction)
-        alert.addAction(cancelAction)
-        present(alert, animated: true, completion: nil)
-    }
-    
-    private func deleteItem(at indexPath: IndexPath) {
-        let category = categoriesList[indexPath.row]
-        trackerCategoryStore.deleteTrackerCategory(category)
-        
-        categoriesList.remove(at: indexPath.row)
-        categoriesListTableView.deleteRows(at: [indexPath], with: .automatic)
-        updateUI()
-    }
-    
-    private func fetchCategories() {
-        let fetchRequest: NSFetchRequest<TrackerCategoryCoreData> = TrackerCategoryCoreData.fetchRequest()
-        fetchRequest.sortDescriptors = [NSSortDescriptor(key: "title", ascending: true)] // Сортируем по названию
-        
-        do {
-            let categories = try CoreDataStack.shared.context.fetch(fetchRequest)
-            categoriesList = categories // Сохраняем категории в массив
-            categoriesListTableView.reloadData() // Обновляем таблицу
-            updateUI() // Скрываем/показываем пустые состояния
-        } catch {
-            print("❌ Ошибка при получении категорий: \(error)")
-        }
-    }
-    
     func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
-        let sections = categoriesList.count
-        return sections
+        return viewModel.categories.count
     }
     
     func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
@@ -253,16 +221,14 @@ final class CategoriesListViewController: UIViewController, UITableViewDataSourc
             return UITableViewCell()
         }
         
-        
-        let category = categoriesList[indexPath.row]
+        let category = viewModel.categories[indexPath.row]
         cell.configure(with: category.title ?? "Без названия")
         return cell
     }
     
     func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
         tableView.deselectRow(at: indexPath, animated: true)
-        let category = categoriesList[indexPath.row]
-        delegate?.updateCategory(with: category)
+        viewModel.selectCategory(at: indexPath.row)
         dismiss(animated: true)
     }
     
@@ -299,7 +265,8 @@ final class CategoriesListViewController: UIViewController, UITableViewDataSourc
     }
     
     @objc private func handleNewCategoryAdded() {
-        fetchCategories()
+        viewModel.fetchCategories()
+        updateUI()
     }
     
     @objc private func addCategoryButtonTapped() {
@@ -308,6 +275,4 @@ final class CategoriesListViewController: UIViewController, UITableViewDataSourc
         navigationController.modalPresentationStyle = .automatic
         present(navigationController, animated: true)
     }
-    
 }
-

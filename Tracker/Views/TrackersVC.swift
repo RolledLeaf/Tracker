@@ -10,7 +10,7 @@ final class TrackersViewController: UIViewController, UICollectionViewDataSource
     private var currentDate: Date = Date()
     private var selectedIndexPath: IndexPath?
     
-   
+    
     private let plusButton = UIButton()
     private let trackersLabel = UILabel()
     private let emptyFieldStarImage = UIImageView()
@@ -34,7 +34,7 @@ final class TrackersViewController: UIViewController, UICollectionViewDataSource
         store.delegate = self
         return store
     }()
-   
+    
     private lazy var trackerCategoryStore:  TrackerCategoryStore = {
         let store = TrackerCategoryStore()
         return store
@@ -183,7 +183,7 @@ final class TrackersViewController: UIViewController, UICollectionViewDataSource
             let isCompleted = trackerRecords.contains { $0.trackerID == tracker.id && $0.date?.isSameDay(as: selectedDate) == true }
             let hasEverBeenCompleted = trackerRecords.contains { $0.trackerID == tracker.id }
             
-            print("🔹 Трекер \(tracker.name ?? "Без имени") – выполнен в этот день? \(isCompleted ? "✅ Да" : "❌ Нет"), когда-либо выполнялся? \(hasEverBeenCompleted ? "📅 Да" : "📅 Нет")")
+            print("🔹 Трекер \(tracker.name ?? "Без имени") нерегулярный? \(weekDays.contains(" ") ? "Да" : "Нет"). Выполнен в этот день? \(isCompleted ? "✅ Да" : "❌ Нет"). Когда-либо выполнялся? \(hasEverBeenCompleted ? "📅 Да" : "📅 Нет")")
             
             if weekDays.contains(" ") {
                 return !hasEverBeenCompleted || isCompleted
@@ -540,10 +540,14 @@ extension TrackersViewController: UISearchBarDelegate {
             
             filteredCategories = trackerCategoryStore.fetchAllTrackerCategories().compactMap { category in
                 let trackersInCategory = searchFilteredTrackers.filter { $0.category == category }
-                return trackersInCategory.isEmpty ? nil : category
+                guard !trackersInCategory.isEmpty else { return nil }
+                
+                let filteredCategory = TrackerCategoryCoreData(context: context)
+                filteredCategory.title = category.title
+                filteredCategory.tracker = NSSet(array: trackersInCategory)
+                return filteredCategory
             }
         }
-        
         reloadCategoryData()
     }
 }
