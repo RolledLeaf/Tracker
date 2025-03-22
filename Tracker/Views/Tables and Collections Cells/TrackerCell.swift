@@ -144,16 +144,8 @@ final class TrackerCell: UICollectionViewCell {
     }
     
     private func getDayWord(for count: Int16) -> String {
-        let remainder10 = count % 10
-        let remainder100 = count % 100
-        
-        if remainder10 == 1 && remainder100 != 11 {
-            return "день"
-        } else if remainder10 >= 2 && remainder10 <= 4 && (remainder100 < 10 || remainder100 >= 20) {
-            return "дня"
-        } else {
-            return "дней"
-        }
+        let format = NSLocalizedString("daysCount", comment: "Количество дней")
+        return String.localizedStringWithFormat(format, count)
     }
     
     func configure(with tracker: TrackerCoreData, trackerRecords: [TrackerRecordCoreData]) {
