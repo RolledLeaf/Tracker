@@ -15,7 +15,6 @@ final class TrackerCell: UICollectionViewCell {
     private var currentDate: Date = Date()
     private var selectedIndexPaths: Set<IndexPath> = []
     
-    
     private lazy var habbitLabel: UILabel = {
         let label = UILabel()
         label.font = .systemFont(ofSize: 14, weight: .regular)
@@ -43,14 +42,6 @@ final class TrackerCell: UICollectionViewCell {
         let label = UILabel()
         label.font = UIFont.systemFont(ofSize: 16)
         label.textAlignment = .center
-        return label
-    }()
-    
-    lazy var daysNumberLabel: UILabel = {
-        let label = UILabel()
-        label.font = .systemFont(ofSize: 14, weight: .bold)
-        label.textColor = .black
-        label.translatesAutoresizingMaskIntoConstraints = false
         return label
     }()
     
@@ -95,7 +86,7 @@ final class TrackerCell: UICollectionViewCell {
     }
     
     private func setupUI() {
-        let uiElements: [UIView] = [backgroundContainer,  habbitLabel, daysNumberLabel, daysCountLabel, emojiContainer, emojiLabel, doneButtonContainer, doneButton ]
+        let uiElements: [UIView] = [backgroundContainer,  habbitLabel, daysCountLabel, emojiContainer, emojiLabel, doneButtonContainer, doneButton ]
         uiElements.forEach { $0.translatesAutoresizingMaskIntoConstraints = false }
         uiElements.forEach { contentView.addSubview($0) }
         
@@ -104,10 +95,9 @@ final class TrackerCell: UICollectionViewCell {
         doneButton.isUserInteractionEnabled = false
         
         NSLayoutConstraint.activate([
-            daysNumberLabel.leadingAnchor.constraint(equalTo: contentView.leadingAnchor, constant: 12),
-            daysNumberLabel.bottomAnchor.constraint(equalTo: contentView.bottomAnchor, constant: -24),
+
             
-            daysCountLabel.leadingAnchor.constraint(equalTo: daysNumberLabel.trailingAnchor, constant: 5),
+            daysCountLabel.leadingAnchor.constraint(equalTo: contentView.leadingAnchor, constant: 12),
             daysCountLabel.bottomAnchor.constraint(equalTo: contentView.bottomAnchor, constant: -24),
             daysCountLabel.heightAnchor.constraint(equalToConstant: 18),
             daysCountLabel.widthAnchor.constraint(equalToConstant: 101),
@@ -171,7 +161,6 @@ final class TrackerCell: UICollectionViewCell {
         doneButtonContainer.backgroundColor = adjustedColor
         
         let daysCount = tracker.daysCount
-        daysNumberLabel.text = "\(daysCount)"
         daysCountLabel.text = getDayWord(for: daysCount)
     }
     
