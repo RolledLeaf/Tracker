@@ -36,13 +36,13 @@ enum CollectionColors: String  {
     case collectionGreen18 = "collectionGreen18"
     
     var uiColor: UIColor? {
-            return UIColor(named: self.rawValue)
-        }
+        return UIColor(named: self.rawValue)
+    }
 }
 
- func adjustAlpha(_ color: UIColor, to alpha: CGFloat) -> UIColor {
-        return color.withAlphaComponent(alpha)
-    }
+func adjustAlpha(_ color: UIColor, to alpha: CGFloat) -> UIColor {
+    return color.withAlphaComponent(alpha)
+}
 
 
 
@@ -81,5 +81,5 @@ extension UIColor {
         }
         return nil
     }
-    }
+}
 
