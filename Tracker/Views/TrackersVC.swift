@@ -18,6 +18,8 @@ final class TrackersViewController: UIViewController, UICollectionViewDataSource
     private let locale = Locale(identifier: "ru_RU")
     private let context = CoreDataStack.shared.persistentContainer.viewContext
     
+    
+     var ifTrackerPinned: Bool = false
     private var datePickerHeightConstraint: NSLayoutConstraint?
     private var categoriesCollectionViewHeight: NSLayoutConstraint?
     private let dateFormatter: DateFormatter = {
@@ -40,7 +42,7 @@ final class TrackersViewController: UIViewController, UICollectionViewDataSource
         return store
     }()
     
-    private lazy var categoriesCollectionView: UICollectionView = {
+     lazy var categoriesCollectionView: UICollectionView = {
         let layout = UICollectionViewFlowLayout()
         layout.scrollDirection = .vertical
         layout.minimumLineSpacing = 0
@@ -188,6 +190,7 @@ final class TrackersViewController: UIViewController, UICollectionViewDataSource
         categoriesCollectionView.reloadData()
     }
     
+    
     private func fetchAllCategories() {
         let fetchedCategories = trackerCategoryStore.fetchAllTrackerCategories()
         print("Запрошены категории. Получены следующие категории: \(fetchedCategories)")
@@ -318,6 +321,23 @@ final class TrackersViewController: UIViewController, UICollectionViewDataSource
     func getSelectedDate() -> Date {
         return selectedDate
     }
+
+    
+}
+
+extension TrackersViewController {
+    func pinTracker(at indexPath: IndexPath) {
+        ifTrackerPinned.toggle()
+        print("")
+    }
+
+    func editTracker(at indexPath: IndexPath) {
+        print("✏️ Редактировать трекер в секции \(indexPath.section), строке \(indexPath.item)")
+    }
+
+    func deleteTracker(at indexPath: IndexPath) {
+        print("🗑 Удалить трекер в секции \(indexPath.section), строке \(indexPath.item)")
+    }
 }
 
 extension TrackersViewController: TrackerCategoryCellDelegate {
@@ -412,10 +432,13 @@ extension TrackersViewController {
         
         cell.delegate = self
         cell.viewController = self
+        cell.backgroundColor = .clear
         cell.configure(with: tracker, trackerRecords: trackerRecordsForTracker)
         
         return cell
     }
+    
+
     
     func collectionView(_ collectionView: UICollectionView, layout collectionViewLayout: UICollectionViewLayout, insetForSectionAt section: Int) -> UIEdgeInsets {
         if section == 0 {

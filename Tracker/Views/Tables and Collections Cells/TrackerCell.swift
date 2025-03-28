@@ -4,11 +4,13 @@ protocol TrackerCategoryCellDelegate: AnyObject {
     func trackerExecution(_ cell: TrackerCell, didTapDoneButtonFor trackerID: UUID, selectedDate: Date)
 }
 
-final class TrackerCell: UICollectionViewCell {
+final class TrackerCell: UICollectionViewCell, UIContextMenuInteractionDelegate {
     weak var delegate: TrackerCategoryCellDelegate?
     weak var viewController: TrackersViewController?
     
     static let reuseIdentifier = "TrackerCell"
+    
+    
     
     private var currentSelectedTracker: TrackerCoreData?
     private var trackerID: UUID?
@@ -72,7 +74,7 @@ final class TrackerCell: UICollectionViewCell {
         let view = UIView()
         view.layer.cornerRadius = 16
         view.layer.masksToBounds = true
-        view.backgroundColor = UIColor.systemGray5
+        view.backgroundColor = .clear
         return view
     }()
     
@@ -86,7 +88,12 @@ final class TrackerCell: UICollectionViewCell {
     }
     
     private func setupUI() {
-        let uiElements: [UIView] = [backgroundContainer,  habbitLabel, daysCountLabel, emojiContainer, emojiLabel, doneButtonContainer, doneButton ]
+        backgroundColor = .clear
+        
+        let interaction = UIContextMenuInteraction(delegate: self)
+        contentView.addInteraction(interaction)
+        
+        let uiElements: [UIView] = [backgroundContainer, daysCountLabel, doneButtonContainer, doneButton]
         uiElements.forEach { $0.translatesAutoresizingMaskIntoConstraints = false }
         uiElements.forEach { contentView.addSubview($0) }
         
@@ -94,9 +101,11 @@ final class TrackerCell: UICollectionViewCell {
         doneButtonContainer.addGestureRecognizer(tapGesture)
         doneButton.isUserInteractionEnabled = false
         
+        let backgroundContainerElements: [UIView] = [habbitLabel, emojiContainer, emojiLabel]
+        backgroundContainerElements.forEach { $0.translatesAutoresizingMaskIntoConstraints = false }
+        backgroundContainerElements.forEach { backgroundContainer.addSubview($0) }
+        
         NSLayoutConstraint.activate([
-
-            
             daysCountLabel.leadingAnchor.constraint(equalTo: contentView.leadingAnchor, constant: 12),
             daysCountLabel.bottomAnchor.constraint(equalTo: contentView.bottomAnchor, constant: -24),
             daysCountLabel.heightAnchor.constraint(equalToConstant: 18),
@@ -133,6 +142,61 @@ final class TrackerCell: UICollectionViewCell {
         ])
     }
     
+    func previewForHighlightingContextMenu(with configuration: UIContextMenuConfiguration) -> UITargetedPreview? {
+        let parameters = UIPreviewParameters()
+        parameters.backgroundColor = .clear
+        parameters.visiblePath = UIBezierPath(roundedRect: backgroundContainer.bounds, cornerRadius: 16)
+        
+        let preview = UITargetedPreview(view: backgroundContainer, parameters: parameters)
+        return preview
+    }
+    
+    func contextMenuInteraction(_ interaction: UIContextMenuInteraction, configurationForMenuAtLocation location: CGPoint) -> UIContextMenuConfiguration? {
+        guard let viewController = viewController,
+              let indexPath = viewController.categoriesCollectionView.indexPath(for: self)
+        else { return nil }
+        
+        return UIContextMenuConfiguration(identifier: nil, previewProvider: {
+            let previewController = UIViewController()
+            previewController.view.backgroundColor = .clear
+
+            // Снимок с backgroundContainer, включая вложенные в него элементы
+            let snapshot = self.backgroundContainer.snapshotView(afterScreenUpdates: true) ?? UIView()
+            snapshot.layer.cornerRadius = 16
+            snapshot.layer.masksToBounds = true
+            snapshot.translatesAutoresizingMaskIntoConstraints = false
+
+            previewController.view.addSubview(snapshot)
+            NSLayoutConstraint.activate([
+                snapshot.topAnchor.constraint(equalTo: previewController.view.topAnchor),
+                snapshot.bottomAnchor.constraint(equalTo: previewController.view.bottomAnchor),
+                snapshot.leadingAnchor.constraint(equalTo: previewController.view.leadingAnchor),
+                snapshot.trailingAnchor.constraint(equalTo: previewController.view.trailingAnchor)
+            ])
+
+            // Размер превью совпадает с backgroundContainer
+            previewController.preferredContentSize = self.backgroundContainer.bounds.size
+            return previewController
+        }, actionProvider: { _ in
+            let isPinned = viewController.ifTrackerPinned
+            let pinTitle = isPinned ? "Открепить" : "Закрепить"
+            
+            let pinAction = UIAction(title: pinTitle, image: UIImage(systemName: "pin")) { _ in
+                viewController.pinTracker(at: indexPath)
+            }
+            
+            let editAction = UIAction(title: "Редактировать", image: UIImage(systemName: "pencil")) { _ in
+                viewController.editTracker(at: indexPath)
+            }
+            
+            let deleteAction = UIAction(title: "Удалить", image: UIImage(systemName: "trash"), attributes: .destructive) { _ in
+                viewController.deleteTracker(at: indexPath)
+            }
+            
+            return UIMenu(title: "", children: [pinAction, editAction, deleteAction])
+        })
+    }
+    
     private func getDayWord(for count: Int16) -> String {
         let format = NSLocalizedString("daysCount", comment: "Количество дней")
         return String.localizedStringWithFormat(format, count)
@@ -153,9 +217,9 @@ final class TrackerCell: UICollectionViewCell {
         
         let currentDate = Date()
         let isCompleted = trackerRecords.contains { $0.trackerID == tracker.id && Calendar.current.isDate($0.date ?? currentDate, inSameDayAs: viewController?.selectedDate ?? currentDate) }
-
+        
         doneButton.setImage(UIImage(systemName: isCompleted ? "checkmark" : "plus"), for: .normal)
-
+        
         let baseColor = trackerColor
         let adjustedColor = isCompleted ? lightenColor(baseColor, by: 0.3) : baseColor
         doneButtonContainer.backgroundColor = adjustedColor
@@ -168,7 +232,7 @@ final class TrackerCell: UICollectionViewCell {
         guard let trackerID = trackerID else {
             return
         }
-       
+        
         guard let selectedDate = viewController?.getSelectedDate() else {
             print("Date Picker is not set!")
             return

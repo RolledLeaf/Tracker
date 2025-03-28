@@ -7,3 +7,9 @@ enum OnboardingImage: String {
 enum UserDefaultsKeys {
     static let hasSeenOnboarding = "hasSeenOnboarding"
 }
+
+enum EditAction: String {
+    case pin = "Закрепить"
+    case edit = "Редактировать"
+    case delete = "Удалить"
+}
