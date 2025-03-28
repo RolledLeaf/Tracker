@@ -110,6 +110,58 @@ final class TrackersViewController: UIViewController, UICollectionViewDataSource
         updateVisibleTrackers(for: datePicker.date)
     }
     
+    private func setupInitialUI() {
+        datePicker.maximumDate = Date()
+        updateUI()
+        view.backgroundColor = UIColor(named: CustomColor.mainBackgroundColor.rawValue)
+        let uiElements = [plusButton, categoriesCollectionView, trackersLabel, searchBar, emptyFieldStarImage, emptyFieldLabel, datePicker, dateButton]
+        uiElements.forEach {$0.translatesAutoresizingMaskIntoConstraints = false
+            view.addSubview($0)
+        }
+        
+        configureLabel(trackersLabel, text: "Трекеры", fontSize: 34, weight: .bold, color: .textColor)
+        configureLabel(emptyFieldLabel, text: "Что будем отслеживать?", fontSize: 12, weight: .regular, color: .textColor)
+        trackersLabel.textAlignment = .left
+        plusButton.setImage(UIImage(named: "plusButton"), for: .normal)
+        plusButton.addTarget(self, action: #selector(plusButtonTapped), for: .touchUpInside)
+        emptyFieldStarImage.image = UIImage(named: "dizzyStar")
+        datePicker.addTarget(self, action: #selector(datePickerValueChanged), for: .valueChanged)
+        
+        NSLayoutConstraint.activate([
+            
+            categoriesCollectionView.leadingAnchor.constraint(equalTo: view.safeAreaLayoutGuide.leadingAnchor, constant: 16),
+            categoriesCollectionView.trailingAnchor.constraint(equalTo: view.safeAreaLayoutGuide.trailingAnchor, constant: -16),
+            categoriesCollectionView.topAnchor.constraint(equalTo: searchBar.bottomAnchor, constant: 34),
+            categoriesCollectionView.bottomAnchor.constraint(equalTo: view.bottomAnchor, constant: -50),
+            
+            
+            trackersLabel.leadingAnchor.constraint(equalTo: view.safeAreaLayoutGuide.leadingAnchor, constant: 16),
+            trackersLabel.topAnchor.constraint(equalTo: view.topAnchor, constant: 88),
+            
+            searchBar.trailingAnchor.constraint(equalTo:view.safeAreaLayoutGuide.trailingAnchor, constant: -10),
+            searchBar.heightAnchor.constraint(equalToConstant: 36),
+            searchBar.leadingAnchor.constraint(equalTo: view.safeAreaLayoutGuide.leadingAnchor, constant: 10),
+            searchBar.topAnchor.constraint(equalTo: trackersLabel.bottomAnchor, constant: 12),
+            
+            emptyFieldLabel.centerXAnchor.constraint(equalTo: view.centerXAnchor),
+            emptyFieldLabel.topAnchor.constraint(equalTo: emptyFieldStarImage.bottomAnchor, constant: 8),
+            
+            emptyFieldStarImage.topAnchor.constraint(equalTo: view.topAnchor, constant: 402),
+            emptyFieldStarImage.centerXAnchor.constraint(equalTo: view.centerXAnchor),
+            emptyFieldStarImage.widthAnchor.constraint(equalToConstant: 80),
+            emptyFieldStarImage.heightAnchor.constraint(equalToConstant: 80)
+            
+        ])
+        
+        categoriesCollectionView.dataSource = self
+        categoriesCollectionView.register(CategoriesCollectionHeaderView.self, forSupplementaryViewOfKind: UICollectionView.elementKindSectionHeader, withReuseIdentifier: CategoriesCollectionHeaderView.identifier)
+        
+        categoriesCollectionView.register(TrackerCell.self, forCellWithReuseIdentifier: TrackerCell.reuseIdentifier)
+        
+        categoriesCollectionView.delegate = self
+        searchBar.delegate = self
+    }
+    
     override func viewDidAppear(_ animated: Bool) {
         super.viewDidAppear(animated)
         
@@ -271,57 +323,7 @@ final class TrackersViewController: UIViewController, UICollectionViewDataSource
         }
     }
     
-    private func setupInitialUI() {
-        datePicker.maximumDate = Date()
-        updateUI()
-        view.backgroundColor = UIColor(named: CustomColor.mainBackgroundColor.rawValue)
-        let uiElements = [plusButton, categoriesCollectionView, trackersLabel, searchBar, emptyFieldStarImage, emptyFieldLabel, datePicker, dateButton]
-        uiElements.forEach {$0.translatesAutoresizingMaskIntoConstraints = false
-            view.addSubview($0)
-        }
-        
-        configureLabel(trackersLabel, text: "Трекеры", fontSize: 34, weight: .bold, color: .textColor)
-        configureLabel(emptyFieldLabel, text: "Что будем отслеживать?", fontSize: 12, weight: .regular, color: .textColor)
-        trackersLabel.textAlignment = .left
-        plusButton.setImage(UIImage(named: "plusButton"), for: .normal)
-        plusButton.addTarget(self, action: #selector(plusButtonTapped), for: .touchUpInside)
-        emptyFieldStarImage.image = UIImage(named: "dizzyStar")
-        datePicker.addTarget(self, action: #selector(datePickerValueChanged), for: .valueChanged)
-        
-        NSLayoutConstraint.activate([
-            
-            categoriesCollectionView.leadingAnchor.constraint(equalTo: view.safeAreaLayoutGuide.leadingAnchor, constant: 16),
-            categoriesCollectionView.trailingAnchor.constraint(equalTo: view.safeAreaLayoutGuide.trailingAnchor, constant: -16),
-            categoriesCollectionView.topAnchor.constraint(equalTo: searchBar.bottomAnchor, constant: 34),
-            categoriesCollectionView.bottomAnchor.constraint(equalTo: view.bottomAnchor, constant: -50),
-            
-            
-            trackersLabel.leadingAnchor.constraint(equalTo: view.safeAreaLayoutGuide.leadingAnchor, constant: 16),
-            trackersLabel.topAnchor.constraint(equalTo: view.topAnchor, constant: 88),
-            
-            searchBar.trailingAnchor.constraint(equalTo:view.safeAreaLayoutGuide.trailingAnchor, constant: -10),
-            searchBar.heightAnchor.constraint(equalToConstant: 36),
-            searchBar.leadingAnchor.constraint(equalTo: view.safeAreaLayoutGuide.leadingAnchor, constant: 10),
-            searchBar.topAnchor.constraint(equalTo: trackersLabel.bottomAnchor, constant: 12),
-            
-            emptyFieldLabel.centerXAnchor.constraint(equalTo: view.centerXAnchor),
-            emptyFieldLabel.topAnchor.constraint(equalTo: emptyFieldStarImage.bottomAnchor, constant: 8),
-            
-            emptyFieldStarImage.topAnchor.constraint(equalTo: view.topAnchor, constant: 402),
-            emptyFieldStarImage.centerXAnchor.constraint(equalTo: view.centerXAnchor),
-            emptyFieldStarImage.widthAnchor.constraint(equalToConstant: 80),
-            emptyFieldStarImage.heightAnchor.constraint(equalToConstant: 80)
-            
-        ])
-        
-        categoriesCollectionView.dataSource = self
-        categoriesCollectionView.register(CategoriesCollectionHeaderView.self, forSupplementaryViewOfKind: UICollectionView.elementKindSectionHeader, withReuseIdentifier: CategoriesCollectionHeaderView.identifier)
-        
-        categoriesCollectionView.register(TrackerCell.self, forCellWithReuseIdentifier: TrackerCell.reuseIdentifier)
-        
-        categoriesCollectionView.delegate = self
-        searchBar.delegate = self
-    }
+   
     
     func getSelectedDate() -> Date {
         return selectedDate
