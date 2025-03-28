@@ -11,7 +11,7 @@ final class TrackersViewController: UIViewController, UICollectionViewDataSource
     private var selectedIndexPath: IndexPath?
     
     
-    private let plusButton = UIButton()
+    private let addTrackerButton = UIButton()
     private let trackersLabel = UILabel()
     private let emptyFieldStarImage = UIImageView()
     private let emptyFieldLabel = UILabel()
@@ -117,7 +117,7 @@ final class TrackersViewController: UIViewController, UICollectionViewDataSource
         datePicker.maximumDate = Date()
         updateUI()
         view.backgroundColor = UIColor(named: CustomColor.mainBackgroundColor.rawValue)
-        let uiElements = [plusButton, categoriesCollectionView, trackersLabel, searchBar, emptyFieldStarImage, emptyFieldLabel, dateButton, datePicker]
+        let uiElements = [addTrackerButton, categoriesCollectionView, trackersLabel, searchBar, emptyFieldStarImage, emptyFieldLabel, dateButton, datePicker]
         uiElements.forEach {$0.translatesAutoresizingMaskIntoConstraints = false
             view.addSubview($0)
         }
@@ -125,8 +125,8 @@ final class TrackersViewController: UIViewController, UICollectionViewDataSource
         configureLabel(trackersLabel, text: "Трекеры", fontSize: 34, weight: .bold, color: .textColor)
         configureLabel(emptyFieldLabel, text: "Что будем отслеживать?", fontSize: 12, weight: .regular, color: .textColor)
         trackersLabel.textAlignment = .left
-        plusButton.setImage(UIImage(named: "plusButton"), for: .normal)
-        plusButton.addTarget(self, action: #selector(plusButtonTapped), for: .touchUpInside)
+        addTrackerButton.setImage(UIImage(named: "addTrackerButton"), for: .normal)
+        addTrackerButton.addTarget(self, action: #selector(addTrackerButtonTapped), for: .touchUpInside)
         emptyFieldStarImage.image = UIImage(named: "dizzyStar")
         datePicker.addTarget(self, action: #selector(datePickerValueChanged), for: .valueChanged)
         
@@ -139,10 +139,10 @@ final class TrackersViewController: UIViewController, UICollectionViewDataSource
             datePicker.centerXAnchor.constraint(equalTo: dateButton.centerXAnchor),
             datePicker.centerYAnchor.constraint(equalTo: dateButton.centerYAnchor),
 
-            plusButton.heightAnchor.constraint(equalToConstant: 19),
-            plusButton.widthAnchor.constraint(equalToConstant: 18),
-            plusButton.leadingAnchor.constraint(equalTo: view.safeAreaLayoutGuide.leadingAnchor, constant: 18),
-            plusButton.bottomAnchor.constraint(equalTo: trackersLabel.safeAreaLayoutGuide.topAnchor, constant: -13),
+            addTrackerButton.heightAnchor.constraint(equalToConstant: 19),
+            addTrackerButton.widthAnchor.constraint(equalToConstant: 18),
+            addTrackerButton.leadingAnchor.constraint(equalTo: view.safeAreaLayoutGuide.leadingAnchor, constant: 18),
+            addTrackerButton.bottomAnchor.constraint(equalTo: trackersLabel.safeAreaLayoutGuide.topAnchor, constant: -13),
             
             categoriesCollectionView.leadingAnchor.constraint(equalTo: view.safeAreaLayoutGuide.leadingAnchor, constant: 16),
             categoriesCollectionView.trailingAnchor.constraint(equalTo: view.safeAreaLayoutGuide.trailingAnchor, constant: -16),
@@ -282,7 +282,7 @@ final class TrackersViewController: UIViewController, UICollectionViewDataSource
         updateVisibleTrackers(for: sender.date)
     }
     
-    @objc private func plusButtonTapped() {
+    @objc private func addTrackerButtonTapped() {
         view.endEditing(true)
         let createHabitVC = CreateHabitTypeViewController()
         createHabitVC.delegate = self
