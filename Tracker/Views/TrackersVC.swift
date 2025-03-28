@@ -100,6 +100,8 @@ final class TrackersViewController: UIViewController, UICollectionViewDataSource
         return button
     }()
     
+    
+    
     override func viewDidLoad() {
         super.viewDidLoad()
         setupInitialUI()
@@ -108,13 +110,14 @@ final class TrackersViewController: UIViewController, UICollectionViewDataSource
         reloadCategoryData()
         updateUI()
         updateVisibleTrackers(for: datePicker.date)
+        print("✅ safeAreaInsets.top = \(view.safeAreaInsets.top)")
     }
     
     private func setupInitialUI() {
         datePicker.maximumDate = Date()
         updateUI()
         view.backgroundColor = UIColor(named: CustomColor.mainBackgroundColor.rawValue)
-        let uiElements = [plusButton, categoriesCollectionView, trackersLabel, searchBar, emptyFieldStarImage, emptyFieldLabel, datePicker, dateButton]
+        let uiElements = [plusButton, categoriesCollectionView, trackersLabel, searchBar, emptyFieldStarImage, emptyFieldLabel, dateButton, datePicker]
         uiElements.forEach {$0.translatesAutoresizingMaskIntoConstraints = false
             view.addSubview($0)
         }
@@ -128,6 +131,18 @@ final class TrackersViewController: UIViewController, UICollectionViewDataSource
         datePicker.addTarget(self, action: #selector(datePickerValueChanged), for: .valueChanged)
         
         NSLayoutConstraint.activate([
+            dateButton.heightAnchor.constraint(equalToConstant: 34),
+            dateButton.widthAnchor.constraint(equalToConstant: 77),
+            dateButton.trailingAnchor.constraint(equalTo: view.safeAreaLayoutGuide.trailingAnchor, constant: -16),
+            dateButton.topAnchor.constraint(equalTo: view.safeAreaLayoutGuide.topAnchor, constant: 5),
+
+            datePicker.centerXAnchor.constraint(equalTo: dateButton.centerXAnchor),
+            datePicker.centerYAnchor.constraint(equalTo: dateButton.centerYAnchor),
+
+            plusButton.heightAnchor.constraint(equalToConstant: 19),
+            plusButton.widthAnchor.constraint(equalToConstant: 18),
+            plusButton.leadingAnchor.constraint(equalTo: view.safeAreaLayoutGuide.leadingAnchor, constant: 18),
+            plusButton.bottomAnchor.constraint(equalTo: trackersLabel.safeAreaLayoutGuide.topAnchor, constant: -13),
             
             categoriesCollectionView.leadingAnchor.constraint(equalTo: view.safeAreaLayoutGuide.leadingAnchor, constant: 16),
             categoriesCollectionView.trailingAnchor.constraint(equalTo: view.safeAreaLayoutGuide.trailingAnchor, constant: -16),
@@ -162,32 +177,7 @@ final class TrackersViewController: UIViewController, UICollectionViewDataSource
         searchBar.delegate = self
     }
     
-    override func viewDidAppear(_ animated: Bool) {
-        super.viewDidAppear(animated)
-        
-        if let navView = navigationController?.view {
-            navView.addSubview(plusButton)
-            navView.addSubview(dateButton)
-            navView.addSubview(datePicker)
-            
-            plusButton.translatesAutoresizingMaskIntoConstraints = false
-            
-            NSLayoutConstraint.activate([
-                dateButton.heightAnchor.constraint(equalToConstant: 34),
-                dateButton.widthAnchor.constraint(equalToConstant: 77),
-                dateButton.trailingAnchor.constraint(equalTo: navView.safeAreaLayoutGuide.trailingAnchor, constant: -16),
-                dateButton.topAnchor.constraint(equalTo: navView.safeAreaLayoutGuide.topAnchor, constant: 5),
-                
-                datePicker.centerXAnchor.constraint(equalTo: dateButton.centerXAnchor),
-                datePicker.centerYAnchor.constraint(equalTo: dateButton.centerYAnchor),
-                
-                plusButton.heightAnchor.constraint(equalToConstant: 19),
-                plusButton.widthAnchor.constraint(equalToConstant: 18),
-                plusButton.leadingAnchor.constraint(equalTo: navView.safeAreaLayoutGuide.leadingAnchor, constant: 18),
-                plusButton.topAnchor.constraint(equalTo: navView.safeAreaLayoutGuide.topAnchor, constant: 5),
-            ])
-        }
-    }
+
     
     private func loadCategories() {
         categories = trackerCategoryStore.fetchAllTrackerCategories()
