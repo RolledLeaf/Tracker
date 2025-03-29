@@ -4,13 +4,11 @@ protocol TrackerCategoryCellDelegate: AnyObject {
     func trackerExecution(_ cell: TrackerCell, didTapDoneButtonFor trackerID: UUID, selectedDate: Date)
 }
 
-final class TrackerCell: UICollectionViewCell, UIContextMenuInteractionDelegate {
+final class TrackerCell: UICollectionViewCell {
     weak var delegate: TrackerCategoryCellDelegate?
     weak var viewController: TrackersViewController?
     
     static let reuseIdentifier = "TrackerCell"
-    
-    
     
     private var currentSelectedTracker: TrackerCoreData?
     private var trackerID: UUID?
@@ -37,8 +35,6 @@ final class TrackerCell: UICollectionViewCell, UIContextMenuInteractionDelegate 
         
         return button
     }()
-    
-    private var isChecked = false
     
     private lazy var emojiLabel: UILabel = {
         let label = UILabel()
@@ -90,8 +86,7 @@ final class TrackerCell: UICollectionViewCell, UIContextMenuInteractionDelegate 
     private func setupUI() {
         backgroundColor = .clear
         
-        let interaction = UIContextMenuInteraction(delegate: self)
-        contentView.addInteraction(interaction)
+       
         
         let uiElements: [UIView] = [backgroundContainer, daysCountLabel, doneButtonContainer, doneButton]
         uiElements.forEach { $0.translatesAutoresizingMaskIntoConstraints = false }
@@ -142,60 +137,7 @@ final class TrackerCell: UICollectionViewCell, UIContextMenuInteractionDelegate 
         ])
     }
     
-    func previewForHighlightingContextMenu(with configuration: UIContextMenuConfiguration) -> UITargetedPreview? {
-        let parameters = UIPreviewParameters()
-        parameters.backgroundColor = .clear
-        parameters.visiblePath = UIBezierPath(roundedRect: backgroundContainer.bounds, cornerRadius: 16)
-        
-        let preview = UITargetedPreview(view: backgroundContainer, parameters: parameters)
-        return preview
-    }
     
-    func contextMenuInteraction(_ interaction: UIContextMenuInteraction, configurationForMenuAtLocation location: CGPoint) -> UIContextMenuConfiguration? {
-        guard let viewController = viewController,
-              let indexPath = viewController.categoriesCollectionView.indexPath(for: self)
-        else { return nil }
-        
-        return UIContextMenuConfiguration(identifier: nil, previewProvider: {
-            let previewController = UIViewController()
-            previewController.view.backgroundColor = .clear
-
-            // Снимок с backgroundContainer, включая вложенные в него элементы
-            let snapshot = self.backgroundContainer.snapshotView(afterScreenUpdates: true) ?? UIView()
-            snapshot.layer.cornerRadius = 16
-            snapshot.layer.masksToBounds = true
-            snapshot.translatesAutoresizingMaskIntoConstraints = false
-
-            previewController.view.addSubview(snapshot)
-            NSLayoutConstraint.activate([
-                snapshot.topAnchor.constraint(equalTo: previewController.view.topAnchor),
-                snapshot.bottomAnchor.constraint(equalTo: previewController.view.bottomAnchor),
-                snapshot.leadingAnchor.constraint(equalTo: previewController.view.leadingAnchor),
-                snapshot.trailingAnchor.constraint(equalTo: previewController.view.trailingAnchor)
-            ])
-
-            // Размер превью совпадает с backgroundContainer
-            previewController.preferredContentSize = self.backgroundContainer.bounds.size
-            return previewController
-        }, actionProvider: { _ in
-            let isPinned = viewController.ifTrackerPinned
-            let pinTitle = isPinned ? "Открепить" : "Закрепить"
-            
-            let pinAction = UIAction(title: pinTitle, image: UIImage(systemName: "pin")) { _ in
-                viewController.pinTracker(at: indexPath)
-            }
-            
-            let editAction = UIAction(title: "Редактировать", image: UIImage(systemName: "pencil")) { _ in
-                viewController.editTracker(at: indexPath)
-            }
-            
-            let deleteAction = UIAction(title: "Удалить", image: UIImage(systemName: "trash"), attributes: .destructive) { _ in
-                viewController.deleteTracker(at: indexPath)
-            }
-            
-            return UIMenu(title: "", children: [pinAction, editAction, deleteAction])
-        })
-    }
     
     private func getDayWord(for count: Int16) -> String {
         let format = NSLocalizedString("daysCount", comment: "Количество дней")

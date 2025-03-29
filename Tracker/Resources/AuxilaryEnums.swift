@@ -10,6 +10,7 @@ enum UserDefaultsKeys {
 
 enum EditAction: String {
     case pin = "Закрепить"
+    case unpin = "Открепить"
     case edit = "Редактировать"
     case delete = "Удалить"
 }

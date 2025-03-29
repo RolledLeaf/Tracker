@@ -61,8 +61,21 @@ final class TrackerStore: NSObject, NSFetchedResultsControllerDelegate {
     
     // MARK: - NSFetchedResultsControllerDelegate
     
-    func controllerWillChangeContent(_ controller: NSFetchedResultsController<NSFetchRequestResult>) {
-        delegate?.didUpdate(TrackerStoreUpdate(insertedIndexes: IndexSet(), deletedIndexes: IndexSet()))
+   
+    
+    
+    func deleteTracker(at indexPath: IndexPath) {
+        let tracker = fetchedResultsController.object(at: indexPath)
+        let trackerName = tracker.name ?? "Без имени"
+        
+        context.delete(tracker)
+        
+        do {
+            try context.save()
+            print("🗑 Трекер '\(trackerName)' удалён через TrackerStore")
+        } catch {
+            print("❌ Ошибка удаления трекера: \(error.localizedDescription)")
+        }
     }
     
    func controller(_ controller: NSFetchedResultsController<NSFetchRequestResult>, didChange anObject: Any, at indexPath: IndexPath?, for type: NSFetchedResultsChangeType, newIndexPath: IndexPath?) {
@@ -80,18 +93,24 @@ final class TrackerStore: NSObject, NSFetchedResultsControllerDelegate {
         }
         
         guard let inserted = insertedIndexes, let deleted = deletedIndexes else { return }
-        delegate?.didUpdate(TrackerStoreUpdate(insertedIndexes: inserted, deletedIndexes: deleted))
+        
+    }
+    
+    func controllerWillChangeContent(_ controller: NSFetchedResultsController<NSFetchRequestResult>) {
+        insertedIndexes = IndexSet()
+        deletedIndexes = IndexSet()
     }
     
     func controllerDidChangeContent(_ controller: NSFetchedResultsController<NSFetchRequestResult>) {
-        guard let inserted = insertedIndexes, let deleted = deletedIndexes else { return }
-        
+        let inserted = insertedIndexes ?? IndexSet()
+        let deleted = deletedIndexes ?? IndexSet()
+
         print("📌 controllerDidChangeContent вызван")
         print("🔹 Вставленные индексы: \(inserted)")
         print("🔹 Удалённые индексы: \(deleted)")
-        
+
         delegate?.didUpdate(TrackerStoreUpdate(insertedIndexes: inserted, deletedIndexes: deleted))
-        
+
         insertedIndexes = nil
         deletedIndexes = nil
     }

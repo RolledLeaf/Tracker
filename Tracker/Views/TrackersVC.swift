@@ -4,7 +4,7 @@ import CoreData
 final class TrackersViewController: UIViewController, UICollectionViewDataSource, UICollectionViewDelegateFlowLayout, UICollectionViewDelegate {
     
     private var categories: [TrackerCategoryCoreData] = []
-    private  var filteredCategories: [TrackerCategoryCoreData] = []
+    private var filteredCategories: [TrackerCategoryCoreData] = []
     private var trackerRecords: [TrackerRecordCoreData] = []
     private var currentSelectedTracker: TrackerCoreData?
     private var currentDate: Date = Date()
@@ -29,7 +29,11 @@ final class TrackersViewController: UIViewController, UICollectionViewDataSource
         return formatter
     }()
     
+    private var isChecked = false
+    
     var selectedDate: Date = Date()
+    
+    private lazy var viewModel = TrackersViewModel(trackerStore: trackerStore)
     
     private lazy var trackerStore: TrackerStore = {
         let store = TrackerStore()
@@ -112,6 +116,9 @@ final class TrackersViewController: UIViewController, UICollectionViewDataSource
         reloadCategoryData()
         updateUI()
         updateVisibleTrackers(for: datePicker.date)
+        viewModel.onTrackersUpdate = { [weak self] trackers in
+            self?.categoriesCollectionView.reloadData()
+        }
         print("✅ safeAreaInsets.top = \(view.safeAreaInsets.top)")
     }
     
@@ -221,14 +228,14 @@ final class TrackersViewController: UIViewController, UICollectionViewDataSource
         formatter.locale = locale
         formatter.dateFormat = "EEE"
         let selectedWeekday = formatter.string(from: selectedDate)
+        
         let allTrackers = trackerStore.fetchAllTrackers()
+        
         let filteredTrackers = allTrackers.filter { tracker in
             guard let weekDays = tracker.weekDays as? [String] else { return false }
             
             let isCompleted = trackerRecords.contains { $0.trackerID == tracker.id && $0.date?.isSameDay(as: selectedDate) == true }
             let hasEverBeenCompleted = trackerRecords.contains { $0.trackerID == tracker.id }
-            
-            print("🔹 Трекер \(tracker.name ?? "Без имени") нерегулярный? \(weekDays.contains(" ") ? "Да" : "Нет"). Выполнен в этот день? \(isCompleted ? "✅ Да" : "❌ Нет"). Когда-либо выполнялся? \(hasEverBeenCompleted ? "📅 Да" : "📅 Нет")")
             
             if weekDays.contains(" ") {
                 return !hasEverBeenCompleted || isCompleted
@@ -237,12 +244,17 @@ final class TrackersViewController: UIViewController, UICollectionViewDataSource
             }
         }
         
-        filteredCategories = trackerCategoryStore.fetchAllTrackerCategories().compactMap { category in
-            let trackersInCategory = filteredTrackers.filter { $0.category == category }
-            return trackersInCategory.isEmpty ? nil : category
+        let trackerIDs = filteredTrackers.compactMap { $0.id }
+        trackerStore.fetchedResultsController.fetchRequest.predicate = NSPredicate(format: "id IN %@", trackerIDs)
+        
+        do {
+            try trackerStore.fetchedResultsController.performFetch()
+            categoriesCollectionView.reloadData()
+            updateUI()
+            print("📌 Трекеры отфильтрованы через FRC")
+        } catch {
+            print("❌ Ошибка при фильтрации трекеров: \(error.localizedDescription)")
         }
-        print("📌 Отфильтрованных категорий: \(filteredCategories.count)")
-        reloadCategoryData()
     }
     
     private func removeTime(from date: Date) -> Date {
@@ -301,44 +313,39 @@ final class TrackersViewController: UIViewController, UICollectionViewDataSource
     }
     
     private func updateUI() {
-        let categoryFetchRequest: NSFetchRequest<TrackerCategoryCoreData> = TrackerCategoryCoreData.fetchRequest()
-        do {
-            let categoriesFromDataBase = try CoreDataStack.shared.context.fetch(categoryFetchRequest)
-            let hasTrackers = !categoriesFromDataBase.isEmpty
-            
-            emptyFieldLabel.isHidden = hasTrackers
-            emptyFieldStarImage.isHidden = hasTrackers
-            categoriesCollectionView.isHidden = !hasTrackers
-            
-            categories = categoriesFromDataBase
-        } catch {
-            print("Ошибка извлечения категорий из БД: \(error.localizedDescription)")
+        let hasVisibleTrackers = categoriesCollectionView.numberOfSections > 0 && (0..<categoriesCollectionView.numberOfSections).contains { section in
+            categoriesCollectionView.numberOfItems(inSection: section) > 0
         }
+
+        emptyFieldLabel.isHidden = hasVisibleTrackers
+        emptyFieldStarImage.isHidden = hasVisibleTrackers
+        categoriesCollectionView.isHidden = !hasVisibleTrackers
     }
-    
-   
     
     func getSelectedDate() -> Date {
         return selectedDate
     }
 
-    
+    private func createContextMenu(for indexPath: IndexPath) -> UIMenu {
+
+        let pinTitle = ifTrackerPinned ? "Открепить" : "Закрепить"
+               let pinAction = UIAction(title: pinTitle, image: nil) { _ in
+                
+              }
+           
+           let editAction = UIAction(title: EditAction.edit.rawValue, image: nil) { _ in
+               
+           }
+           
+           let deleteAction = UIAction(title: EditAction.delete.rawValue, image: nil) { _ in
+               self.viewModel.deleteTracker(at: indexPath)
+               
+           }
+           return UIMenu(title: "", children: [pinAction, editAction, deleteAction])
+       }
 }
 
-extension TrackersViewController {
-    func pinTracker(at indexPath: IndexPath) {
-        ifTrackerPinned.toggle()
-        print("")
-    }
 
-    func editTracker(at indexPath: IndexPath) {
-        print("✏️ Редактировать трекер в секции \(indexPath.section), строке \(indexPath.item)")
-    }
-
-    func deleteTracker(at indexPath: IndexPath) {
-        print("🗑 Удалить трекер в секции \(indexPath.section), строке \(indexPath.item)")
-    }
-}
 
 extension TrackersViewController: TrackerCategoryCellDelegate {
     func trackerExecution(_ cell: TrackerCell, didTapDoneButtonFor trackerID: UUID, selectedDate: Date) {
@@ -372,12 +379,7 @@ extension TrackersViewController: TrackerCategoryCellDelegate {
     }
     
     func getTrackerByID(_ trackerID: UUID) -> TrackerCoreData? {
-        for category in filteredCategories {
-            if let tracker = category.tracker?.first(where: { ($0 as AnyObject).id == trackerID }) {
-                return tracker as? TrackerCoreData
-            }
-        }
-        return nil
+        return trackerStore.fetchAllTrackers().first(where: { $0.id == trackerID })
     }
 }
 
@@ -407,11 +409,11 @@ extension TrackersViewController {
     }
     
     func numberOfSections(in collectionView: UICollectionView) -> Int {
-        return filteredCategories.count
+        return trackerStore.numberOfSections
     }
     
     func collectionView(_ collectionView: UICollectionView, numberOfItemsInSection section: Int) -> Int {
-        return filteredCategories[section].tracker?.count ?? 0
+        return trackerStore.numberOfRowsInSection(section)
     }
     
     func collectionView(_ collectionView: UICollectionView, cellForItemAt indexPath: IndexPath) -> UICollectionViewCell {
@@ -421,21 +423,23 @@ extension TrackersViewController {
         ) as? TrackerCell else {
             fatalError("Cannot dequeue TrackerCell")
         }
-        
-        let category = filteredCategories[indexPath.section]
-        guard let tracker = category.tracker?.allObjects[indexPath.item] as? TrackerCoreData else {
-            print("❌ Ошибка: не найден трекер в секции \(indexPath.section), строка \(indexPath.row)")
-            return UICollectionViewCell()
-        }
-        
+
+        let tracker = trackerStore.fetchedResultsController.object(at: indexPath)
         let trackerRecordsForTracker = trackerRecords.filter { $0.trackerID == tracker.id }
-        
+
         cell.delegate = self
         cell.viewController = self
         cell.backgroundColor = .clear
         cell.configure(with: tracker, trackerRecords: trackerRecordsForTracker)
-        
+
         return cell
+    }
+    
+  
+    func collectionView(_ collectionView: UICollectionView, contextMenuConfigurationForItemAt indexPath: IndexPath, point: CGPoint) -> UIContextMenuConfiguration? {
+        return UIContextMenuConfiguration(identifier: nil, previewProvider: nil) { _ in
+            return self.createContextMenu(for: indexPath)
+        }
     }
     
 
@@ -457,10 +461,10 @@ extension TrackersViewController {
               ) as? CategoriesCollectionHeaderView else {
             return UICollectionReusableView()
         }
-        
-        let category = filteredCategories[indexPath.section]
-        header.configure(with: category.title ?? "Без категории")
-        
+
+        let sectionTitle = trackerStore.getSectionTitle(for: indexPath.section)
+        header.configure(with: sectionTitle)
+
         return header
     }
     
@@ -524,34 +528,46 @@ extension TrackersViewController: UISearchBarDelegate {
     }
     
     private func filterTrackers(for searchText: String) {
+        let formatter = DateFormatter()
+        formatter.locale = locale
+        formatter.dateFormat = "EEE"
+        let selectedWeekday = formatter.string(from: selectedDate)
+
         let allTrackers = trackerStore.fetchAllTrackers()
-        
-        let dateFilteredTrackers = allTrackers.filter { tracker in
-            guard let weekDays = tracker.weekDays as? [String] else { return false }
-            
+
+        let filteredTrackers = allTrackers.filter { tracker in
+            guard let name = tracker.name?.lowercased(),
+                  let weekDays = tracker.weekDays as? [String] else { return false }
+
+            let matchesName = name.contains(searchText.lowercased())
             let isCompleted = trackerRecords.contains { $0.trackerID == tracker.id && $0.date?.isSameDay(as: selectedDate) == true }
-            let isRegular = !weekDays.contains(" ")
-            
-            return isRegular ? weekDays.contains(getSelectedWeekday()) : isCompleted
+            let hasEverBeenCompleted = trackerRecords.contains { $0.trackerID == tracker.id }
+
+            if weekDays.contains(" ") {
+                return matchesName && (!hasEverBeenCompleted || isCompleted)
+            } else {
+                return matchesName && weekDays.contains(selectedWeekday)
+            }
         }
-        
+
         if searchText.isEmpty {
             updateVisibleTrackers(for: selectedDate)
-        } else {
-            let searchFilteredTrackers = dateFilteredTrackers.filter { tracker in
-                tracker.name?.lowercased().contains(searchText.lowercased()) ?? false
-            }
-            
-            filteredCategories = trackerCategoryStore.fetchAllTrackerCategories().compactMap { category in
-                let trackersInCategory = searchFilteredTrackers.filter { $0.category == category }
-                guard !trackersInCategory.isEmpty else { return nil }
-                
-                let filteredCategory = TrackerCategoryCoreData(context: context)
-                filteredCategory.title = category.title
-                filteredCategory.tracker = NSSet(array: trackersInCategory)
-                return filteredCategory
-            }
+            return
         }
-        reloadCategoryData()
+
+        let trackerIDs = filteredTrackers.compactMap { $0.id }
+        if trackerIDs.isEmpty {
+            trackerStore.fetchedResultsController.fetchRequest.predicate = nil
+        } else {
+            trackerStore.fetchedResultsController.fetchRequest.predicate = NSPredicate(format: "id IN %@", trackerIDs)
+        }
+
+        do {
+            try trackerStore.fetchedResultsController.performFetch()
+            categoriesCollectionView.reloadData()
+            print("🔎 Фильтрация по поиску выполнена через FRC")
+        } catch {
+            print("❌ Ошибка фильтрации трекеров по поиску: \(error)")
+        }
     }
 }
