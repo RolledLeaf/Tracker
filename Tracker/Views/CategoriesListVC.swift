@@ -200,11 +200,11 @@ final class CategoriesListViewController: UIViewController, UITableViewDataSourc
     
     private func createContextMenu(for indexPath: IndexPath) -> UIMenu {
         
-        let editAction = UIAction(title: "Редактировать", image: UIImage(systemName: "pencil")) { _ in
+        let editAction = UIAction(title: EditAction.edit.rawValue, image: UIImage(systemName: "pencil")) { _ in
             self.viewModel.editCategory(at: indexPath.row, newName: self.viewModel.categories[indexPath.row].title ?? "")
         }
         
-        let deleteAction = UIAction(title: "Удалить", image: UIImage(systemName: "trash"), attributes: .destructive) { _ in
+        let deleteAction = UIAction(title: EditAction.delete.rawValue, image: UIImage(systemName: "trash"), attributes: .destructive) { _ in
             self.viewModel.deleteCategory(at: indexPath.row)
             self.updateTableHeight()
         }

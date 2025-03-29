@@ -3,13 +3,13 @@ import UIKit
 
 final class OnboardingViewController: UIPageViewController, UIPageViewControllerDataSource, UIPageViewControllerDelegate  {
     
-    lazy var pages: [UIViewController] = {
+    private lazy var pages: [UIViewController] = {
         
         let firstPage = UIViewController()
         firstPage.view.backgroundColor = .systemBlue
         
         let imageView1: UIImageView = {
-            let imageView = UIImageView(image: UIImage(named: OnbordingImage.firstPage.rawValue))
+            let imageView = UIImageView(image: UIImage(named: OnboardingImage.firstPage.rawValue))
             imageView.contentMode = .scaleAspectFill
             imageView.translatesAutoresizingMaskIntoConstraints = false
             firstPage.view.addSubview(imageView)
@@ -45,7 +45,7 @@ final class OnboardingViewController: UIPageViewController, UIPageViewController
         secondPage.view.backgroundColor = .systemRed
         
         let imageView2: UIImageView = {
-            let imageView = UIImageView(image: UIImage(named: OnbordingImage.secondPage.rawValue))
+            let imageView = UIImageView(image: UIImage(named: OnboardingImage.secondPage.rawValue))
             imageView.contentMode = .scaleAspectFill
             imageView.translatesAutoresizingMaskIntoConstraints = false
             secondPage.view.addSubview(imageView)
@@ -79,7 +79,7 @@ final class OnboardingViewController: UIPageViewController, UIPageViewController
         return [firstPage, secondPage]
     }()
     
-    lazy var pageControl: UIPageControl = {
+    private lazy var pageControl: UIPageControl = {
         let pageControl = UIPageControl()
         pageControl.numberOfPages = pages.count
         pageControl.currentPage = 0
