@@ -62,7 +62,20 @@ final class TrackerStore: NSObject, NSFetchedResultsControllerDelegate {
     // MARK: - NSFetchedResultsControllerDelegate
     
    
-    
+    func editTracker(at indexPath: IndexPath, with newData: TrackerEditData) {
+        let tracker = fetchedResultsController.object(at: indexPath)
+        tracker.name = newData.name
+        tracker.emoji = newData.emoji
+        tracker.color = newData.color as NSString
+        tracker.daysCount = newData.daysCount
+
+        do {
+            try context.save()
+            print("✏️ Трекер отредактирован: \(tracker.name ?? "Без имени")")
+        } catch {
+            print("❌ Ошибка при редактировании трекера: \(error)")
+        }
+    }
     
     func deleteTracker(at indexPath: IndexPath) {
         let tracker = fetchedResultsController.object(at: indexPath)
@@ -134,4 +147,12 @@ extension TrackerStore: TrackerStoreProtocol {
     func getSectionTitle(for section: Int) -> String {
         return fetchedResultsController.sections?[section].name ?? "Без категории"
     }
+}
+
+
+struct TrackerEditData {
+    let name: String
+    let emoji: String
+    let color: String
+    let daysCount: Int16
 }
