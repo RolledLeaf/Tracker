@@ -2,7 +2,7 @@ import UIKit
 
 protocol ScheduleViewControllerDelegate: AnyObject {
     
-    func updateSubtitle (for title: String, with subtitle: String?)
+    func updateSchedule(for title: String, with subtitle: String?)
 }
 
 final class ScheduleViewController: UIViewController, UITableViewDelegate, UITableViewDataSource, ScheduleTableCellDelegate {
@@ -118,7 +118,7 @@ final class ScheduleViewController: UIViewController, UITableViewDelegate, UITab
         print("Завершено. Переданные дни недели: \(tempSelectedWeekDays)")
         selectedWeekDays = tempSelectedWeekDays
         let sortedWeekDaysString = getSortedSelectedWeekDays()
-        delegate?.updateSubtitle(for: "Расписание", with: sortedWeekDaysString)
+        delegate?.updateSchedule(for: "Расписание", with: sortedWeekDaysString)
         dismiss(animated: true, completion: nil)
     }
     
