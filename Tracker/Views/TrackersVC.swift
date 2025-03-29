@@ -333,15 +333,27 @@ final class TrackersViewController: UIViewController, UICollectionViewDataSource
                 
               }
            
-           let editAction = UIAction(title: EditAction.edit.rawValue, image: nil) { _ in
-               let editHabitVC = EditHabitViewController()
-               let tracker = self.trackerStore.fetchedResultsController.object(at: indexPath)
-               editHabitVC.trackerToEdit = tracker
-
-               let navigationController = UINavigationController(rootViewController: editHabitVC)
-               navigationController.modalPresentationStyle = .automatic
-               self.present(navigationController, animated: true)
-           }
+        let editAction = UIAction(title: EditAction.edit.rawValue, image: nil) { _ in
+            let editHabitVC = EditHabitViewController()
+            let editIrregularVC = EditIrregularEventViewController()
+            
+            let tracker = self.trackerStore.fetchedResultsController.object(at: indexPath)
+            
+            if let weekDays = tracker.weekDays as? [String], weekDays == [" "] {
+                editIrregularVC.trackerToEdit = tracker
+                
+                let navigationController = UINavigationController(rootViewController: editIrregularVC)
+                navigationController.modalPresentationStyle = .automatic
+                self.present(navigationController, animated: true)
+            } else {
+                
+                editHabitVC.trackerToEdit = tracker
+                
+                let navigationController = UINavigationController(rootViewController: editHabitVC)
+                navigationController.modalPresentationStyle = .automatic
+                self.present(navigationController, animated: true)
+            }
+        }
            
            let deleteAction = UIAction(title: EditAction.delete.rawValue, image: nil) { _ in
                self.viewModel.deleteTracker(at: indexPath)
