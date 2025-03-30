@@ -222,6 +222,9 @@ final class CategoriesListViewController: UIViewController, UITableViewDataSourc
         }
         
         let category = viewModel.categories[indexPath.row]
+        if category.title == "Закреплённые" {
+            cell.setHidden(true)
+        }
         cell.configure(with: category.title ?? "Без названия")
         return cell
     }

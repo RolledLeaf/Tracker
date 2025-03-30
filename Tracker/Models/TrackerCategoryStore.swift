@@ -4,24 +4,16 @@ final class TrackerCategoryStore: NSObject, NSFetchedResultsControllerDelegate {
     
     private let context: NSManagedObjectContext
     
-    lazy var fetchedResultsController: NSFetchedResultsController<TrackerCategoryCoreData> = {
-        let fetchRequest = NSFetchRequest<TrackerCategoryCoreData>(entityName: "TrackerCategoryCoreData")
-        fetchRequest.sortDescriptors = [NSSortDescriptor(key: "title", ascending: true)]
-        
-        let fetchedResultsController = NSFetchedResultsController(
-            fetchRequest: fetchRequest,
-            managedObjectContext: context,
-            sectionNameKeyPath: "title",
-            cacheName: nil
-        )
-        
-        fetchedResultsController.delegate = self
-        try? fetchedResultsController.performFetch()
-        return fetchedResultsController
-    }()
+   
     
     init(context: NSManagedObjectContext = CoreDataStack.shared.context) {
         self.context = context
+    }
+    
+    func nextAvailableSortOrder() -> Int16 {
+        let categories = fetchAllTrackerCategories()
+        let maxOrder = categories.map { $0.sortOrder }.max() ?? 0
+        return maxOrder + 1
     }
     
     func fetchAllTrackerCategories() -> [TrackerCategoryCoreData] {
@@ -56,10 +48,7 @@ final class TrackerCategoryStore: NSObject, NSFetchedResultsControllerDelegate {
         }
     }
     
-    func getCategory(at indexPath: IndexPath) -> TrackerCategoryCoreData? {
-        let category = fetchedResultsController.object(at: indexPath)
-        return category
-    }
+   
     
     func deleteTrackerCategory(_ category: TrackerCategoryCoreData) {
         context.delete(category)

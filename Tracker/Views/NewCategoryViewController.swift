@@ -2,6 +2,8 @@ import UIKit
 
 final class NewCategoryViewController: UIViewController {
     
+    private let trackerCategoryStore = TrackerCategoryStore()
+    
     private lazy var titleLabel: UILabel = {
         let label = UILabel()
         label.textColor = UIColor.custom(.textColor)
@@ -86,10 +88,13 @@ final class NewCategoryViewController: UIViewController {
         }
     }
     
+    
+    
     private func saveCategoryToCoreData(_ categoryName: String) {
         let context = CoreDataStack.shared.context
         let newCategory = TrackerCategoryCoreData(context: context)
         newCategory.title = categoryName
+        newCategory.sortOrder = trackerCategoryStore.nextAvailableSortOrder()
         
         do {
             try context.save()
