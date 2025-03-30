@@ -223,20 +223,20 @@ final class TrackersViewController: UIViewController, UICollectionViewDataSource
     
     private func updateVisibleTrackers(for selectedDate: Date) {
         print("📌 Вызван метод updateVisibleTrackers для даты \(selectedDate)")
-        
+
         let formatter = DateFormatter()
         formatter.locale = locale
         formatter.dateFormat = "EEE"
         let selectedWeekday = formatter.string(from: selectedDate)
-        
+
         let allTrackers = trackerStore.fetchAllTrackers()
-        
+
         let filteredTrackers = allTrackers.filter { tracker in
             guard let weekDays = tracker.weekDays as? [String] else { return false }
-            
+ 
             let isCompleted = trackerRecords.contains { $0.trackerID == tracker.id && $0.date?.isSameDay(as: selectedDate) == true }
             let hasEverBeenCompleted = trackerRecords.contains { $0.trackerID == tracker.id }
-            
+ 
             if weekDays.contains(" ") {
                 return !hasEverBeenCompleted || isCompleted
             } else {
@@ -244,9 +244,14 @@ final class TrackersViewController: UIViewController, UICollectionViewDataSource
             }
         }
         
-        let trackerIDs = filteredTrackers.compactMap { $0.id }
-        trackerStore.fetchedResultsController.fetchRequest.predicate = NSPredicate(format: "id IN %@", trackerIDs)
+        let sortedTrackers = filteredTrackers.sorted {
+            ($0.category?.sortOrder ?? 0) < ($1.category?.sortOrder ?? 0)
+        }
         
+        
+        let trackerIDs = sortedTrackers.compactMap { $0.id }
+        trackerStore.fetchedResultsController.fetchRequest.predicate = NSPredicate(format: "id IN %@", trackerIDs)
+
         do {
             try trackerStore.fetchedResultsController.performFetch()
             categoriesCollectionView.reloadData()
@@ -294,7 +299,7 @@ final class TrackersViewController: UIViewController, UICollectionViewDataSource
     }
     
     @objc private func datePickerValueChanged(_ sender: UIDatePicker) {
-        updateVisibleTrackers(for: sender.date)
+      updateVisibleTrackers(for: sender.date)
     }
     
     @objc private func addTrackerButtonTapped() {
@@ -328,10 +333,32 @@ final class TrackersViewController: UIViewController, UICollectionViewDataSource
 
     private func createContextMenu(for indexPath: IndexPath) -> UIMenu {
 
-        let pinTitle = ifTrackerPinned ? "Открепить" : "Закрепить"
-               let pinAction = UIAction(title: pinTitle, image: nil) { _ in
-                
-              }
+        let tracker = self.trackerStore.fetchedResultsController.object(at: indexPath)
+        let isPinned = tracker.category?.title == "Закреплённые"
+        let pinTitle = isPinned ? "Открепить" : "Закрепить"
+        let pinAction = UIAction(title: pinTitle, image: nil) { _ in
+            if isPinned {
+                if let originalTitle = tracker.originalCategoryTitle {
+                    let allCategories = self.trackerCategoryStore.fetchCategories()
+                    if let originalCategory = allCategories.first(where: { $0.title == originalTitle }) {
+                        tracker.category = originalCategory
+                        tracker.originalCategoryTitle = nil
+                    }
+                }
+            } else {
+                tracker.originalCategoryTitle = tracker.category?.title
+                if let pinnedCategory = self.trackerCategoryStore.getOrCreatePinnedCategory() {
+                    tracker.category = pinnedCategory
+                }
+            }
+
+            do {
+                try CoreDataStack.shared.context.save()
+                self.updateVisibleTrackers(for: self.selectedDate)
+            } catch {
+                print("❌ Ошибка при закреплении/откреплении трекера: \(error)")
+            }
+        }
            
         let editAction = UIAction(title: EditAction.edit.rawValue, image: nil) { _ in
             let editHabitVC = EditHabitViewController()
@@ -390,7 +417,7 @@ extension TrackersViewController: TrackerCategoryCellDelegate {
         
         do {
             try context.save()
-            updateVisibleTrackers(for: selectedDate)
+          updateVisibleTrackers(for: selectedDate)
         } catch {
             print("❌ Ошибка при обновлении записи выполнения: \(error)")
         }
@@ -402,25 +429,6 @@ extension TrackersViewController: TrackerCategoryCellDelegate {
 }
 
 extension TrackersViewController {
-    private func getTrackers(for indexPath: IndexPath) -> [TrackerCoreData] {
-        guard let category = trackerCategoryStore.getCategory(at: indexPath) else {
-            print("❌ Категория не найдена для секции \(indexPath.section)")
-            return []
-        }
-        
-        let fetchRequest: NSFetchRequest<TrackerCoreData> = TrackerCoreData.fetchRequest()
-        fetchRequest.predicate = NSPredicate(format: "category == %@", category)
-        
-        do {
-            let trackers = try context.fetch(fetchRequest)
-            print("📌 Загружены трекеры для категории '\(category.title ?? "Без названия")': \(trackers.map { $0.name })")
-            return trackers
-        } catch {
-            print("❌ Ошибка загрузки трекеров: \(error)")
-            return []
-        }
-    }
-    
     
     func didChangeContent() {
         reloadCategoryData()
@@ -449,17 +457,40 @@ extension TrackersViewController {
         cell.viewController = self
         cell.backgroundColor = .clear
         cell.configure(with: tracker, trackerRecords: trackerRecordsForTracker)
+        
 
         return cell
     }
     
   
-    func collectionView(_ collectionView: UICollectionView, contextMenuConfigurationForItemAt indexPath: IndexPath, point: CGPoint) -> UIContextMenuConfiguration? {
-        return UIContextMenuConfiguration(identifier: nil, previewProvider: nil) { _ in
-            return self.createContextMenu(for: indexPath)
-        }
-    }
+
     
+    func collectionView(_ collectionView: UICollectionView, contextMenuConfigurationForItemAt indexPath: IndexPath, point: CGPoint) -> UIContextMenuConfiguration? {
+        return UIContextMenuConfiguration(identifier: nil, previewProvider: {
+            guard let cell = collectionView.cellForItem(at: indexPath) as? TrackerCell else {
+                return nil
+            }
+
+            // Возвращаем UIViewController с backgroundContainer как view
+            let previewController = UIViewController()
+            let snapshot = cell.snapshotView(of: cell.backgroundContainer)
+            previewController.view = UIView(frame: snapshot.bounds)
+            previewController.view.addSubview(snapshot)
+            snapshot.translatesAutoresizingMaskIntoConstraints = false
+            NSLayoutConstraint.activate([
+                snapshot.topAnchor.constraint(equalTo: previewController.view.topAnchor),
+                snapshot.bottomAnchor.constraint(equalTo: previewController.view.bottomAnchor),
+                snapshot.leadingAnchor.constraint(equalTo: previewController.view.leadingAnchor),
+                snapshot.trailingAnchor.constraint(equalTo: previewController.view.trailingAnchor)
+            ])
+            previewController.preferredContentSize = snapshot.bounds.size
+            previewController.view.layer.cornerRadius = 16
+            previewController.view.clipsToBounds = true
+            return previewController
+        }, actionProvider: { _ in
+            return self.createContextMenu(for: indexPath)
+        })
+    }
 
     
     func collectionView(_ collectionView: UICollectionView, layout collectionViewLayout: UICollectionViewLayout, insetForSectionAt section: Int) -> UIEdgeInsets {
@@ -469,6 +500,8 @@ extension TrackersViewController {
             return UIEdgeInsets(top: 16, left: 0, bottom: 0, right: 0)
         }
     }
+    
+    
     
     func collectionView(_ collectionView: UICollectionView, viewForSupplementaryElementOfKind kind: String, at indexPath: IndexPath) -> UICollectionReusableView {
         guard kind == UICollectionView.elementKindSectionHeader,
@@ -511,28 +544,16 @@ extension Date {
 
 extension TrackersViewController: TrackerStoreDelegate {
     func didUpdate(_ update: TrackerStoreUpdate) {
-        updateUI()
-        print("📌 Вызван метод didUpdate — обновляем данные")
-        do {
-            try trackerCategoryStore.fetchedResultsController.performFetch()
-            reloadCategoryData()
-        } catch {
-            print("❌ Ошибка обновления данных: \(error)")
-        }
+        updateVisibleTrackers(for: selectedDate)
+       
     }
 }
 
 extension TrackersViewController: NewTrackerDelegate {
     func didCreateTracker(_ tracker: TrackerCoreData, _ category: TrackerCategoryCoreData) {
-        do {
-            try trackerCategoryStore.fetchedResultsController.performFetch()
-            updateVisibleTrackers(for: datePicker.date)
-            updateUI()
-            print("📌 Трекер создан, обновляем коллекцию")
-            reloadCategoryData()
-        } catch {
-            print("❌ Ошибка обновления FRC: \(error)")
-        }
+       
+        updateVisibleTrackers(for: selectedDate)
+        print("Tracker \(tracker.name ?? "unnamed") created with categorySortOrder \(category.sortOrder)")
     }
 }
 
@@ -569,7 +590,7 @@ extension TrackersViewController: UISearchBarDelegate {
         }
 
         if searchText.isEmpty {
-            updateVisibleTrackers(for: selectedDate)
+           updateVisibleTrackers(for: selectedDate)
             return
         }
 
@@ -587,5 +608,17 @@ extension TrackersViewController: UISearchBarDelegate {
         } catch {
             print("❌ Ошибка фильтрации трекеров по поиску: \(error)")
         }
+    }
+}
+
+extension UIView {
+    func snapshotView(of subview: UIView) -> UIView {
+        let renderer = UIGraphicsImageRenderer(bounds: subview.bounds)
+        let image = renderer.image { ctx in
+            subview.drawHierarchy(in: subview.bounds, afterScreenUpdates: true)
+        }
+        let imageView = UIImageView(image: image)
+        imageView.frame = subview.bounds
+        return imageView
     }
 }

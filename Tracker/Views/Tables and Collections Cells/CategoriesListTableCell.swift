@@ -67,4 +67,10 @@ final class CategoriesListTableCell: UITableViewCell {
     func configure(with title: String){
         categoryNameLabel.text = title
     }
+    
+    func setHidden(_ hidden: Bool) {
+        self.isHidden = hidden
+        self.isUserInteractionEnabled = false
+        self.contentView.isHidden = hidden
+    }
 }

@@ -21,5 +21,4 @@ final class TrackersViewModel {
         trackerStore.deleteTracker(at: indexPath)
        
     }
-    
 }

@@ -66,7 +66,7 @@ final class TrackerCell: UICollectionViewCell {
         return view
     }()
     
-    private lazy var backgroundContainer: UIView = {
+     lazy var backgroundContainer: UIView = {
         let view = UIView()
         view.layer.cornerRadius = 16
         view.layer.masksToBounds = true
@@ -74,9 +74,24 @@ final class TrackerCell: UICollectionViewCell {
         return view
     }()
     
+    private lazy var pinImageView: UIImageView = {
+        let imageView = UIImageView(image: UIImage(systemName: "pin.fill"))
+        imageView.tintColor = .white
+        imageView.translatesAutoresizingMaskIntoConstraints = false
+        imageView.isHidden = true
+        return imageView
+    }()
+    
     override init(frame: CGRect) {
         super.init(frame: frame)
         setupUI()
+        contentView.addSubview(pinImageView)
+        NSLayoutConstraint.activate([
+            pinImageView.topAnchor.constraint(equalTo: contentView.topAnchor, constant: 12),
+            pinImageView.trailingAnchor.constraint(equalTo: contentView.trailingAnchor, constant: -12),
+            pinImageView.widthAnchor.constraint(equalToConstant: 8),
+            pinImageView.heightAnchor.constraint(equalToConstant: 12)
+        ])
     }
     
     required init?(coder: NSCoder) {
@@ -156,6 +171,8 @@ final class TrackerCell: UICollectionViewCell {
         backgroundContainer.backgroundColor = trackerColor
         doneButtonContainer.backgroundColor = trackerColor
         emojiContainer.backgroundColor = lightenColor(trackerColor, by: 0.3)
+        
+        pinImageView.isHidden = tracker.category?.title != "Закреплённые"
         
         let currentDate = Date()
         let isCompleted = trackerRecords.contains { $0.trackerID == tracker.id && Calendar.current.isDate($0.date ?? currentDate, inSameDayAs: viewController?.selectedDate ?? currentDate) }
