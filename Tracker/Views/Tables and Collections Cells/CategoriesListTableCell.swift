@@ -70,7 +70,7 @@ final class CategoriesListTableCell: UITableViewCell {
     
     func setHidden(_ hidden: Bool) {
         self.isHidden = hidden
-        self.isUserInteractionEnabled = !hidden
+        self.isUserInteractionEnabled = false
         self.contentView.isHidden = hidden
     }
 }

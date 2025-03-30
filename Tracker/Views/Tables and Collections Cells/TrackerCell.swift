@@ -66,7 +66,7 @@ final class TrackerCell: UICollectionViewCell {
         return view
     }()
     
-    private lazy var backgroundContainer: UIView = {
+     lazy var backgroundContainer: UIView = {
         let view = UIView()
         view.layer.cornerRadius = 16
         view.layer.masksToBounds = true

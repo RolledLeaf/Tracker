@@ -463,12 +463,34 @@ extension TrackersViewController {
     }
     
   
-    func collectionView(_ collectionView: UICollectionView, contextMenuConfigurationForItemAt indexPath: IndexPath, point: CGPoint) -> UIContextMenuConfiguration? {
-        return UIContextMenuConfiguration(identifier: nil, previewProvider: nil) { _ in
-            return self.createContextMenu(for: indexPath)
-        }
-    }
+
     
+    func collectionView(_ collectionView: UICollectionView, contextMenuConfigurationForItemAt indexPath: IndexPath, point: CGPoint) -> UIContextMenuConfiguration? {
+        return UIContextMenuConfiguration(identifier: nil, previewProvider: {
+            guard let cell = collectionView.cellForItem(at: indexPath) as? TrackerCell else {
+                return nil
+            }
+
+            // Возвращаем UIViewController с backgroundContainer как view
+            let previewController = UIViewController()
+            let snapshot = cell.snapshotView(of: cell.backgroundContainer)
+            previewController.view = UIView(frame: snapshot.bounds)
+            previewController.view.addSubview(snapshot)
+            snapshot.translatesAutoresizingMaskIntoConstraints = false
+            NSLayoutConstraint.activate([
+                snapshot.topAnchor.constraint(equalTo: previewController.view.topAnchor),
+                snapshot.bottomAnchor.constraint(equalTo: previewController.view.bottomAnchor),
+                snapshot.leadingAnchor.constraint(equalTo: previewController.view.leadingAnchor),
+                snapshot.trailingAnchor.constraint(equalTo: previewController.view.trailingAnchor)
+            ])
+            previewController.preferredContentSize = snapshot.bounds.size
+            previewController.view.layer.cornerRadius = 16
+            previewController.view.clipsToBounds = true
+            return previewController
+        }, actionProvider: { _ in
+            return self.createContextMenu(for: indexPath)
+        })
+    }
 
     
     func collectionView(_ collectionView: UICollectionView, layout collectionViewLayout: UICollectionViewLayout, insetForSectionAt section: Int) -> UIEdgeInsets {
@@ -478,6 +500,8 @@ extension TrackersViewController {
             return UIEdgeInsets(top: 16, left: 0, bottom: 0, right: 0)
         }
     }
+    
+    
     
     func collectionView(_ collectionView: UICollectionView, viewForSupplementaryElementOfKind kind: String, at indexPath: IndexPath) -> UICollectionReusableView {
         guard kind == UICollectionView.elementKindSectionHeader,
@@ -584,5 +608,17 @@ extension TrackersViewController: UISearchBarDelegate {
         } catch {
             print("❌ Ошибка фильтрации трекеров по поиску: \(error)")
         }
+    }
+}
+
+extension UIView {
+    func snapshotView(of subview: UIView) -> UIView {
+        let renderer = UIGraphicsImageRenderer(bounds: subview.bounds)
+        let image = renderer.image { ctx in
+            subview.drawHierarchy(in: subview.bounds, afterScreenUpdates: true)
+        }
+        let imageView = UIImageView(image: image)
+        imageView.frame = subview.bounds
+        return imageView
     }
 }
