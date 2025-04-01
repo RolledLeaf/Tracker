@@ -106,7 +106,17 @@ final class TrackersViewController: UIViewController, UICollectionViewDataSource
         return button
     }()
     
-    
+    private lazy var filterButton: UIButton = {
+        let button = UIButton(type: .system)
+        button.tintColor = UIColor.custom(.textColor)
+        button.layer.cornerRadius = 16
+        button.setTitle("Фильтры", for: .normal)
+        button.titleLabel?.font = UIFont.systemFont(ofSize: 17, weight: .regular)
+        button.setTitleColor(.white, for: .normal)
+        button.backgroundColor = UIColor.custom(.toggleSwitchBlue)
+        button.addTarget(self, action: #selector(filterButtonTapped), for: .touchUpInside)
+        return button
+    }()
     
     override func viewDidLoad() {
         super.viewDidLoad()
@@ -126,7 +136,7 @@ final class TrackersViewController: UIViewController, UICollectionViewDataSource
         datePicker.maximumDate = Date()
         updateUI()
         view.backgroundColor = UIColor(named: CustomColor.mainBackgroundColor.rawValue)
-        let uiElements = [addTrackerButton, categoriesCollectionView, trackersLabel, searchBar, emptyFieldStarImage, emptyFieldLabel, dateButton, datePicker]
+        let uiElements = [addTrackerButton, categoriesCollectionView, trackersLabel, searchBar, emptyFieldStarImage, emptyFieldLabel, dateButton, datePicker, filterButton]
         uiElements.forEach {$0.translatesAutoresizingMaskIntoConstraints = false
             view.addSubview($0)
         }
@@ -143,7 +153,7 @@ final class TrackersViewController: UIViewController, UICollectionViewDataSource
             dateButton.heightAnchor.constraint(equalToConstant: 34),
             dateButton.widthAnchor.constraint(equalToConstant: 77),
             dateButton.trailingAnchor.constraint(equalTo: view.safeAreaLayoutGuide.trailingAnchor, constant: -16),
-            dateButton.topAnchor.constraint(equalTo: view.safeAreaLayoutGuide.topAnchor, constant: 5),
+            dateButton.topAnchor.constraint(equalTo: view.safeAreaLayoutGuide.topAnchor, constant: -10),
 
             datePicker.centerXAnchor.constraint(equalTo: dateButton.centerXAnchor),
             datePicker.centerYAnchor.constraint(equalTo: dateButton.centerYAnchor),
@@ -151,7 +161,7 @@ final class TrackersViewController: UIViewController, UICollectionViewDataSource
             addTrackerButton.heightAnchor.constraint(equalToConstant: 19),
             addTrackerButton.widthAnchor.constraint(equalToConstant: 18),
             addTrackerButton.leadingAnchor.constraint(equalTo: view.safeAreaLayoutGuide.leadingAnchor, constant: 18),
-            addTrackerButton.bottomAnchor.constraint(equalTo: trackersLabel.safeAreaLayoutGuide.topAnchor, constant: -13),
+            addTrackerButton.bottomAnchor.constraint(equalTo: trackersLabel.safeAreaLayoutGuide.topAnchor, constant: -10),
             
             categoriesCollectionView.leadingAnchor.constraint(equalTo: view.safeAreaLayoutGuide.leadingAnchor, constant: 16),
             categoriesCollectionView.trailingAnchor.constraint(equalTo: view.safeAreaLayoutGuide.trailingAnchor, constant: -16),
@@ -160,7 +170,7 @@ final class TrackersViewController: UIViewController, UICollectionViewDataSource
             
             
             trackersLabel.leadingAnchor.constraint(equalTo: view.safeAreaLayoutGuide.leadingAnchor, constant: 16),
-            trackersLabel.topAnchor.constraint(equalTo: view.topAnchor, constant: 88),
+            trackersLabel.topAnchor.constraint(equalTo: view.safeAreaLayoutGuide.topAnchor, constant: 20),
             
             searchBar.trailingAnchor.constraint(equalTo:view.safeAreaLayoutGuide.trailingAnchor, constant: -10),
             searchBar.heightAnchor.constraint(equalToConstant: 36),
@@ -173,8 +183,12 @@ final class TrackersViewController: UIViewController, UICollectionViewDataSource
             emptyFieldStarImage.topAnchor.constraint(equalTo: view.topAnchor, constant: 402),
             emptyFieldStarImage.centerXAnchor.constraint(equalTo: view.centerXAnchor),
             emptyFieldStarImage.widthAnchor.constraint(equalToConstant: 80),
-            emptyFieldStarImage.heightAnchor.constraint(equalToConstant: 80)
+            emptyFieldStarImage.heightAnchor.constraint(equalToConstant: 80),
             
+            filterButton.bottomAnchor.constraint(equalTo: view.bottomAnchor, constant: -100),
+            filterButton.leadingAnchor.constraint(equalTo: view.safeAreaLayoutGuide.leadingAnchor, constant: 130),
+            filterButton.trailingAnchor.constraint(equalTo: view.safeAreaLayoutGuide.trailingAnchor, constant: -130),
+            filterButton.heightAnchor.constraint(equalToConstant: 50),
         ])
         
         categoriesCollectionView.dataSource = self
@@ -309,6 +323,13 @@ final class TrackersViewController: UIViewController, UICollectionViewDataSource
         let navigationController = UINavigationController(rootViewController: createHabitVC)
         navigationController.modalPresentationStyle = .automatic
         present(navigationController, animated: true)
+    }
+    
+    @objc private func filterButtonTapped() {
+        view.endEditing(true)
+        let filterVC = FiltersViewController()
+        filterVC.modalPresentationStyle = .automatic
+        present(filterVC, animated: true)
     }
     
     private func configureLabel(_ label: UILabel, text: String, fontSize: CGFloat, weight: UIFont.Weight, color: CustomColor) {
@@ -461,9 +482,6 @@ extension TrackersViewController {
 
         return cell
     }
-    
-  
-
     
     func collectionView(_ collectionView: UICollectionView, contextMenuConfigurationForItemAt indexPath: IndexPath, point: CGPoint) -> UIContextMenuConfiguration? {
         return UIContextMenuConfiguration(identifier: nil, previewProvider: {

@@ -25,7 +25,7 @@ final class SceneDelegate: UIResponder, UIWindowSceneDelegate {
         let hasSeenOnboarding = UserDefaults.standard.bool(forKey: UserDefaultsKeys.hasSeenOnboarding)
         
         if hasSeenOnboarding {
-            window?.rootViewController = TrackersViewController()
+            window?.rootViewController = TabBarController()
             } else {
                 window?.rootViewController = OnboardingViewController(transitionStyle: .scroll, navigationOrientation: .horizontal, options: nil)
             }
