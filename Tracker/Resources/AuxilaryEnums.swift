@@ -1,4 +1,3 @@
-
 enum OnboardingImage: String {
     case firstPage = "firstPage"
     case secondPage = "secondPage"
@@ -13,4 +12,11 @@ enum EditAction: String {
     case unpin = "Открепить"
     case edit = "Редактировать"
     case delete = "Удалить"
+}
+
+enum TrackerFilterType {
+    case all
+    case today
+    case completed
+    case uncompleted
 }

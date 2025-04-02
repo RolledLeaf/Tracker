@@ -125,11 +125,20 @@ final class TrackersViewController: UIViewController, UICollectionViewDataSource
         loadTrackerRecords()
         reloadCategoryData()
         updateUI()
+        
         updateVisibleTrackers(for: datePicker.date)
         viewModel.onTrackersUpdate = { [weak self] trackers in
             self?.categoriesCollectionView.reloadData()
         }
-        print("✅ safeAreaInsets.top = \(view.safeAreaInsets.top)")
+        viewModel.onFilterChanged = { [weak self] filter in
+            guard let self = self else { return }
+            if filter == .today {
+                self.selectedDate = Date()
+                self.datePicker.setDate(self.selectedDate, animated: true)
+                self.dateButton.setTitle(self.currentDateFormatted(), for: .normal)
+            }
+            self.updateVisibleTrackers(for: self.selectedDate)
+        }
     }
     
     private func setupInitialUI() {
@@ -236,8 +245,6 @@ final class TrackersViewController: UIViewController, UICollectionViewDataSource
     }
     
     private func updateVisibleTrackers(for selectedDate: Date) {
-        print("📌 Вызван метод updateVisibleTrackers для даты \(selectedDate)")
-
         let formatter = DateFormatter()
         formatter.locale = locale
         formatter.dateFormat = "EEE"
@@ -245,24 +252,49 @@ final class TrackersViewController: UIViewController, UICollectionViewDataSource
 
         let allTrackers = trackerStore.fetchAllTrackers()
 
-        let filteredTrackers = allTrackers.filter { tracker in
-            guard let weekDays = tracker.weekDays as? [String] else { return false }
- 
-            let isCompleted = trackerRecords.contains { $0.trackerID == tracker.id && $0.date?.isSameDay(as: selectedDate) == true }
-            let hasEverBeenCompleted = trackerRecords.contains { $0.trackerID == tracker.id }
- 
-            if weekDays.contains(" ") {
-                return !hasEverBeenCompleted || isCompleted
-            } else {
-                return weekDays.contains(selectedWeekday)
+        let filteredTrackers: [TrackerCoreData]
+
+        switch viewModel.selectedFilter {
+        case .all:
+            filteredTrackers = allTrackers.filter { tracker in
+                guard let weekDays = tracker.weekDays as? [String] else { return false }
+                let isCompleted = trackerRecords.contains { $0.trackerID == tracker.id && $0.date?.isSameDay(as: selectedDate) == true }
+                let hasEverBeenCompleted = trackerRecords.contains { $0.trackerID == tracker.id }
+                return weekDays.contains(" ") ? !hasEverBeenCompleted || isCompleted : weekDays.contains(selectedWeekday)
+            }
+            
+        case .today:
+            filteredTrackers = allTrackers.filter { tracker in
+                guard let weekDays = tracker.weekDays as? [String] else { return false }
+                let isCompleted = trackerRecords.contains { $0.trackerID == tracker.id && $0.date?.isSameDay(as: selectedDate) == true }
+                let hasEverBeenCompleted = trackerRecords.contains { $0.trackerID == tracker.id }
+                return weekDays.contains(" ") ? !hasEverBeenCompleted || isCompleted : weekDays.contains(selectedWeekday)
+            }
+            
+        case .completed:
+            filteredTrackers = allTrackers.filter { tracker in
+                trackerRecords.contains { $0.trackerID == tracker.id && $0.date?.isSameDay(as: selectedDate) == true }
+            }
+
+        case .uncompleted:
+            filteredTrackers = allTrackers.filter { tracker in
+                guard let weekDays = tracker.weekDays as? [String] else { return false }
+                let isCompleted = trackerRecords.contains { $0.trackerID == tracker.id && $0.date?.isSameDay(as: selectedDate) == true }
+                let hasEverBeenCompleted = trackerRecords.contains { $0.trackerID == tracker.id }
+
+                if weekDays.contains(" ") {
+                    return !hasEverBeenCompleted
+                } else {
+                    return !isCompleted
+                }
             }
         }
-        
+
+        // Далее сортировка и обновление FRC
         let sortedTrackers = filteredTrackers.sorted {
             ($0.category?.sortOrder ?? 0) < ($1.category?.sortOrder ?? 0)
         }
-        
-        
+
         let trackerIDs = sortedTrackers.compactMap { $0.id }
         trackerStore.fetchedResultsController.fetchRequest.predicate = NSPredicate(format: "id IN %@", trackerIDs)
 
@@ -328,7 +360,9 @@ final class TrackersViewController: UIViewController, UICollectionViewDataSource
     @objc private func filterButtonTapped() {
         view.endEditing(true)
         let filterVC = FiltersViewController()
-        filterVC.modalPresentationStyle = .automatic
+        filterVC.onFilterSelected = { [weak self] filter in
+            self?.viewModel.selectedFilter = filter
+        }
         present(filterVC, animated: true)
     }
     
@@ -346,6 +380,7 @@ final class TrackersViewController: UIViewController, UICollectionViewDataSource
         emptyFieldLabel.isHidden = hasVisibleTrackers
         emptyFieldStarImage.isHidden = hasVisibleTrackers
         categoriesCollectionView.isHidden = !hasVisibleTrackers
+        filterButton.isHidden = !hasVisibleTrackers
     }
     
     func getSelectedDate() -> Date {
@@ -447,14 +482,16 @@ extension TrackersViewController: TrackerCategoryCellDelegate {
     func getTrackerByID(_ trackerID: UUID) -> TrackerCoreData? {
         return trackerStore.fetchAllTrackers().first(where: { $0.id == trackerID })
     }
+    
+    // MARK: - Trackers Filtering Methods
+       
+        
+    
 }
 
 extension TrackersViewController {
     
-    func didChangeContent() {
-        reloadCategoryData()
-    }
-    
+
     func numberOfSections(in collectionView: UICollectionView) -> Int {
         return trackerStore.numberOfSections
     }

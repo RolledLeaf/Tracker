@@ -19,14 +19,11 @@ final class FiltersViewController: UIViewController, UITableViewDelegate, UITabl
         return tableView
     }()
     
-    
+    var onFilterSelected: ((TrackerFilterType) -> Void)?
     private var filterTitles: [String] = ["Все трекеры", "Трекеры на сегодня", "Завершённые", "Не завершённые"]
-    
-    
     
     override func viewDidLoad() {
         super.viewDidLoad()
-        
         setupUI()
     }
     
@@ -70,6 +67,25 @@ extension FiltersViewController {
         cell.configure(with: filterTitles[indexPath.row])
         cell.customSeparator.isHidden = indexPath.row == filterTitles.count - 1
         return cell
+    }
+    
+    func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
+        let selectedFilter: TrackerFilterType
+        
+        switch indexPath.row {
+        case 0:
+            selectedFilter = .all
+        case 1:
+            selectedFilter = .today
+        case 2:
+            selectedFilter = .completed
+        case 3:
+            selectedFilter = .uncompleted
+        default:
+            selectedFilter = .all
+        }
+        onFilterSelected?(selectedFilter)
+        dismiss(animated: true)
     }
     
     func tableView(_ tableView: UITableView, willDisplay cell: UITableViewCell, forRowAt indexPath: IndexPath) {
