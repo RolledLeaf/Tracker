@@ -9,6 +9,9 @@ final class TrackersViewController: UIViewController, UICollectionViewDataSource
     private var currentSelectedTracker: TrackerCoreData?
     private var currentDate: Date = Date()
     private var selectedIndexPath: IndexPath?
+    private var isFilterButtonMinimized = false
+    private var filterButtonLeadingConstraint: NSLayoutConstraint!
+    private var filterButtonTrailingConstraint: NSLayoutConstraint!
     
     
     private let addTrackerButton = UIButton()
@@ -158,6 +161,17 @@ final class TrackersViewController: UIViewController, UICollectionViewDataSource
         emptyFieldStarImage.image = UIImage(named: "dizzyStar")
         datePicker.addTarget(self, action: #selector(datePickerValueChanged), for: .valueChanged)
         
+        let swipeRight = UISwipeGestureRecognizer(target: self, action: #selector(handleSwipeRight(_:)))
+        swipeRight.direction = .right
+        view.addGestureRecognizer(swipeRight)
+        
+        filterButtonTrailingConstraint = filterButton.trailingAnchor.constraint(equalTo: view.safeAreaLayoutGuide.trailingAnchor, constant: -130)
+       
+        filterButtonLeadingConstraint = filterButton.leadingAnchor.constraint(equalTo: view.safeAreaLayoutGuide.leadingAnchor, constant: 130)
+      
+        
+      
+        
         NSLayoutConstraint.activate([
             dateButton.heightAnchor.constraint(equalToConstant: 34),
             dateButton.widthAnchor.constraint(equalToConstant: 77),
@@ -195,10 +209,16 @@ final class TrackersViewController: UIViewController, UICollectionViewDataSource
             emptyFieldStarImage.heightAnchor.constraint(equalToConstant: 80),
             
             filterButton.bottomAnchor.constraint(equalTo: view.bottomAnchor, constant: -100),
-            filterButton.leadingAnchor.constraint(equalTo: view.safeAreaLayoutGuide.leadingAnchor, constant: 130),
-            filterButton.trailingAnchor.constraint(equalTo: view.safeAreaLayoutGuide.trailingAnchor, constant: -130),
+            
             filterButton.heightAnchor.constraint(equalToConstant: 50),
         ])
+        filterButtonLeadingConstraint = filterButton.leadingAnchor.constraint(equalTo: view.safeAreaLayoutGuide.leadingAnchor, constant: 130)
+        filterButtonLeadingConstraint.isActive = true
+        
+        filterButtonTrailingConstraint =
+        filterButton.trailingAnchor.constraint(equalTo: view.safeAreaLayoutGuide.trailingAnchor, constant: -130)
+        filterButtonTrailingConstraint.isActive = true
+        
         
         categoriesCollectionView.dataSource = self
         categoriesCollectionView.register(CategoriesCollectionHeaderView.self, forSupplementaryViewOfKind: UICollectionView.elementKindSectionHeader, withReuseIdentifier: CategoriesCollectionHeaderView.identifier)
@@ -358,13 +378,52 @@ final class TrackersViewController: UIViewController, UICollectionViewDataSource
     }
     
     @objc private func filterButtonTapped() {
-        view.endEditing(true)
-        let filterVC = FiltersViewController()
-        filterVC.onFilterSelected = { [weak self] filter in
-            self?.viewModel.selectedFilter = filter
+        
+        if isFilterButtonMinimized == true  {
+            guard isFilterButtonMinimized else { return }
+            
+            isFilterButtonMinimized = false
+            self.filterButtonLeadingConstraint.isActive = true
+            UIView.animate(withDuration: 0.3) {
+                self.filterButton.setTitle("Фильтры", for: .normal)
+                self.filterButton.setImage(UIImage(systemName: ""), for: .normal)
+                
+                self.filterButtonLeadingConstraint.constant = 130
+                self.filterButtonTrailingConstraint.constant = -130
+             
+                self.filterButton.heightAnchor.constraint(equalToConstant: 50).isActive = true
+                self.view.layoutIfNeeded()
+            }
+        } else {
+            
+            view.endEditing(true)
+            let filterVC = FiltersViewController()
+            filterVC.onFilterSelected = { [weak self] filter in
+                self?.viewModel.selectedFilter = filter
+            }
+            present(filterVC, animated: true)
         }
-        present(filterVC, animated: true)
     }
+    
+    @objc private func handleSwipeRight(_ gesture: UISwipeGestureRecognizer) {
+        guard !isFilterButtonMinimized else { return }
+
+        isFilterButtonMinimized = true
+
+        UIView.animate(withDuration: 0.3) {
+            self.filterButton.setTitle("", for: .normal)
+            self.filterButton.setImage(UIImage(systemName: "line.horizontal.3"), for: .normal)
+            self.filterButton.imageEdgeInsets = UIEdgeInsets(top: 0, left: -5, bottom: 0, right: 0)
+    
+            self.filterButtonTrailingConstraint.constant = 10
+                    self.filterButtonLeadingConstraint.isActive = false
+            
+            self.filterButton.heightAnchor.constraint(equalToConstant: 50).isActive = true
+            self.view.layoutIfNeeded()
+        }
+    }
+    
+    
     
     private func configureLabel(_ label: UILabel, text: String, fontSize: CGFloat, weight: UIFont.Weight, color: CustomColor) {
         label.text = text
