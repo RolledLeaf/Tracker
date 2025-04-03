@@ -2,6 +2,11 @@ import UIKit
 
 final class FiltersViewController: UIViewController, UITableViewDelegate, UITableViewDataSource  {
     
+    private var currentFilter: TrackerFilterType {
+        let rawValue = UserDefaults.standard.string(forKey: UserDefaultsKeys.selectedFilter)
+        return TrackerFilterType(rawValue: rawValue ?? "") ?? .all
+    }
+    
     lazy var titleLabel: UILabel = {
         let label = UILabel()
         label.text = "Фильтры"
@@ -24,6 +29,7 @@ final class FiltersViewController: UIViewController, UITableViewDelegate, UITabl
     
     override func viewDidLoad() {
         super.viewDidLoad()
+        
         setupUI()
     }
     
@@ -64,7 +70,23 @@ extension FiltersViewController {
             print("Unable to dequeue cell")
             return UITableViewCell()
         }
+        
         cell.configure(with: filterTitles[indexPath.row])
+        let filterType: TrackerFilterType
+        
+        switch indexPath.row {
+        case 0:
+            filterType = .all
+        case 1:
+            filterType = .today
+        case 2:
+            filterType = .completed
+        case 3:
+            filterType = .uncompleted
+        default: filterType = .all
+        }
+        
+        cell.showCheckmark(filterType == currentFilter)
         cell.customSeparator.isHidden = indexPath.row == filterTitles.count - 1
         return cell
     }
@@ -85,6 +107,8 @@ extension FiltersViewController {
             selectedFilter = .all
         }
         onFilterSelected?(selectedFilter)
+        UserDefaults.standard.set(selectedFilter.rawValue, forKey: UserDefaultsKeys.selectedFilter)
+        print("Selected filter: \(selectedFilter) saved in UserDefaults")
         dismiss(animated: true)
     }
     

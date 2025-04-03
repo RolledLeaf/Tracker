@@ -310,7 +310,6 @@ final class TrackersViewController: UIViewController, UICollectionViewDataSource
             }
         }
 
-        // Далее сортировка и обновление FRC
         let sortedTrackers = filteredTrackers.sorted {
             ($0.category?.sortOrder ?? 0) < ($1.category?.sortOrder ?? 0)
         }

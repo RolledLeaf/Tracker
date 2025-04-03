@@ -2,7 +2,7 @@ import UIKit
 
 final class FiltersTableCell: UITableViewCell {
     
-    static let identifier = "FiltersTableCell" //
+    static let identifier = "FiltersTableCell"
     
      lazy var categoryNameLabel: UILabel = {
         let label = UILabel()
@@ -17,7 +17,7 @@ final class FiltersTableCell: UITableViewCell {
     private lazy var checkMark: UIImageView = {
         let imageView = UIImageView()
         imageView.image = UIImage(systemName: "checkmark")
-        imageView.tintColor = UIColor.custom(.backgroundGray)
+        imageView.tintColor = UIColor.custom(.toggleSwitchBlue)
         imageView.translatesAutoresizingMaskIntoConstraints = false
         return imageView
     }()
@@ -34,6 +34,7 @@ final class FiltersTableCell: UITableViewCell {
     override init(style: UITableViewCell.CellStyle, reuseIdentifier: String?) {
         super.init(style: style, reuseIdentifier: reuseIdentifier)
         setupUI()
+        
     }
     
     required init?(coder: NSCoder) {
@@ -41,6 +42,8 @@ final class FiltersTableCell: UITableViewCell {
     }
     
     // MARK: - UI Setup
+    
+  
     
     private func setupUI() {
         contentView.addSubview(categoryNameLabel)
@@ -60,20 +63,21 @@ final class FiltersTableCell: UITableViewCell {
       
             checkMark.trailingAnchor.constraint(equalTo: contentView.trailingAnchor, constant: -16),
             checkMark.centerYAnchor.constraint(equalTo: contentView.centerYAnchor),
-            checkMark.widthAnchor.constraint(equalToConstant: 10),
-            checkMark.heightAnchor.constraint(equalToConstant: 15)
+            checkMark.widthAnchor.constraint(equalToConstant: 15),
+            checkMark.heightAnchor.constraint(equalToConstant: 20)
         ])
+        checkMark.isHidden = true
     }
     
-    override func setSelected(_ selected: Bool, animated: Bool) {
-        super.setSelected(selected, animated: animated)
-        checkMark.tintColor = selected
-                ? UIColor.custom(.toggleSwitchBlue)
-                : UIColor.custom(.backgroundGray)
+    func showCheckmark(_ visible: Bool) {
+        checkMark.isHidden = !visible
     }
+    
+   
     
     // MARK: - Configuration Method
     func configure(with title: String){
         categoryNameLabel.text = title
+        setSelected(true , animated: true)
     }
 }

@@ -5,6 +5,7 @@ enum OnboardingImage: String {
 
 enum UserDefaultsKeys {
     static let hasSeenOnboarding = "hasSeenOnboarding"
+    static let selectedFilter = "selectedFilter"
 }
 
 enum EditAction: String {
@@ -14,9 +15,10 @@ enum EditAction: String {
     case delete = "Удалить"
 }
 
-enum TrackerFilterType {
+enum TrackerFilterType: String {
     case all
     case today
     case completed
     case uncompleted
 }
+
