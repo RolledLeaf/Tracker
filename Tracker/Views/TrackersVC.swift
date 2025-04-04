@@ -111,8 +111,6 @@ final class TrackersViewController: UIViewController, UICollectionViewDataSource
         return button
     }()
     
-   
-    
     private lazy var filterButton: UIButton = {
         let button = UIButton(type: .system)
         button.tintColor = UIColor.custom(.textColor)
