@@ -21,7 +21,6 @@ final class StatisticsViewController: UIViewController {
         label.text = "Анализировать пока нечего"
         label.font = UIFont.systemFont(ofSize: 12, weight: .medium)
         label.textAlignment = .center
-        
         return label
     }()
     
@@ -30,6 +29,7 @@ final class StatisticsViewController: UIViewController {
         tableView.separatorStyle = .none
         tableView.backgroundColor = .clear
         tableView.rowHeight = 90
+        tableView.showsVerticalScrollIndicator = false
         let layer = tableView.layer
         layer.cornerRadius = 16
         return tableView
@@ -61,6 +61,7 @@ final class StatisticsViewController: UIViewController {
     
     private func setupUI() {
         view.backgroundColor = UIColor(named: CustomColor.mainBackgroundColor.rawValue)
+        statisticsTableView.isScrollEnabled = false
         
         statisticsPlaceholderImage.image = UIImage(named: "statisticsPlaceholder")
         
@@ -83,17 +84,24 @@ final class StatisticsViewController: UIViewController {
             statisticsTableView.topAnchor.constraint(equalTo: titleLabel.bottomAnchor, constant: 77),
             statisticsTableView.leadingAnchor.constraint(equalTo: view.leadingAnchor, constant: 16),
             statisticsTableView.trailingAnchor.constraint(equalTo: view.trailingAnchor, constant: -16),
-            statisticsTableView.heightAnchor.constraint(equalToConstant: 396)
+            statisticsTableView.heightAnchor.constraint(equalToConstant: 410)
             
         ])
         statisticsTableView.dataSource = self
         statisticsTableView.register(StatisticsCell.self, forCellReuseIdentifier: StatisticsCell.identifier)
+        statisticsTableView.delegate = self
     }
-}
     
+}
+
 extension StatisticsViewController: UITableViewDataSource {
-    func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
+    
+    func numberOfSections(in tableView: UITableView) -> Int {
         statisticsTableParameters.count
+    }
+    
+    func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
+        1
     }
     
     func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
@@ -101,10 +109,54 @@ extension StatisticsViewController: UITableViewDataSource {
             print("Unable to dequeue cell")
             return UITableViewCell()
         }
-        cell.configure(with: statisticsTableParameters[indexPath.row])
+        cell.configure(with: statisticsTableParameters[indexPath.section])
+        
         return cell
     }
 }
-    
 
+extension StatisticsViewController: UITableViewDelegate {
+    
+    func tableView(_ tableView: UITableView, heightForFooterInSection section: Int) -> CGFloat {
+        return 12 // отступ между ячейками
+    }
+    
+    func tableView(_ tableView: UITableView, viewForFooterInSection section: Int) -> UIView? {
+        let spacer = UIView()
+        spacer.backgroundColor = .clear
+        return spacer
+    }
+    
+    func tableView(_ tableView: UITableView, willDisplay cell: UITableViewCell, forRowAt indexPath: IndexPath) {
+        let gradient = CAGradientLayer()
+        gradient.name = "gradientBorder"
+        gradient.frame = cell.bounds
+        gradient.colors = [
+            UIColor(red: 253/255, green: 76/255, blue: 73/255, alpha: 1).cgColor,  // #FD4C49
+            
+            UIColor(red: 70/255, green: 230/255, blue: 157/255, alpha: 1).cgColor, // #46E69D
+            
+            UIColor(red: 0.0, green: 123/255, blue: 250/255, alpha: 1).cgColor // #007BFA
+        ]
+        gradient.startPoint = CGPoint(x: 0, y: 0)
+        gradient.endPoint = CGPoint(x: 1, y: 0)
+        
+        // Создаём маску — рамка толщиной 2 pt
+        let maskLayer = CAShapeLayer()
+        let path = UIBezierPath(roundedRect: cell.bounds.insetBy(dx: 1.5, dy: 1.5), cornerRadius: 16)
+        let outerPath = UIBezierPath(roundedRect: cell.bounds, cornerRadius: 16)
+        path.append(outerPath.reversing())
+        maskLayer.path = path.cgPath
+        gradient.mask = maskLayer
+        
+        cell.contentView.layer.insertSublayer(gradient, at: 0)
+        
+        
+        cell.layer.cornerRadius = 16
+        cell.clipsToBounds = true
+        cell.layer.borderWidth = 1
+        cell.layer.borderColor = UIColor.systemGray6.cgColor
+    }
+    
+}
 

@@ -6,8 +6,8 @@ final class StatisticsCell: UITableViewCell {
     
     private lazy var titleLabel: UILabel = {
         let label = UILabel()
-        label.font = .systemFont(ofSize: 17, weight: .regular)
-        label.textColor = UIColor.custom(.createButtonColor)
+        label.font = .systemFont(ofSize: 34, weight: .medium)
+        label.textColor = UIColor.custom(.textColor)
         label.backgroundColor = .clear
         label.translatesAutoresizingMaskIntoConstraints = false
         return label
@@ -15,15 +15,12 @@ final class StatisticsCell: UITableViewCell {
     
     private lazy var detailedTextLabel: UILabel = {
         let label = UILabel()
-        label.font = .systemFont(ofSize: 17, weight: .regular)
-        label.textColor = UIColor.custom(.textFieldGray)
+        label.font = .systemFont(ofSize: 12, weight: .medium)
+        label.textColor = UIColor.custom(.textColor)
         label.backgroundColor = .clear
         label.translatesAutoresizingMaskIntoConstraints = false
         return label
     }()
-    
-    
-    
   
     
     // MARK: - Init
@@ -58,9 +55,6 @@ final class StatisticsCell: UITableViewCell {
     }
     
     // MARK: - Configuration Method
-    
-  
-    
     func configure(with option: (title: Int, subtitle: String)) {
         // Устанавливаем текст для заголовка
         titleLabel.text = "\(option.title)"

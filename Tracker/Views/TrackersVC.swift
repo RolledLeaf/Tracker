@@ -574,7 +574,6 @@ extension TrackersViewController: TrackerCategoryCellDelegate {
 
 extension TrackersViewController {
     
-
     func numberOfSections(in collectionView: UICollectionView) -> Int {
         return trackerStore.numberOfSections
     }
