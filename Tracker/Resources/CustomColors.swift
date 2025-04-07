@@ -44,8 +44,6 @@ func adjustAlpha(_ color: UIColor, to alpha: CGFloat) -> UIColor {
     return color.withAlphaComponent(alpha)
 }
 
-
-
 func lightenColor(_ color: UIColor, by percentage: CGFloat) -> UIColor {
     // Ограничиваем процент в пределах от 0 до 1
     let percentage = max(0, min(percentage, 1))

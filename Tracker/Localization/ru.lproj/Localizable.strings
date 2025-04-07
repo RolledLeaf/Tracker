@@ -1,7 +1,13 @@
-/* 
-  Localizable.strings
-  Tracker
 
-  Created by Vitaly Wexler on 22.03.2025.
-  
-*/
+
+
+
+//TrackersVC
+"trackersLabel" = "Трекеры";
+"emptyFieldLabel" = "Что будем отслеживать?";
+"nothingFoundLabel" = "Ничего не найдено";
+"ilterButtonTitle" = "Фильтры";
+
+//TabBarVC
+"trackers" = "Трекеры";
+"statistics" = "Статистика";
