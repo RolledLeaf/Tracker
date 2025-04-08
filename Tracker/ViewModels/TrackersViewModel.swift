@@ -1,6 +1,5 @@
 import Foundation
 
-
 final class TrackersViewModel {
     private var trackerStore = TrackerStore()
     
