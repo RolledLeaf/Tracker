@@ -4,8 +4,6 @@ import UIKit
 
 final class StatisticsViewController: UIViewController {
     
-    
-    
     lazy var titleLabel: UILabel = {
         let label = UILabel()
         label.textColor = UIColor(named: CustomColor.textColor.rawValue)
@@ -35,7 +33,9 @@ final class StatisticsViewController: UIViewController {
         return tableView
     }()
     
+    private let viewModel = StatisticsViewModel()
     private let statisticsPlaceholderImage = UIImageView()
+    
     private var bestPeriod: Int?
     private var perfectDays: Int?
     private var completedTrackers: Int?
@@ -52,11 +52,35 @@ final class StatisticsViewController: UIViewController {
         super.viewDidLoad()
         setupUI()
         updatePlaceholderVisibility()
+        getStatistics()
     }
     
-    private func updatePlaceholderVisibility() {
-        statisticsPlaceholderLabel.isHidden = bestPeriod != nil
-        statisticsPlaceholderImage.isHidden = bestPeriod != nil
+    override func viewWillAppear(_ animated: Bool) {
+        super.viewWillAppear(animated)
+        updatePlaceholderVisibility()
+        getStatistics()
+    }
+    
+    private func getStatistics() {
+        viewModel.onStatisticsCalculated = { [weak self] stats in
+            guard let self = self else { return }
+            self.statisticsTableParameters = [
+                (title: stats.bestPeriod, subtitle: "Лучший период"),
+                (title: stats.perfectDays, subtitle: "Идеальные дни"),
+                (title: stats.completedTrackers, subtitle: "Трекеров завершено"),
+                (title: stats.averageValue, subtitle: "Среднее значение")
+            ]
+            self.statisticsTableView.reloadData()
+            self.updatePlaceholderVisibility()
+        }
+        viewModel.calculateStatistics()
+    }
+    
+    func updatePlaceholderVisibility() {
+        let shouldShowPlaceholder = statisticsTableParameters.allSatisfy { $0.title == 0 }
+        statisticsPlaceholderLabel.isHidden = !shouldShowPlaceholder
+        statisticsPlaceholderImage.isHidden = !shouldShowPlaceholder
+        statisticsTableView.isHidden = shouldShowPlaceholder
     }
     
     private func setupUI() {

@@ -12,6 +12,7 @@ final class TrackersViewController: UIViewController, UICollectionViewDataSource
     private var isFilterButtonMinimized = false
     private var filterButtonLeadingConstraint: NSLayoutConstraint!
     private var filterButtonTrailingConstraint: NSLayoutConstraint!
+    private var filterButtonWidthConstraint: NSLayoutConstraint!
     
     
     private let addTrackerButton = UIButton()
@@ -226,6 +227,10 @@ final class TrackersViewController: UIViewController, UICollectionViewDataSource
             
             filterButton.heightAnchor.constraint(equalToConstant: 50),
         ])
+        
+        filterButtonWidthConstraint = filterButton.widthAnchor.constraint(equalToConstant: 260)
+        filterButtonWidthConstraint.isActive = false
+        
         filterButtonLeadingConstraint = filterButton.leadingAnchor.constraint(equalTo: view.safeAreaLayoutGuide.leadingAnchor, constant: 130)
         filterButtonLeadingConstraint.isActive = true
         
@@ -392,6 +397,7 @@ final class TrackersViewController: UIViewController, UICollectionViewDataSource
             guard isFilterButtonMinimized else { return }
             
             isFilterButtonMinimized = false
+            self.filterButtonWidthConstraint.isActive = false
             self.filterButtonLeadingConstraint.isActive = true
             UIView.animate(withDuration: 0.3) {
                 self.filterButton.setTitle("Фильтры", for: .normal)
@@ -421,11 +427,14 @@ final class TrackersViewController: UIViewController, UICollectionViewDataSource
 
         UIView.animate(withDuration: 0.3) {
             self.filterButton.setTitle("", for: .normal)
-            self.filterButton.setImage(UIImage(systemName: "line.horizontal.3"), for: .normal)
-            self.filterButton.imageEdgeInsets = UIEdgeInsets(top: 0, left: -5, bottom: 0, right: 0)
+            self.filterButton.setImage(UIImage(systemName: "chevron.left"), for: .normal)
+            self.filterButton.imageEdgeInsets = UIEdgeInsets(top: 0, left: -15, bottom: 0, right: 0)
     
-            self.filterButtonTrailingConstraint.constant = 13
-                    self.filterButtonLeadingConstraint.isActive = false
+            self.filterButtonTrailingConstraint.constant = 20
+            self.filterButtonLeadingConstraint.isActive = false
+            self.filterButtonWidthConstraint.isActive = true
+            self.filterButtonWidthConstraint.constant = 40
+            
             
             
             self.view.layoutIfNeeded()
@@ -529,8 +538,6 @@ final class TrackersViewController: UIViewController, UICollectionViewDataSource
        }
 }
 
-
-
 extension TrackersViewController: TrackerCategoryCellDelegate {
     func trackerExecution(_ cell: TrackerCell, didTapDoneButtonFor trackerID: UUID, selectedDate: Date) {
         let context = CoreDataStack.shared.context
@@ -565,11 +572,6 @@ extension TrackersViewController: TrackerCategoryCellDelegate {
     func getTrackerByID(_ trackerID: UUID) -> TrackerCoreData? {
         return trackerStore.fetchAllTrackers().first(where: { $0.id == trackerID })
     }
-    
-    // MARK: - Trackers Filtering Methods
-       
-        
-    
 }
 
 extension TrackersViewController {
