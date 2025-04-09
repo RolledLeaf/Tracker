@@ -156,7 +156,7 @@ final class TrackersViewController: UIViewController, UICollectionViewDataSource
         }
         
         configureLabel(trackersLabel, text: NSLocalizedString("trackersLabel", comment: ""), fontSize: 34, weight: .bold, color: .textColor)
-        configureLabel(emptyFieldLabel, text: NSLocalizedString("emptyFieldLabel", comment: ""), fontSize: 12, weight: .regular, color: .textColor)
+        configureLabel(emptyFieldLabel, text: NSLocalizedString("emptyTrackerCollectionPlaceholder", comment: ""), fontSize: 12, weight: .regular, color: .textColor)
         configureLabel(nothingFoundLabel, text: NSLocalizedString("nothingFoundLabel", comment: ""), fontSize: 12, weight: .medium, color: .textColor)
         trackersLabel.textAlignment = .left
         
@@ -400,7 +400,7 @@ final class TrackersViewController: UIViewController, UICollectionViewDataSource
             self.filterButtonWidthConstraint.isActive = false
             self.filterButtonLeadingConstraint.isActive = true
             UIView.animate(withDuration: 0.3) {
-                self.filterButton.setTitle(NSLocalizedString("filters", comment: ""), for: .normal)
+                self.filterButton.setTitle(NSLocalizedString("filtersButtonTitle", comment: ""), for: .normal)
                 self.filterButton.setImage(UIImage(systemName: ""), for: .normal)
                 
                 self.filterButtonLeadingConstraint.constant = 130
@@ -508,7 +508,7 @@ final class TrackersViewController: UIViewController, UICollectionViewDataSource
             }
         }
            
-        let editAction = UIAction(title: EditAction.edit.rawValue, image: nil) { _ in
+        let editAction = UIAction(title: NSLocalizedString("contextMenuEdit", comment: ""), image: nil) { _ in
             let editHabitVC = EditHabitViewController()
             let editIrregularVC = EditIrregularEventViewController()
             
@@ -530,7 +530,7 @@ final class TrackersViewController: UIViewController, UICollectionViewDataSource
             }
         }
            
-           let deleteAction = UIAction(title: EditAction.delete.rawValue, image: nil) { _ in
+           let deleteAction = UIAction(title: NSLocalizedString("contextMenuDelete", comment: ""), image: nil) { _ in
                self.viewModel.deleteTracker(at: indexPath)
                
            }

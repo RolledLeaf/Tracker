@@ -39,6 +39,7 @@
 
 //CategoriesListVC
 "categoryTitleLabel" = "Категория";
+"emptyTrackerCollectionPlaceholder" = "Что будем отслеживать?";
 "emptyCategories" = "Привычки и события можно \n объединить по смыслу";
 "addCategoryButton" = "Добавить категорию";
 "contextMenuEdit" = "Редактировать";
@@ -50,6 +51,7 @@
 // NewCategoryVC
 "newCategoryTitleLabel" = "Новая категория";
 "categoryNameTextField" = "Введите название категории";
+"newCategoryNameAlert" = "Введите новое название категории";
 
 //StatisticsVC
 "statisticsTitleLabel" = "Статистика";

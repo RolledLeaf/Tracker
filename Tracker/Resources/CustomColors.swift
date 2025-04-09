@@ -10,9 +10,11 @@ enum CustomColor: String {
     case textFieldGray = "textFieldGray"
     case cancelButtonRed = "cancelButtonRed"
     case toggleSwitchBlue = "toggleSwitchBlue"
+    case toggleSwitchGray = "toggleSwitchGray"
     case mainBackgroundColor = "mainBackgroundColor"
     case tabBarSeparateLineColor = "tabBarSeparateLineColor"
     case tablesColor = "tablesColor"
+    case thumbTintColor = "thumbTintColor"
 }
 
 enum CollectionColors: String  {

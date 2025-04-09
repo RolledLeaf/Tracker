@@ -80,13 +80,13 @@ final class CategoriesListViewController: UIViewController, UITableViewDataSourc
         }
         
         viewModel.onEditCategoryRequest = { [weak self] category, currentText in
-            let alert = UIAlertController(title: "Редактировать", message: "Введите новое название категории", preferredStyle: .alert)
+            let alert = UIAlertController(title: NSLocalizedString("contextMenuEdit", comment: ""), message: NSLocalizedString("newCategoryNameAlert", comment: ""), preferredStyle: .alert)
             alert.addTextField { textField in
                 textField.text = currentText
                 textField.placeholder = NSLocalizedString("categoryEditinigPlaceholder", comment: "")
             }
             
-            let saveAction = UIAlertAction(title: NSLocalizedString("save", comment: ""), style: .default) { _ in
+            let saveAction = UIAlertAction(title: NSLocalizedString(NSLocalizedString("save", comment: ""), comment: ""), style: .default) { _ in
                 guard let newText = alert.textFields?.first?.text, !newText.isEmpty else { return }
                 if let index = self?.viewModel.categories.firstIndex(where: { $0 == category }) {
                     self?.viewModel.updateCategoryName(at: index, newName: newText)
@@ -200,11 +200,11 @@ final class CategoriesListViewController: UIViewController, UITableViewDataSourc
     
     private func createContextMenu(for indexPath: IndexPath) -> UIMenu {
         
-        let editAction = UIAction(title: EditAction.edit.rawValue, image: UIImage(systemName: "pencil")) { _ in
+        let editAction = UIAction(title: NSLocalizedString("contextMenuEdit", comment: ""), image: UIImage(systemName: "pencil")) { _ in
             self.viewModel.editCategory(at: indexPath.row, newName: self.viewModel.categories[indexPath.row].title ?? "")
         }
         
-        let deleteAction = UIAction(title: EditAction.delete.rawValue, image: UIImage(systemName: "trash"), attributes: .destructive) { _ in
+        let deleteAction = UIAction(title: NSLocalizedString("contextMenuDelete", comment: ""), image: UIImage(systemName: "trash"), attributes: .destructive) { _ in
             self.viewModel.deleteCategory(at: indexPath.row)
             self.updateTableHeight()
         }
