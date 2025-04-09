@@ -8,7 +8,7 @@ final class NewIrregularEventViewController: UIViewController, UITableViewDelega
     
     private lazy var titleLabel: UILabel = {
         let label = UILabel()
-        label.text = "Новое нерегулярное событие"
+        label.text = NSLocalizedString("newIrregularEvent", comment: "")
         label.font = .systemFont(ofSize: 16, weight: .medium)
         label.textColor = UIColor.custom(.createButtonColor)
         label.textAlignment = .center
@@ -17,7 +17,7 @@ final class NewIrregularEventViewController: UIViewController, UITableViewDelega
     
     private lazy var characterLimitLabel: UILabel = {
         let label = UILabel()
-        label.text = "Ограничение 38 символов"
+        label.text = NSLocalizedString("characterLimitLabel", comment: "")
         label.font = .systemFont(ofSize: 14)
         label.textColor = UIColor.custom(.cancelButtonRed)
         label.isHidden = true
@@ -27,7 +27,7 @@ final class NewIrregularEventViewController: UIViewController, UITableViewDelega
     
     private lazy var trackerNameTextField: UITextField = {
         let textField = UITextField()
-        textField.placeholder = "Введите название трекера"
+        textField.placeholder = NSLocalizedString("trackerNameTextField", comment: "")
         textField.layer.cornerRadius = 16
         textField.font = .systemFont(ofSize: 17, weight: .regular)
         textField.textColor = UIColor.custom(.createButtonColor)
@@ -41,7 +41,7 @@ final class NewIrregularEventViewController: UIViewController, UITableViewDelega
         toolbar.sizeToFit()
         
         let flexSpace = UIBarButtonItem(barButtonSystemItem: .flexibleSpace, target: nil, action: nil)
-        let doneButton = UIBarButtonItem(title: "Готово", style: .done, target: textField, action: #selector(UIResponder.resignFirstResponder))
+        let doneButton = UIBarButtonItem(title: NSLocalizedString("doneButton", comment: ""), style: .done, target: textField, action: #selector(UIResponder.resignFirstResponder))
         toolbar.items = [flexSpace, doneButton]
         textField.inputAccessoryView = toolbar
         return textField
@@ -88,7 +88,7 @@ final class NewIrregularEventViewController: UIViewController, UITableViewDelega
     
     private lazy var createTrackerButton: UIButton = {
         let button = UIButton()
-        button.setTitle("Создать", for: .normal)
+        button.setTitle(NSLocalizedString("createTrackerButton", comment: ""), for: .normal)
         button.titleLabel?.font = UIFont.systemFont(ofSize: 16, weight: .medium)
         button.setTitleColor(.white, for: .normal)
         button.backgroundColor = UIColor.custom(.textFieldGray)
@@ -99,7 +99,7 @@ final class NewIrregularEventViewController: UIViewController, UITableViewDelega
     
     private lazy var cancelButton: UIButton = {
         let button = UIButton()
-        button.setTitle("Отменить", for: .normal)
+        button.setTitle(NSLocalizedString("cancel", comment: ""), for: .normal)
         button.titleLabel?.font = UIFont.systemFont(ofSize: 16, weight: .medium)
         button.setTitleColor(UIColor.custom(.cancelButtonRed), for: .normal)
         button.backgroundColor = .clear
@@ -116,7 +116,7 @@ final class NewIrregularEventViewController: UIViewController, UITableViewDelega
     
     
     var tableViewOptions: [(title: String, subtitle: String?)] = [
-        (title: "Категория", subtitle: nil)
+        (title: NSLocalizedString("tableViewOptionCategory", comment: ""), subtitle: nil)
     ]
     
     var selectedColor: CollectionColors? {
@@ -239,7 +239,7 @@ final class NewIrregularEventViewController: UIViewController, UITableViewDelega
     }
     
     private func showAlert(message: String) {
-        let alert = UIAlertController(title: "Привычка не создана", message: message, preferredStyle: .alert)
+        let alert = UIAlertController(title: NSLocalizedString("alertTrackerNotCreated", comment: ""), message: message, preferredStyle: .alert)
         alert.addAction(UIAlertAction(title: "OK", style: .default))
         present(alert, animated: true)
     }
@@ -264,7 +264,7 @@ final class NewIrregularEventViewController: UIViewController, UITableViewDelega
               
                 let selectedCategory = selectedCategory
         else {
-            showAlert(message: "Не все данные выбраны!")
+            showAlert(message: NSLocalizedString("alertFieldsMissed", comment: ""))
             print("Не все данные выбраны!")
             return
         }
@@ -334,7 +334,7 @@ final class NewIrregularEventViewController: UIViewController, UITableViewDelega
         if collectionView == emojiCollectionView {
             header.configure(with: "Emoji")
         } else if collectionView == colorsCollectionView {
-            header.configure(with: "Цвет")
+            header.configure(with: NSLocalizedString("colorCollectionViewTitle", comment: ""))
         }
         return header
     }
@@ -435,8 +435,8 @@ final class NewIrregularEventViewController: UIViewController, UITableViewDelega
 
 extension NewIrregularEventViewController: CategoriesListViewControllerDelegate {
     func updateCategory(with category: TrackerCategoryCoreData) {
-        if let index = tableViewOptions.firstIndex(where: { $0.title == "Категория" }) {
-            tableViewOptions[index].subtitle = category.title 
+        if let index = tableViewOptions.firstIndex(where: { $0.title == NSLocalizedString("tableViewOptionCategory", comment: "") }) {
+            tableViewOptions[index].subtitle = category.title
         }
         selectedCategory = category
         categoryTableView.reloadData()

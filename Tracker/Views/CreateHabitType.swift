@@ -6,7 +6,7 @@ final class CreateHabitTypeViewController: UIViewController {
     
     private lazy var titleLabel: UILabel = {
         let label = UILabel()
-        label.text = "Создание трекера"
+        label.text = NSLocalizedString("trackerCreationTitle", comment: "")
         label.font = UIFont.systemFont(ofSize: 16, weight: .medium)
         label.textColor = UIColor.custom(.textColor)
         label.textAlignment = .center
@@ -15,7 +15,7 @@ final class CreateHabitTypeViewController: UIViewController {
     
     private lazy var habitButton: UIButton = {
         let button = UIButton(type: .system)
-        button.setTitle("Привычка", for: .normal)
+        button.setTitle(NSLocalizedString("habitButton", comment: ""), for: .normal)
         button.titleLabel?.font = UIFont.systemFont(ofSize: 16, weight: .medium)
         button.setTitleColor(UIColor.custom(.createButtonTextColor), for: .normal)
         button.backgroundColor = UIColor.custom(.createButtonColor)
@@ -27,7 +27,7 @@ final class CreateHabitTypeViewController: UIViewController {
     
     private lazy var irregularEventButton: UIButton = {
         let button = UIButton(type: .system)
-        button.setTitle("Нерегулярные событие", for: .normal)
+        button.setTitle(NSLocalizedString("irregularButton", comment: ""), for: .normal)
         button.titleLabel?.font = UIFont.systemFont(ofSize: 16, weight: .medium)
         button.setTitleColor(UIColor.custom(.createButtonTextColor), for: .normal)
         button.backgroundColor = UIColor.custom(.createButtonColor)

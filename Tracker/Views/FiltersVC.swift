@@ -9,7 +9,7 @@ final class FiltersViewController: UIViewController, UITableViewDelegate, UITabl
     
     lazy var titleLabel: UILabel = {
         let label = UILabel()
-        label.text = "Фильтры"
+        label.text = NSLocalizedString("Фильтры", comment: "")
         label.font = UIFont.systemFont(ofSize: 16, weight: .medium)
         return label
     }()
@@ -25,7 +25,10 @@ final class FiltersViewController: UIViewController, UITableViewDelegate, UITabl
     }()
     
     var onFilterSelected: ((TrackerFilterType) -> Void)?
-    private var filterTitles: [String] = ["Все трекеры", "Трекеры на сегодня", "Завершённые", "Не завершённые"]
+    
+    private let filterTitles: [String] = {
+        return NSLocalizedString("filterOptions", comment: "").components(separatedBy: ", ")
+    }()
     
     override func viewDidLoad() {
         super.viewDidLoad()

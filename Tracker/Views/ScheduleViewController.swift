@@ -14,7 +14,7 @@ final class ScheduleViewController: UIViewController, UITableViewDelegate, UITab
         label.textColor = UIColor.custom(.textColor)
         label.font = .systemFont(ofSize: 16, weight: .medium)
         label.textAlignment = .center
-        label.text = "Расписание"
+        label.text = NSLocalizedString("tableViewOptionSchedule", comment: "")
         return label
     }()
     
@@ -29,7 +29,7 @@ final class ScheduleViewController: UIViewController, UITableViewDelegate, UITab
     
     private lazy var doneButton: UIButton = {
         let button = UIButton()
-        button.setTitle("Готово", for: .normal)
+        button.setTitle(NSLocalizedString("doneButton", comment: ""), for: .normal)
         button.titleLabel?.font = UIFont.systemFont(ofSize: 16, weight: .medium)
         button.setTitleColor(UIColor.custom(.createButtonTextColor), for: .normal)
         button.backgroundColor = UIColor.custom(.createButtonColor)
@@ -39,19 +39,22 @@ final class ScheduleViewController: UIViewController, UITableViewDelegate, UITab
         return button
     }()
     
-    private let weekDays: [String] = ["Понедельник", "Вторник", "Среда", "Четверг", "Пятница", "Суббота", "Воскресенье"]
+    private let sWeekDaysString = NSLocalizedString("shortWeekDaysSymbols", comment: "Week days short symbols")
+
+    private var weekDays: [String] {
+        return NSLocalizedString("weekDays", comment: "").components(separatedBy: ", ")
+    }
     
-    //English localization
-    private let weekDayOrder = ["Mon", "Tue", "Wed", "Thu", "Fri", "Sat", "Sun"]
-    private let weekDayAbbreviations: [String: String] = [
-        "Понедельник": "Пн",
-        "Вторник": "Вт",
-        "Среда": "Ср",
-        "Четверг": "Чт",
-        "Пятница": "Пт",
-        "Суббота": "Сб",
-        "Воскресенье": "Вс"
-    ]
+
+    private var weekDayOrder: [String] {
+        return NSLocalizedString("shortWeekDaysSymbols", comment: "").components(separatedBy: ", ")
+    }
+
+    private var weekDayAbbreviations: [String: String] {
+        let fullDays = weekDays
+        let shortDays = weekDayOrder
+        return Dictionary(uniqueKeysWithValues: zip(fullDays, shortDays))
+    }
   
     private var selectedWeekDays: [String] = []
     private var tempSelectedWeekDays: [String] = []
@@ -101,7 +104,7 @@ final class ScheduleViewController: UIViewController, UITableViewDelegate, UITab
     
     private func getSortedSelectedWeekDays() -> String {
         if selectedWeekDays.count == weekDays.count {
-            return "Ежедневно"
+            return NSLocalizedString("everyday", comment: "")
         } else {
             let sortedAbbreviations = selectedWeekDays.sorted {
                 let index1 = weekDayOrder.firstIndex(of: weekDayAbbreviations[$0] ?? "") ?? 0
@@ -118,7 +121,7 @@ final class ScheduleViewController: UIViewController, UITableViewDelegate, UITab
         print("Завершено. Переданные дни недели: \(tempSelectedWeekDays)")
         selectedWeekDays = tempSelectedWeekDays
         let sortedWeekDaysString = getSortedSelectedWeekDays()
-        delegate?.updateSchedule(for: "Расписание", with: sortedWeekDaysString)
+        delegate?.updateSchedule(for: NSLocalizedString("tableViewOptionSchedule", comment: ""), with: sortedWeekDaysString)
         dismiss(animated: true, completion: nil)
     }
     

@@ -14,7 +14,7 @@ final class CategoriesListViewController: UIViewController, UITableViewDataSourc
         label.textColor = UIColor.custom(.textColor)
         label.font = .systemFont(ofSize: 16, weight: .medium)
         label.textAlignment = .center
-        label.text = "Категория"
+        label.text = NSLocalizedString("categoryTitleLabel", comment: "")
         return label
     }()
     
@@ -41,13 +41,13 @@ final class CategoriesListViewController: UIViewController, UITableViewDataSourc
         label.font = .systemFont(ofSize: 12, weight: .regular)
         label.textAlignment = .center
         label.numberOfLines = 2
-        label.text = "Привычки и события можно \n объединить по смыслу"
+        label.text = NSLocalizedString("emptyCategories", comment: "")
         return label
     }()
     
     private lazy var addCategoryButton: UIButton = {
         let button = UIButton()
-        button.setTitle("Добавить категорию", for: .normal)
+        button.setTitle(NSLocalizedString("addCategoryButton", comment: ""), for: .normal)
         button.titleLabel?.font = UIFont.systemFont(ofSize: 16, weight: .medium)
         button.setTitleColor(UIColor.custom(.createButtonTextColor), for: .normal)
         button.backgroundColor = UIColor.custom(.createButtonColor)
@@ -83,17 +83,17 @@ final class CategoriesListViewController: UIViewController, UITableViewDataSourc
             let alert = UIAlertController(title: "Редактировать", message: "Введите новое название категории", preferredStyle: .alert)
             alert.addTextField { textField in
                 textField.text = currentText
-                textField.placeholder = "Название категории"
+                textField.placeholder = NSLocalizedString("categoryEditinigPlaceholder", comment: "")
             }
             
-            let saveAction = UIAlertAction(title: "Сохранить", style: .default) { _ in
+            let saveAction = UIAlertAction(title: NSLocalizedString("save", comment: ""), style: .default) { _ in
                 guard let newText = alert.textFields?.first?.text, !newText.isEmpty else { return }
                 if let index = self?.viewModel.categories.firstIndex(where: { $0 == category }) {
                     self?.viewModel.updateCategoryName(at: index, newName: newText)
                 }
             }
             
-            let cancelAction = UIAlertAction(title: "Отменить", style: .cancel, handler: nil)
+            let cancelAction = UIAlertAction(title: NSLocalizedString("cancel", comment: ""), style: .cancel, handler: nil)
             
             alert.addAction(saveAction)
             alert.addAction(cancelAction)
@@ -222,10 +222,10 @@ final class CategoriesListViewController: UIViewController, UITableViewDataSourc
         }
         
         let category = viewModel.categories[indexPath.row]
-        if category.title == "Закреплённые" {
+        if category.title == NSLocalizedString("pinned", comment: "") {
             cell.setHidden(true)
         }
-        cell.configure(with: category.title ?? "Без названия")
+        cell.configure(with: category.title ?? NSLocalizedString("noNameString", comment: ""))
         return cell
     }
     
