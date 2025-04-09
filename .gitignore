@@ -26,6 +26,9 @@ DerivedData/
 *.perspectivev3
 !default.perspectivev3
 
+# Custom screenshots directory
+/TrackerTests/__Snapshots__/TrackerTests
+
 ## Obj-C/Swift specific
 *.hmap
 
