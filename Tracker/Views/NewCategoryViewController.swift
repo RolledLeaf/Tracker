@@ -9,14 +9,14 @@ final class NewCategoryViewController: UIViewController {
         label.textColor = UIColor.custom(.textColor)
         label.font = .systemFont(ofSize: 16, weight: .medium)
         label.textAlignment = .center
-        label.text = "Новая категория"
+        label.text = NSLocalizedString("newCategoryTitleLabel", comment: "")
         return label
     }()
     
     private lazy var categoryNameTextField:UITextField = {
         let textField = UITextField()
         textField.layer.cornerRadius = 16
-        textField.placeholder = "Введите название категории"
+        textField.placeholder = NSLocalizedString("categoryNameTextField", comment: "")
         textField.font = .systemFont(ofSize: 17, weight: .regular)
         textField.textColor = UIColor.custom(.createButtonColor)
         textField.backgroundColor = UIColor.custom(.backgroundGray)
@@ -28,7 +28,7 @@ final class NewCategoryViewController: UIViewController {
         let toolbar = UIToolbar()
         toolbar.sizeToFit()
         let flexSpace = UIBarButtonItem(barButtonSystemItem: .flexibleSpace, target: nil, action: nil)
-        let doneButton = UIBarButtonItem(title: "Готово", style: .done, target: textField, action: #selector(UIResponder.resignFirstResponder))
+        let doneButton = UIBarButtonItem(title: NSLocalizedString("doneButton", comment: ""), style: .done, target: textField, action: #selector(UIResponder.resignFirstResponder))
         toolbar.items = [flexSpace, doneButton]
         
         textField.inputAccessoryView = toolbar
@@ -37,7 +37,7 @@ final class NewCategoryViewController: UIViewController {
     
     private lazy var doneButton: UIButton = {
         let button = UIButton()
-        button.setTitle("Готово", for: .normal)
+        button.setTitle(NSLocalizedString("doneButton", comment: ""), for: .normal)
         button.titleLabel?.font = UIFont.systemFont(ofSize: 16, weight: .medium)
         button.setTitleColor(UIColor.custom(.createButtonTextColor), for: .normal)
         button.backgroundColor = UIColor.custom(.textFieldGray)

@@ -9,14 +9,14 @@ final class StatisticsViewController: UIViewController {
         label.textColor = UIColor(named: CustomColor.textColor.rawValue)
         label.font = UIFont.systemFont(ofSize: 34, weight: .bold)
         label.textAlignment = .left
-        label.text = "Статистика"
+        label.text = NSLocalizedString("statisticsTitleLabel", comment: "")
         return label
     }()
     
     lazy var statisticsPlaceholderLabel: UILabel = {
         let label = UILabel()
         label.textColor = UIColor(named: CustomColor.textColor.rawValue)
-        label.text = "Анализировать пока нечего"
+        label.text = NSLocalizedString("placeholderLabel", comment: "")
         label.font = UIFont.systemFont(ofSize: 12, weight: .medium)
         label.textAlignment = .center
         return label
@@ -42,10 +42,10 @@ final class StatisticsViewController: UIViewController {
     private var averageStat: Int?
     
     var statisticsTableParameters: [(title: Int, subtitle: String)] = [
-        (title: 0, subtitle: "Лучший период"),
-        (title: 0, subtitle: "Идеальные дни"),
-        (title: 0, subtitle: "Трекеров завершено"),
-        (title: 0, subtitle: "Среднее значение")
+        (title: 0, subtitle: NSLocalizedString("bestPeriod", comment: "")),
+        (title: 0, subtitle: NSLocalizedString("perfectDays", comment: "")),
+        (title: 0, subtitle: NSLocalizedString("completedTrackers", comment: "")),
+        (title: 0, subtitle: NSLocalizedString("averageValue", comment: ""))
     ]
     
     override func viewDidLoad() {
@@ -65,10 +65,10 @@ final class StatisticsViewController: UIViewController {
         viewModel.onStatisticsCalculated = { [weak self] stats in
             guard let self = self else { return }
             self.statisticsTableParameters = [
-                (title: stats.bestPeriod, subtitle: "Лучший период"),
-                (title: stats.perfectDays, subtitle: "Идеальные дни"),
-                (title: stats.completedTrackers, subtitle: "Трекеров завершено"),
-                (title: stats.averageValue, subtitle: "Среднее значение")
+                (title: stats.bestPeriod, subtitle: NSLocalizedString("bestPeriod", comment: "")),
+                (title: stats.perfectDays, subtitle: NSLocalizedString("perfectDays", comment: "")),
+                (title: stats.completedTrackers, subtitle: NSLocalizedString("completedTrackers", comment: "")),
+                (title: stats.averageValue, subtitle: NSLocalizedString("averageValue", comment: ""))
             ]
             self.statisticsTableView.reloadData()
             self.updatePlaceholderVisibility()

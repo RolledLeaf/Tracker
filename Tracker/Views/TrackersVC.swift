@@ -65,7 +65,7 @@ final class TrackersViewController: UIViewController, UICollectionViewDataSource
     
     private lazy var searchBar: UISearchBar = {
         let searchBar = UISearchBar()
-        searchBar.placeholder = "Поиск"
+        searchBar.placeholder = NSLocalizedString("search", comment: "")
         searchBar.setImage(UIImage(systemName: "magnifyingglass"), for: .search, state: .normal)
         searchBar.layer.cornerRadius = 10
         searchBar.searchBarStyle = .minimal
@@ -116,7 +116,7 @@ final class TrackersViewController: UIViewController, UICollectionViewDataSource
         let button = UIButton(type: .system)
         button.tintColor = UIColor.custom(.textColor)
         button.layer.cornerRadius = 16
-        button.setTitle("Фильтры", for: .normal)
+        button.setTitle(NSLocalizedString("filtersButtonTitle", comment: ""), for: .normal)
         button.titleLabel?.font = UIFont.systemFont(ofSize: 17, weight: .regular)
         button.setTitleColor(.white, for: .normal)
         button.backgroundColor = UIColor.custom(.toggleSwitchBlue)
@@ -155,9 +155,9 @@ final class TrackersViewController: UIViewController, UICollectionViewDataSource
             view.addSubview($0)
         }
         
-        configureLabel(trackersLabel, text: "Трекеры", fontSize: 34, weight: .bold, color: .textColor)
-        configureLabel(emptyFieldLabel, text: "Что будем отслеживать?", fontSize: 12, weight: .regular, color: .textColor)
-        configureLabel(nothingFoundLabel, text: "Ничего не найдено", fontSize: 12, weight: .medium, color: .textColor)
+        configureLabel(trackersLabel, text: NSLocalizedString("trackersLabel", comment: ""), fontSize: 34, weight: .bold, color: .textColor)
+        configureLabel(emptyFieldLabel, text: NSLocalizedString("emptyFieldLabel", comment: ""), fontSize: 12, weight: .regular, color: .textColor)
+        configureLabel(nothingFoundLabel, text: NSLocalizedString("nothingFoundLabel", comment: ""), fontSize: 12, weight: .medium, color: .textColor)
         trackersLabel.textAlignment = .left
         
         
@@ -400,7 +400,7 @@ final class TrackersViewController: UIViewController, UICollectionViewDataSource
             self.filterButtonWidthConstraint.isActive = false
             self.filterButtonLeadingConstraint.isActive = true
             UIView.animate(withDuration: 0.3) {
-                self.filterButton.setTitle("Фильтры", for: .normal)
+                self.filterButton.setTitle(NSLocalizedString("filters", comment: ""), for: .normal)
                 self.filterButton.setImage(UIImage(systemName: ""), for: .normal)
                 
                 self.filterButtonLeadingConstraint.constant = 130
@@ -482,8 +482,8 @@ final class TrackersViewController: UIViewController, UICollectionViewDataSource
     private func createContextMenu(for indexPath: IndexPath) -> UIMenu {
 
         let tracker = self.trackerStore.fetchedResultsController.object(at: indexPath)
-        let isPinned = tracker.category?.title == "Закреплённые"
-        let pinTitle = isPinned ? "Открепить" : "Закрепить"
+        let isPinned = tracker.category?.title == NSLocalizedString("pinned", comment: "")
+        let pinTitle = isPinned ? NSLocalizedString("pin", comment: "") : NSLocalizedString("unpin", comment: "")
         let pinAction = UIAction(title: pinTitle, image: nil) { _ in
             if isPinned {
                 if let originalTitle = tracker.originalCategoryTitle {

@@ -10,7 +10,7 @@ final class NewHabitViewController: UIViewController, UITableViewDelegate, UITab
     
     private lazy var titleLabel: UILabel = {
         let label = UILabel()
-        label.text = "Новая привычка"
+        label.text = NSLocalizedString("newHabittitleLabel", comment: "")
         label.font = .systemFont(ofSize: 16, weight: .medium)
         label.textColor = UIColor.custom(.createButtonColor)
         label.textAlignment = .center
@@ -19,7 +19,7 @@ final class NewHabitViewController: UIViewController, UITableViewDelegate, UITab
     
     private lazy var characterLimitLabel: UILabel = {
         let label = UILabel()
-        label.text = "Ограничение 38 символов"
+        label.text = NSLocalizedString("characterLimitLabel", comment: "")
         label.font = .systemFont(ofSize: 14)
         label.textColor = UIColor.custom(.cancelButtonRed)
         label.isHidden = true
@@ -29,7 +29,7 @@ final class NewHabitViewController: UIViewController, UITableViewDelegate, UITab
     
     private lazy var trackerNameTextField: UITextField = {
         let textField = UITextField()
-        textField.placeholder = "Введите название трекера"
+        textField.placeholder = NSLocalizedString("trackerNameTextField", comment: "")
         textField.layer.cornerRadius = 16
         textField.font = .systemFont(ofSize: 17, weight: .regular)
         textField.textColor = UIColor.custom(.createButtonColor)
@@ -43,7 +43,7 @@ final class NewHabitViewController: UIViewController, UITableViewDelegate, UITab
         toolbar.sizeToFit()
         
         let flexSpace = UIBarButtonItem(barButtonSystemItem: .flexibleSpace, target: nil, action: nil)
-        let doneButton = UIBarButtonItem(title: "Готово", style: .done, target: textField, action: #selector(UIResponder.resignFirstResponder))
+        let doneButton = UIBarButtonItem(title: NSLocalizedString("doneButton", comment: ""), style: .done, target: textField, action: #selector(UIResponder.resignFirstResponder))
         toolbar.items = [flexSpace, doneButton]
         
         textField.inputAccessoryView = toolbar
@@ -92,7 +92,7 @@ final class NewHabitViewController: UIViewController, UITableViewDelegate, UITab
     
     private lazy var createTrackerButton: UIButton = {
         let button = UIButton()
-        button.setTitle("Создать", for: .normal)
+        button.setTitle(NSLocalizedString("createTrackerButton", comment: ""), for: .normal)
         button.titleLabel?.font = UIFont.systemFont(ofSize: 16, weight: .medium)
         button.setTitleColor(.white, for: .normal)
         
@@ -104,7 +104,7 @@ final class NewHabitViewController: UIViewController, UITableViewDelegate, UITab
     
     private lazy var cancelButton: UIButton = {
         let button = UIButton()
-        button.setTitle("Отменить", for: .normal)
+        button.setTitle(NSLocalizedString("cancel", comment: ""), for: .normal)
         button.titleLabel?.font = UIFont.systemFont(ofSize: 16, weight: .medium)
         button.setTitleColor(UIColor.custom(.cancelButtonRed), for: .normal)
         button.backgroundColor = .clear
@@ -120,8 +120,8 @@ final class NewHabitViewController: UIViewController, UITableViewDelegate, UITab
     let contentView = UIView()
     
     var tableViewOptions: [(title: String, subtitle: String?)] = [
-        (title: "Категория", subtitle: nil),
-        (title: "Расписание", subtitle: nil)
+        (title: NSLocalizedString("tableViewOptionCategory", comment: ""), subtitle: nil),
+        (title: NSLocalizedString("tableViewOptionSchedule", comment: ""), subtitle: nil)
     ]
     
     var selectedWeekDays: [String]? {
@@ -250,7 +250,7 @@ final class NewHabitViewController: UIViewController, UITableViewDelegate, UITab
     }
     
     private func showAlert(message: String) {
-        let alert = UIAlertController(title: "Привычка не создана", message: message, preferredStyle: .alert)
+        let alert = UIAlertController(title: NSLocalizedString("alertTrackerNotCreated", comment: ""), message: message, preferredStyle: .alert)
         alert.addAction(UIAlertAction(title: "OK", style: .default))
         present(alert, animated: true)
     }
@@ -276,7 +276,7 @@ final class NewHabitViewController: UIViewController, UITableViewDelegate, UITab
               let selectedWeekDays = selectedWeekDays,
               let selectedCategory = selectedCategory
         else {
-            showAlert(message: "Не все данные выбраны!")
+            showAlert(message: NSLocalizedString("alertFieldsMissed", comment: ""))
             print("Не все данные выбраны!")
             return
         }
@@ -345,7 +345,7 @@ final class NewHabitViewController: UIViewController, UITableViewDelegate, UITab
         if collectionView == emojiCollectionView {
             header.configure(with: "Emoji")
         } else if collectionView == colorsCollectionView {
-            header.configure(with: "Цвет")
+            header.configure(with: NSLocalizedString("colorCollectionViewTitle", comment: ""))
         }
         
         return header
@@ -466,9 +466,9 @@ extension NewHabitViewController: ScheduleViewControllerDelegate {
             tableViewOptions[index].subtitle = subtitle
             categoryAndScheduleTableView.reloadData()
         }
-        if title == "Расписание", let subtitle = subtitle {
-            if subtitle == "Ежедневно" {
-                selectedWeekDays = ["Пн", "Вт", "Ср", "Чт", "Пт", "Сб", "Вс"]
+        if title == NSLocalizedString("tableViewOptionSchedule", comment: ""), let subtitle = subtitle {
+            if subtitle == NSLocalizedString("everyday", comment: "") {
+                selectedWeekDays = shortWeekdaySymbols
             } else {
                 selectedWeekDays = subtitle.split(separator: ",").map { $0.trimmingCharacters(in: .whitespaces) }
             }
@@ -479,7 +479,7 @@ extension NewHabitViewController: ScheduleViewControllerDelegate {
 extension NewHabitViewController: CategoriesListViewControllerDelegate {
     func updateCategory(with category: TrackerCategoryCoreData) {
         print("Вызов делегата обновления категорий")
-        if let index = tableViewOptions.firstIndex(where: { $0.title == "Категория" }) {
+        if let index = tableViewOptions.firstIndex(where: { $0.title == NSLocalizedString("tableViewOptionCategory", comment: "") }) {
             tableViewOptions[index].subtitle = category.title
         }
         selectedCategory = category 

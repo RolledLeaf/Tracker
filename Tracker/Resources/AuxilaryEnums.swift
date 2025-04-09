@@ -15,6 +15,10 @@ enum EditAction: String {
     case delete = "Удалить"
 }
 
+enum PinnedCategories: String {
+    case pinned = "Закрепленные"
+}
+
 enum TrackerFilterType: String {
     case all
     case today
