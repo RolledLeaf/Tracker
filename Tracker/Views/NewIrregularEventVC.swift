@@ -245,7 +245,7 @@ final class NewIrregularEventViewController: UIViewController, UITableViewDelega
     }
     
     private func updateCreateCategoryButtonColor() {
-        if let name = trackerNameTextField.text, !name.isEmpty,
+        if let name = trackerNameTextField.text, !name.isEmpty, !name.isBlank,
            selectedColor != nil,
            selectedEmoji != nil,
            selectedCategory != nil {
@@ -260,7 +260,7 @@ final class NewIrregularEventViewController: UIViewController, UITableViewDelega
     }
     
     @objc private func createTrackerButtonTapped(_ sender: UIButton) {
-        guard let name = trackerNameTextField.text,
+        guard let name = trackerNameTextField.text, !name.isEmpty, !name.isBlank,
               let selectedColor = selectedColor,
               let selectedEmoji = selectedEmoji,
               

@@ -257,13 +257,13 @@ final class NewHabitViewController: UIViewController, UITableViewDelegate, UITab
     }
     
     private func updateCreateCategoryButtonColor() {
-        if let name = trackerNameTextField.text, !name.isEmpty,
+        if let name = trackerNameTextField.text, !name.isEmpty, !name.isBlank,
            selectedColor != nil,
            selectedEmoji != nil,
            let selectedWeekDays = selectedWeekDays, !selectedWeekDays.isEmpty,
            selectedCategory != nil {
             createTrackerButton.titleLabel?.textColor = UIColor.custom(.createButtonTextColor)
-            createTrackerButton.backgroundColor = UIColor.custom(.createButtonColor)  // Активный цвет
+            createTrackerButton.backgroundColor = UIColor.custom(.createButtonColor)
             print("Условия выполнены, кнопка Создать перекрашена в \(UIColor.custom(.createButtonColor))")
         } else {
             createTrackerButton.backgroundColor = UIColor.custom(.textFieldGray)  // Неактивный цвет
@@ -273,7 +273,7 @@ final class NewHabitViewController: UIViewController, UITableViewDelegate, UITab
     }
     
     @objc private func createTrackerButtonTapped(_ sender: UIButton) {
-        guard let name = trackerNameTextField.text,
+        guard let name = trackerNameTextField.text, !name.isEmpty, !name.isBlank,
               let selectedColor = selectedColor,
               let selectedEmoji = selectedEmoji,
               let selectedWeekDays = selectedWeekDays,
