@@ -3,8 +3,8 @@ import UIKit
 final class TabBarController: UITabBarController {
     override func viewDidLoad() {
         super.viewDidLoad()
-        setupTabBar()
         delegate = self
+        setupTabBar()
     }
     
     private func setupTabBar() {
@@ -15,6 +15,8 @@ final class TabBarController: UITabBarController {
         
         statisticsVC.tabBarItem = UITabBarItem(title: NSLocalizedString("statistics", comment: ""), image: UIImage(named: "statistics"), tag: 1)
         
+        // Оборачиваем каждый контроллер в UINavigationController,
+        // чтобы корректно отображался navigation bar и stack
         viewControllers = [UINavigationController(rootViewController: trackerVC),
                            UINavigationController(rootViewController: statisticsVC)]
         tabBar.backgroundColor = UIColor.custom(.mainBackgroundColor)
@@ -32,19 +34,25 @@ final class TabBarController: UITabBarController {
             separatorLine.leadingAnchor.constraint(equalTo: tabBar.leadingAnchor),
             separatorLine.trailingAnchor.constraint(equalTo: tabBar.trailingAnchor),
             separatorLine.topAnchor.constraint(equalTo: tabBar.topAnchor),
-            separatorLine.heightAnchor.constraint(equalToConstant: 1) //
+            separatorLine.heightAnchor.constraint(equalToConstant: 1)
         ])
     }
 }
     
 extension TabBarController: UITabBarControllerDelegate {
-    
     func tabBarController(_ tabBarController: UITabBarController, didSelect viewController: UIViewController) {
-        if viewController is TrackersViewController {
-            print("TrackersViewController is selected")
-        } else if viewController is StatisticsViewController {
-            Analytics.logEvent(.statisticsViewed)
+        // Получаем корневой контроллер из UINavigationController,
+        // так как viewController — это UINavigationController
+        if let nav = viewController as? UINavigationController,
+           let root = nav.viewControllers.first {
+            
+            if root is TrackersViewController {
+                print("TrackersViewController is selected")
+                
+            } else if root is StatisticsViewController {
+                print("StatisticsViewController is selected")
+                Analytics.logEvent(.statisticsViewed)
+            }
         }
     }
-    
 }
