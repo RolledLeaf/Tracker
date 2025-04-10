@@ -39,7 +39,8 @@
 
 //CategoriesListVC
 "categoryTitleLabel" = "Category";
-"emptyFieldLabel" = "Trackers and events are mergeable \n by category";
+"emptyTrackerCollectionPlaceholder" = "What we gonna track?";
+"emptyCategories" = "Trackers and events are mergeable \n by category";
 "addCategoryButton" = "Add category";
 "contextMenuEdit" = "Edit";
 "editingMenu" = "Input new category name";
@@ -50,6 +51,7 @@
 // NewCategoryVC
 "newCategoryTitleLabel" = "New category";
 "categoryNameTextField" = "Input category name";
+"newCategoryNameAlert" = "Input new category name";
 
 //StatisticsVC
 "statisticsTitleLabel" = "Statistics";
@@ -62,3 +64,5 @@
 
 //FiltersVC
 "filterOptions" = "All trackers, Trackers for today, Completed, Uncompleted";
+
+// NSLocalizedString("", comment: "")

@@ -249,10 +249,12 @@ final class NewIrregularEventViewController: UIViewController, UITableViewDelega
            selectedColor != nil,
            selectedEmoji != nil,
            selectedCategory != nil {
+            createTrackerButton.titleLabel?.textColor = UIColor.custom(.createButtonTextColor)
             createTrackerButton.backgroundColor = UIColor.custom(.createButtonColor)  // Активный цвет
             print("Условия выполнены, кнопка Создать перекрашена в \(UIColor.custom(.createButtonColor))")
         } else {
             createTrackerButton.backgroundColor = UIColor.custom(.textFieldGray)  // Неактивный цвет
+            createTrackerButton.titleLabel?.textColor = UIColor.custom(.textColor)
             print("Условия не выполнены, кнопка Создать снова \(UIColor.custom(.textFieldGray)) цвета")
         }
     }

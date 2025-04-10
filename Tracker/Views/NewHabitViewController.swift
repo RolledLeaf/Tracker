@@ -10,7 +10,7 @@ final class NewHabitViewController: UIViewController, UITableViewDelegate, UITab
     
     private lazy var titleLabel: UILabel = {
         let label = UILabel()
-        label.text = NSLocalizedString("newHabittitleLabel", comment: "")
+        label.text = NSLocalizedString("newHabitTitleLabel", comment: "")
         label.font = .systemFont(ofSize: 16, weight: .medium)
         label.textColor = UIColor.custom(.createButtonColor)
         label.textAlignment = .center
@@ -54,6 +54,7 @@ final class NewHabitViewController: UIViewController, UITableViewDelegate, UITab
     private lazy var categoryAndScheduleTableView: UITableView = {
         let tableView = UITableView()
         tableView.separatorStyle = .singleLine
+        tableView.separatorColor = UIColor.custom(.textFieldGray)
         tableView.isScrollEnabled = false
         tableView.backgroundColor = .clear
         tableView.rowHeight = 75
@@ -94,8 +95,7 @@ final class NewHabitViewController: UIViewController, UITableViewDelegate, UITab
         let button = UIButton()
         button.setTitle(NSLocalizedString("createTrackerButton", comment: ""), for: .normal)
         button.titleLabel?.font = UIFont.systemFont(ofSize: 16, weight: .medium)
-        button.setTitleColor(.white, for: .normal)
-        
+        button.setTitleColor(UIColor.custom(.textColor), for: .normal)
         button.backgroundColor = UIColor.custom(.textFieldGray)
         button.layer.cornerRadius = 16
         button.addTarget(self, action: #selector(createTrackerButtonTapped), for: .touchUpInside)
@@ -123,6 +123,7 @@ final class NewHabitViewController: UIViewController, UITableViewDelegate, UITab
         (title: NSLocalizedString("tableViewOptionCategory", comment: ""), subtitle: nil),
         (title: NSLocalizedString("tableViewOptionSchedule", comment: ""), subtitle: nil)
     ]
+    
     
     var selectedWeekDays: [String]? {
         didSet {
@@ -261,10 +262,12 @@ final class NewHabitViewController: UIViewController, UITableViewDelegate, UITab
            selectedEmoji != nil,
            let selectedWeekDays = selectedWeekDays, !selectedWeekDays.isEmpty,
            selectedCategory != nil {
+            createTrackerButton.titleLabel?.textColor = UIColor.custom(.createButtonTextColor)
             createTrackerButton.backgroundColor = UIColor.custom(.createButtonColor)  // Активный цвет
             print("Условия выполнены, кнопка Создать перекрашена в \(UIColor.custom(.createButtonColor))")
         } else {
             createTrackerButton.backgroundColor = UIColor.custom(.textFieldGray)  // Неактивный цвет
+            createTrackerButton.titleLabel?.textColor = UIColor.custom(.textColor)
             print("Условия не выполнены, кнопка Создать снова \(UIColor.custom(.textFieldGray)) цвета")
         }
     }

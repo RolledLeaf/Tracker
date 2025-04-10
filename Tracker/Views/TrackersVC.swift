@@ -1,5 +1,6 @@
 import UIKit
 import CoreData
+import AppMetricaCore
 
 final class TrackersViewController: UIViewController, UICollectionViewDataSource, UICollectionViewDelegateFlowLayout, UICollectionViewDelegate {
     
@@ -103,9 +104,9 @@ final class TrackersViewController: UIViewController, UICollectionViewDataSource
     
     private lazy var dateButton: UIButton = {
         let button = UIButton(type: .system)
-        button.setTitleColor(UIColor.custom(.textColor), for: .normal)
+        button.setTitleColor(UIColor.custom(.pitchBlack), for: .normal)
         button.setTitle(currentDateFormatted(), for: .normal)
-        button.backgroundColor = UIColor.custom(.backgroundGray)
+        button.backgroundColor = UIColor.custom(.dataGray)
         button.layer.cornerRadius = 8
         button.clipsToBounds = true
         button.titleLabel?.font = UIFont.systemFont(ofSize: 17, weight: .regular)
@@ -156,7 +157,7 @@ final class TrackersViewController: UIViewController, UICollectionViewDataSource
         }
         
         configureLabel(trackersLabel, text: NSLocalizedString("trackersLabel", comment: ""), fontSize: 34, weight: .bold, color: .textColor)
-        configureLabel(emptyFieldLabel, text: NSLocalizedString("emptyFieldLabel", comment: ""), fontSize: 12, weight: .regular, color: .textColor)
+        configureLabel(emptyFieldLabel, text: NSLocalizedString("emptyTrackerCollectionPlaceholder", comment: ""), fontSize: 12, weight: .regular, color: .textColor)
         configureLabel(nothingFoundLabel, text: NSLocalizedString("nothingFoundLabel", comment: ""), fontSize: 12, weight: .medium, color: .textColor)
         trackersLabel.textAlignment = .left
         
@@ -317,6 +318,7 @@ final class TrackersViewController: UIViewController, UICollectionViewDataSource
             }
             
         case .completed:
+            Analytics.logEvent(.filterCompletedActive)
             filteredTrackers = allTrackers.filter { tracker in
                 trackerRecords.contains { $0.trackerID == tracker.id && $0.date?.isSameDay(as: selectedDate) == true }
             }
@@ -390,6 +392,7 @@ final class TrackersViewController: UIViewController, UICollectionViewDataSource
         let navigationController = UINavigationController(rootViewController: createHabitVC)
         navigationController.modalPresentationStyle = .automatic
         present(navigationController, animated: true)
+        Analytics.logEvent(.addTrackerButtonTapped)
     }
     
     @objc private func filterButtonTapped() {
@@ -400,7 +403,7 @@ final class TrackersViewController: UIViewController, UICollectionViewDataSource
             self.filterButtonWidthConstraint.isActive = false
             self.filterButtonLeadingConstraint.isActive = true
             UIView.animate(withDuration: 0.3) {
-                self.filterButton.setTitle(NSLocalizedString("filters", comment: ""), for: .normal)
+                self.filterButton.setTitle(NSLocalizedString("filtersButtonTitle", comment: ""), for: .normal)
                 self.filterButton.setImage(UIImage(systemName: ""), for: .normal)
                 
                 self.filterButtonLeadingConstraint.constant = 130
@@ -508,7 +511,7 @@ final class TrackersViewController: UIViewController, UICollectionViewDataSource
             }
         }
            
-        let editAction = UIAction(title: EditAction.edit.rawValue, image: nil) { _ in
+        let editAction = UIAction(title: NSLocalizedString("contextMenuEdit", comment: ""), image: nil) { _ in
             let editHabitVC = EditHabitViewController()
             let editIrregularVC = EditIrregularEventViewController()
             
@@ -530,7 +533,7 @@ final class TrackersViewController: UIViewController, UICollectionViewDataSource
             }
         }
            
-           let deleteAction = UIAction(title: EditAction.delete.rawValue, image: nil) { _ in
+           let deleteAction = UIAction(title: NSLocalizedString("contextMenuDelete", comment: ""), image: nil) { _ in
                self.viewModel.deleteTracker(at: indexPath)
                
            }
@@ -599,8 +602,6 @@ extension TrackersViewController {
         cell.viewController = self
         cell.backgroundColor = .clear
         cell.configure(with: tracker, trackerRecords: trackerRecordsForTracker)
-        
-
         return cell
     }
     

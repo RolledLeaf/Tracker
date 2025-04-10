@@ -46,7 +46,7 @@ final class TrackerCell: UICollectionViewCell {
     lazy var daysCountLabel: UILabel = {
         let label = UILabel()
         label.font = .systemFont(ofSize: 12, weight: .regular)
-        label.textColor = .black
+        label.textColor = UIColor.custom(.textColor)
         label.translatesAutoresizingMaskIntoConstraints = false
         return label
     }()
@@ -102,7 +102,7 @@ final class TrackerCell: UICollectionViewCell {
         backgroundColor = .clear
         
        
-        
+
         let uiElements: [UIView] = [backgroundContainer, daysCountLabel, doneButtonContainer, doneButton]
         uiElements.forEach { $0.translatesAutoresizingMaskIntoConstraints = false }
         uiElements.forEach { contentView.addSubview($0) }

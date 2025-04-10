@@ -19,7 +19,7 @@ final class NewCategoryViewController: UIViewController {
         textField.placeholder = NSLocalizedString("categoryNameTextField", comment: "")
         textField.font = .systemFont(ofSize: 17, weight: .regular)
         textField.textColor = UIColor.custom(.createButtonColor)
-        textField.backgroundColor = UIColor.custom(.backgroundGray)
+        textField.backgroundColor = UIColor.custom(.tablesColor)
         textField.textAlignment = .left
         let paddingView = UIView(frame: CGRect(x: 0, y: 0, width: 16, height: textField.frame.height))
         textField.leftView = paddingView
