@@ -206,7 +206,8 @@ final class CategoriesListViewController: UIViewController, UITableViewDataSourc
         
         let deleteAction = UIAction(title: NSLocalizedString("contextMenuDelete", comment: ""), image: UIImage(systemName: "trash"), attributes: .destructive) { _ in
             self.viewModel.deleteCategory(at: indexPath.row)
-            self.updateTableHeight()
+            self.updateUI()
+            
         }
         return UIMenu(title: "", children: [editAction, deleteAction])
     }
