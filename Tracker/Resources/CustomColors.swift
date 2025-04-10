@@ -15,6 +15,7 @@ enum CustomColor: String {
     case tabBarSeparateLineColor = "tabBarSeparateLineColor"
     case tablesColor = "tablesColor"
     case thumbTintColor = "thumbTintColor"
+    case pitchBlack = "pitchBlack"
 }
 
 enum CollectionColors: String  {

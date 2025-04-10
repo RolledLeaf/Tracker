@@ -8,7 +8,7 @@ final class FiltersTableCell: UITableViewCell {
         let label = UILabel()
         label.font = .systemFont(ofSize: 17, weight: .regular)
         label.textColor = UIColor.custom(.createButtonColor)
-        label.backgroundColor = UIColor.custom(.backgroundGray)
+         label.backgroundColor = .clear
         label.textAlignment = .left
         label.translatesAutoresizingMaskIntoConstraints = false
         return label

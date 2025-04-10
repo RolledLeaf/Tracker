@@ -1,5 +1,6 @@
 import UIKit
 import CoreData
+import AppMetricaCore
 
 final class TrackersViewController: UIViewController, UICollectionViewDataSource, UICollectionViewDelegateFlowLayout, UICollectionViewDelegate {
     
@@ -103,9 +104,9 @@ final class TrackersViewController: UIViewController, UICollectionViewDataSource
     
     private lazy var dateButton: UIButton = {
         let button = UIButton(type: .system)
-        button.setTitleColor(UIColor.custom(.textColor), for: .normal)
+        button.setTitleColor(UIColor.custom(.pitchBlack), for: .normal)
         button.setTitle(currentDateFormatted(), for: .normal)
-        button.backgroundColor = UIColor.custom(.backgroundGray)
+        button.backgroundColor = UIColor.custom(.dataGray)
         button.layer.cornerRadius = 8
         button.clipsToBounds = true
         button.titleLabel?.font = UIFont.systemFont(ofSize: 17, weight: .regular)
@@ -317,6 +318,7 @@ final class TrackersViewController: UIViewController, UICollectionViewDataSource
             }
             
         case .completed:
+            Analytics.logEvent(.filterCompletedActive)
             filteredTrackers = allTrackers.filter { tracker in
                 trackerRecords.contains { $0.trackerID == tracker.id && $0.date?.isSameDay(as: selectedDate) == true }
             }
@@ -390,6 +392,7 @@ final class TrackersViewController: UIViewController, UICollectionViewDataSource
         let navigationController = UINavigationController(rootViewController: createHabitVC)
         navigationController.modalPresentationStyle = .automatic
         present(navigationController, animated: true)
+        Analytics.logEvent(.addTrackerButtonTapped)
     }
     
     @objc private func filterButtonTapped() {
@@ -599,8 +602,6 @@ extension TrackersViewController {
         cell.viewController = self
         cell.backgroundColor = .clear
         cell.configure(with: tracker, trackerRecords: trackerRecordsForTracker)
-        
-
         return cell
     }
     
