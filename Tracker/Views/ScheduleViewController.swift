@@ -21,6 +21,7 @@ final class ScheduleViewController: UIViewController, UITableViewDelegate, UITab
     private lazy var weekDaysTable: UITableView = {
         let tableView = UITableView()
         tableView.separatorStyle = .singleLine
+        tableView.separatorColor = UIColor.custom(.textFieldGray)
         tableView.isScrollEnabled = false
         tableView.backgroundColor = .clear
         tableView.rowHeight = 75

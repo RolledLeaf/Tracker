@@ -8,16 +8,7 @@ enum UserDefaultsKeys {
     static let selectedFilter = "selectedFilter"
 }
 
-enum EditAction: String {
-    case pin = "Закрепить"
-    case unpin = "Открепить"
-    case edit = "Редактировать"
-    case delete = "Удалить"
-}
 
-enum PinnedCategories: String {
-    case pinned = "Закрепленные"
-}
 
 enum TrackerFilterType: String {
     case all

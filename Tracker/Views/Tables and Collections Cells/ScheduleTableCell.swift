@@ -13,7 +13,7 @@ final class ScheduleTableCell: UITableViewCell {
     private lazy var titleLabel: UILabel = {
         let label = UILabel()
         label.font = .systemFont(ofSize: 17, weight: .regular)
-        label.textColor = .black
+        label.textColor = UIColor.custom(.textColor)
         label.backgroundColor = .clear
         label.textAlignment = .left
         label.translatesAutoresizingMaskIntoConstraints = false
@@ -23,7 +23,10 @@ final class ScheduleTableCell: UITableViewCell {
     private lazy var toggleSwitch: UISwitch = {
         let toggle = UISwitch()
         toggle.onTintColor = UIColor.custom(.toggleSwitchBlue)
-        toggle.thumbTintColor = .white // Цвет кружка
+        toggle.tintColor = UIColor.custom(.toggleSwitchGray)
+        toggle.thumbTintColor = UIColor.custom(.thumbTintColor) // Цвет кружка
+        toggle.backgroundColor = UIColor.custom(.toggleSwitchGray) // для iOS 13+
+        toggle.layer.cornerRadius = toggle.frame.height / 2
         toggle.translatesAutoresizingMaskIntoConstraints = false
         return toggle
     }()
