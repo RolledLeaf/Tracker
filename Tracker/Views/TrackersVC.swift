@@ -22,7 +22,7 @@ final class TrackersViewController: UIViewController, UICollectionViewDataSource
     private let trackersLabel = UILabel()
     private let nothingFoundLabel = UILabel()
     private let emptyFieldLabel = UILabel()
-    private let locale = Locale(identifier: "ru_RU")
+    private let locale = Locale.current
     private let context = CoreDataStack.shared.persistentContainer.viewContext
     
     
@@ -32,7 +32,6 @@ final class TrackersViewController: UIViewController, UICollectionViewDataSource
     private let dateFormatter: DateFormatter = {
         let formatter = DateFormatter()
         formatter.dateFormat = "dd.MM.YY"
-        formatter.locale = Locale(identifier: "ru_RU")
         return formatter
     }()
     
@@ -96,7 +95,7 @@ final class TrackersViewController: UIViewController, UICollectionViewDataSource
         picker.preferredDatePickerStyle = .compact
         picker.addTarget(self, action: #selector(dateChanged(_:)), for: .valueChanged)
         picker.backgroundColor = UIColor.custom(.backgroundGray)
-        picker.locale = Locale(identifier: "ru_RU")
+        picker.locale = locale
         picker.isHidden = false
         picker.alpha = 0.015
         return picker
@@ -743,6 +742,9 @@ extension TrackersViewController: UISearchBarDelegate {
             categoriesCollectionView.isHidden = true
             trackerStore.fetchedResultsController.fetchRequest.predicate = nil
         } else {
+            nothingFoundImage.isHidden =  true
+            nothingFoundLabel.isHidden = true
+            categoriesCollectionView.isHidden = false
             trackerStore.fetchedResultsController.fetchRequest.predicate = NSPredicate(format: "id IN %@", trackerIDs)
         }
 
