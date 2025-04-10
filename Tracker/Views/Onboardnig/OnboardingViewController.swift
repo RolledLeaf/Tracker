@@ -20,7 +20,7 @@ final class OnboardingViewController: UIPageViewController, UIPageViewController
             let label = UILabel()
             label.text = "Отслеживайте только \n то, что хотите"
             label.numberOfLines = 0
-            label.textColor = UIColor.custom(.createButtonColor)
+            label.textColor = UIColor.custom(.pitchBlack)
             label.textAlignment = .center
             label.font = UIFont.systemFont(ofSize: 32, weight: .bold)
             label.translatesAutoresizingMaskIntoConstraints = false
@@ -56,7 +56,7 @@ final class OnboardingViewController: UIPageViewController, UIPageViewController
             let label = UILabel()
             label.text = "Даже если это \n не литры воды и йога"
             label.numberOfLines = 0
-            label.textColor = UIColor.custom(.createButtonColor)
+            label.textColor = UIColor.custom(.pitchBlack)
             label.textAlignment = .center
             label.font = UIFont.systemFont(ofSize: 32, weight: .bold)
             label.translatesAutoresizingMaskIntoConstraints = false
@@ -84,8 +84,8 @@ final class OnboardingViewController: UIPageViewController, UIPageViewController
         pageControl.numberOfPages = pages.count
         pageControl.currentPage = 0
         
-        pageControl.currentPageIndicatorTintColor = UIColor.custom(.createButtonColor)
-        pageControl.pageIndicatorTintColor = adjustAlpha(UIColor.custom(.createButtonColor) ?? .backgroundGray, to: 0.3)
+        pageControl.currentPageIndicatorTintColor = UIColor.custom(.pitchBlack)
+        pageControl.pageIndicatorTintColor = adjustAlpha(UIColor.custom(.thumbTintColor) ?? .backgroundGray, to: 0.3)
         pageControl.translatesAutoresizingMaskIntoConstraints = false
         return pageControl
     }()
@@ -116,8 +116,8 @@ final class OnboardingViewController: UIPageViewController, UIPageViewController
         let finishButton = UIButton(type: .system)
         finishButton.setTitle("Вот это технологии!", for: .normal)
         finishButton.titleLabel?.font = UIFont.systemFont(ofSize: 16, weight: .medium)
-        finishButton.setTitleColor(UIColor.custom(.createButtonTextColor), for: .normal)
-        finishButton.backgroundColor = UIColor.custom(.createButtonColor)
+        finishButton.setTitleColor(UIColor.custom(.thumbTintColor), for: .normal)
+        finishButton.backgroundColor = UIColor.custom(.pitchBlack)
         finishButton.layer.cornerRadius = 16
         
         finishButton.translatesAutoresizingMaskIntoConstraints = false
