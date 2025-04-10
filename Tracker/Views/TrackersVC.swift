@@ -184,7 +184,7 @@ final class TrackersViewController: UIViewController, UICollectionViewDataSource
             dateButton.heightAnchor.constraint(equalToConstant: 34),
             dateButton.widthAnchor.constraint(equalToConstant: 77),
             dateButton.trailingAnchor.constraint(equalTo: view.safeAreaLayoutGuide.trailingAnchor, constant: -16),
-            dateButton.topAnchor.constraint(equalTo: view.safeAreaLayoutGuide.topAnchor, constant: -10),
+            dateButton.topAnchor.constraint(equalTo: view.safeAreaLayoutGuide.topAnchor, constant: -5),
 
             datePicker.centerXAnchor.constraint(equalTo: dateButton.centerXAnchor),
             datePicker.centerYAnchor.constraint(equalTo: dateButton.centerYAnchor),
@@ -201,7 +201,7 @@ final class TrackersViewController: UIViewController, UICollectionViewDataSource
             
             
             trackersLabel.leadingAnchor.constraint(equalTo: view.safeAreaLayoutGuide.leadingAnchor, constant: 16),
-            trackersLabel.topAnchor.constraint(equalTo: view.safeAreaLayoutGuide.topAnchor, constant: 20),
+            trackersLabel.topAnchor.constraint(equalTo: view.safeAreaLayoutGuide.topAnchor, constant: 25),
             
             searchBar.trailingAnchor.constraint(equalTo:view.safeAreaLayoutGuide.trailingAnchor, constant: -10),
             searchBar.heightAnchor.constraint(equalToConstant: 36),
