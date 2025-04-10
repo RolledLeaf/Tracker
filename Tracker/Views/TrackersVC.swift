@@ -731,11 +731,16 @@ extension TrackersViewController: UISearchBarDelegate {
 
         if searchText.isEmpty {
            updateVisibleTrackers(for: selectedDate)
+            nothingFoundImage.isHidden =  true
+            nothingFoundLabel.isHidden = true
+            categoriesCollectionView.isHidden = false
             return
         }
-
         let trackerIDs = filteredTrackers.compactMap { $0.id }
         if trackerIDs.isEmpty {
+            nothingFoundImage.isHidden = false
+            nothingFoundLabel.isHidden = false
+            categoriesCollectionView.isHidden = true
             trackerStore.fetchedResultsController.fetchRequest.predicate = nil
         } else {
             trackerStore.fetchedResultsController.fetchRequest.predicate = NSPredicate(format: "id IN %@", trackerIDs)
