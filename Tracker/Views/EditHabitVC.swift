@@ -261,7 +261,7 @@ final class EditHabitViewController: UIViewController, UITableViewDelegate, UITa
     }
     
     private func showAlert(message: String) {
-        let alert = UIAlertController(title: NSLocalizedString("alertTrackerNotCreated", comment: ""), message: message, preferredStyle: .alert)
+        let alert = UIAlertController(title: NSLocalizedString("alertTrackerNotSaved", comment: ""), message: message, preferredStyle: .alert)
         alert.addAction(UIAlertAction(title: NSLocalizedString("ok", comment: ""), style: .default))
         present(alert, animated: true)
     }
@@ -289,7 +289,7 @@ final class EditHabitViewController: UIViewController, UITableViewDelegate, UITa
               let selectedWeekDays = selectedWeekDays,
               let selectedCategory = selectedCategory
         else {
-            showAlert(message: NSLocalizedString("alertTrackerNotSaved", comment: ""))
+            showAlert(message: NSLocalizedString("alertFieldsMissed", comment: ""))
             print("Не все данные выбраны!")
             return
         }

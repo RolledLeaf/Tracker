@@ -279,7 +279,7 @@ final class EditIrregularEventViewController: UIViewController, UITableViewDeleg
               let selectedEmoji = selectedEmoji,
               let selectedCategory = selectedCategory
         else {
-            showAlert(message: "Не все данные выбраны!")
+            showAlert(message: NSLocalizedString("alertFieldsMissed", comment: ""))
             print("Не все данные выбраны!")
             return
         }

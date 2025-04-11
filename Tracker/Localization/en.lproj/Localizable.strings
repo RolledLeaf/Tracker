@@ -33,7 +33,7 @@
 "tableViewOptionCategory" = "Category";
 "tableViewOptionSchedule" = "Schedule";
 "alertTrackerNotCreated" = "Tracker wasn't created";
-"alertFieldsMissed" = "Unselected fields!";
+"alertFieldsMissed" = "Missed fields!";
 "colorCollectionViewTitle" = "Color";
 "everyday" = "Daily";
 
@@ -78,7 +78,6 @@
 //"tableViewOptionCategory" = "Категория";
 //"tableViewOptionSchedule" = "Расписание";
 "alertTrackerNotSaved" = "Unable to save";
-//"alertFieldsMissed" = "Не все данные выбраны!";
 //"everyday" = "Ежедневно";
 //"shortWeekDaysSymbols" = "Пн, Вт, Ср, Чт, Пт, Сб, Вс";
 
