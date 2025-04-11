@@ -77,7 +77,7 @@
 //"cancel" = "Отменить";
 //"tableViewOptionCategory" = "Категория";
 //"tableViewOptionSchedule" = "Расписание";
-//"alertTrackerNotCreated" = "Привычка не создана";
+"alertTrackerNotSaved" = "Unable to save";
 //"alertFieldsMissed" = "Не все данные выбраны!";
 //"everyday" = "Ежедневно";
 //"shortWeekDaysSymbols" = "Пн, Вт, Ср, Чт, Пт, Сб, Вс";

@@ -289,7 +289,7 @@ final class EditHabitViewController: UIViewController, UITableViewDelegate, UITa
               let selectedWeekDays = selectedWeekDays,
               let selectedCategory = selectedCategory
         else {
-            showAlert(message: NSLocalizedString("alertFieldsMissed", comment: ""))
+            showAlert(message: NSLocalizedString("alertTrackerNotSaved", comment: ""))
             print("Не все данные выбраны!")
             return
         }
