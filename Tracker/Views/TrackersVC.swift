@@ -339,9 +339,7 @@ final class TrackersViewController: UIViewController, UICollectionViewDataSource
             }
         }
 
-        let sortedTrackers = filteredTrackers.sorted {
-            ($0.category?.sortOrder ?? 0) < ($1.category?.sortOrder ?? 0)
-        }
+        let sortedTrackers = filteredTrackers
 
         let trackerIDs = sortedTrackers.compactMap { $0.id }
         trackerStore.fetchedResultsController.fetchRequest.predicate = NSPredicate(format: "id IN %@", trackerIDs)
@@ -485,7 +483,7 @@ final class TrackersViewController: UIViewController, UICollectionViewDataSource
 
         let tracker = self.trackerStore.fetchedResultsController.object(at: indexPath)
         let isPinned = tracker.category?.title == NSLocalizedString("pinned", comment: "")
-        let pinTitle = isPinned ? NSLocalizedString("pin", comment: "") : NSLocalizedString("unpin", comment: "")
+        let pinTitle = isPinned ? NSLocalizedString("unpin", comment: "") : NSLocalizedString("pin", comment: "")
         let pinAction = UIAction(title: pinTitle, image: nil) { _ in
             if isPinned {
                 if let originalTitle = tracker.originalCategoryTitle {
@@ -504,7 +502,7 @@ final class TrackersViewController: UIViewController, UICollectionViewDataSource
 
             do {
                 try CoreDataStack.shared.context.save()
-                self.updateVisibleTrackers(for: self.selectedDate)
+                self.reloadCategoryData()
             } catch {
                 print("❌ Ошибка при закреплении/откреплении трекера: \(error)")
             }
@@ -691,7 +689,8 @@ extension TrackersViewController: TrackerStoreDelegate {
 extension TrackersViewController: NewTrackerDelegate {
     func didCreateTracker(_ tracker: TrackerCoreData, _ category: TrackerCategoryCoreData) {
        
-        updateVisibleTrackers(for: selectedDate)
+        updateVisibleTrackers(for: currentDate)
+        reloadCategoryData()
         print("Tracker \(tracker.name ?? "unnamed") created with categorySortOrder \(category.sortOrder)")
     }
 }
