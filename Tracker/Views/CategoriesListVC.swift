@@ -83,7 +83,6 @@ final class CategoriesListViewController: UIViewController, UITableViewDataSourc
             let alert = UIAlertController(title: NSLocalizedString("contextMenuEdit", comment: ""), message: NSLocalizedString("newCategoryNameAlert", comment: ""), preferredStyle: .alert)
             alert.addTextField { textField in
                 textField.text = currentText
-                textField.placeholder = NSLocalizedString("categoryEditinigPlaceholder", comment: "")
             }
             
             let saveAction = UIAlertAction(title: NSLocalizedString(NSLocalizedString("save", comment: ""), comment: ""), style: .default) { _ in
