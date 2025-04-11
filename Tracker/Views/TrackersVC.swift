@@ -487,7 +487,7 @@ final class TrackersViewController: UIViewController, UICollectionViewDataSource
         let pinAction = UIAction(title: pinTitle, image: nil) { _ in
             if isPinned {
                 if let originalTitle = tracker.originalCategoryTitle {
-                    let allCategories = self.trackerCategoryStore.fetchCategories()
+                    let allCategories = self.trackerCategoryStore.fetchAllTrackerCategories()
                     if let originalCategory = allCategories.first(where: { $0.title == originalTitle }) {
                         tracker.category = originalCategory
                         tracker.originalCategoryTitle = nil

@@ -17,7 +17,7 @@ class CategoriesViewModel {
     }
 
     func fetchCategories() {
-        categories = categoryStore.fetchCategories()
+        categories = categoryStore.fetchAllTrackerCategories()
     }
 
     func selectCategory(at index: Int) {

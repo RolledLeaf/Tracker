@@ -19,7 +19,7 @@ final class TrackerCategoryStore: NSObject, NSFetchedResultsControllerDelegate {
     func fetchAllTrackerCategories() -> [TrackerCategoryCoreData] {
         let fetchRequest: NSFetchRequest<TrackerCategoryCoreData> = TrackerCategoryCoreData.fetchRequest()
         fetchRequest.sortDescriptors = [NSSortDescriptor(key: "sortOrder", ascending: true)]
-        fetchRequest.predicate = NSPredicate(format: "title != %@", "Закреплённые") // исключаем
+        fetchRequest.predicate = NSPredicate(format: "title != %@", NSLocalizedString("pinned", comment: "")) // исключаем
         do {
             return try context.fetch(fetchRequest)
         } catch {
@@ -30,14 +30,14 @@ final class TrackerCategoryStore: NSObject, NSFetchedResultsControllerDelegate {
     
     func getOrCreatePinnedCategory() -> TrackerCategoryCoreData? {
         let fetchRequest: NSFetchRequest<TrackerCategoryCoreData> = TrackerCategoryCoreData.fetchRequest()
-        fetchRequest.predicate = NSPredicate(format: "title == %@", "Закреплённые")
+        fetchRequest.predicate = NSPredicate(format: "title == %@", NSLocalizedString("pinned", comment: ""))
         fetchRequest.fetchLimit = 1
         do {
             if let category = try context.fetch(fetchRequest).first {
                 return category
             } else {
                 let newCategory = TrackerCategoryCoreData(context: context)
-                newCategory.title = "Закреплённые"
+                newCategory.title = NSLocalizedString("pinned", comment: "")
                 newCategory.sortOrder = 0
                 try context.save()
                 return newCategory
@@ -59,15 +59,15 @@ final class TrackerCategoryStore: NSObject, NSFetchedResultsControllerDelegate {
         }
     }
     
-    func fetchCategories() -> [TrackerCategoryCoreData] {
-        let request: NSFetchRequest<TrackerCategoryCoreData> = TrackerCategoryCoreData.fetchRequest()
-        do {
-            return try context.fetch(request)
-        } catch {
-            print("Failed to fetch categories: \(error)")
-            return []
-        }
-    }
+//    func fetchCategories() -> [TrackerCategoryCoreData] {
+//        let request: NSFetchRequest<TrackerCategoryCoreData> = TrackerCategoryCoreData.fetchRequest()
+//        do {
+//            return try context.fetch(request)
+//        } catch {
+//            print("Failed to fetch categories: \(error)")
+//            return []
+//        }
+//    }
     
     func saveCategory(name: String) {
         let newCategory = TrackerCategoryCoreData(context: context)

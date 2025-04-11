@@ -223,7 +223,8 @@ final class CategoriesListViewController: UIViewController, UITableViewDataSourc
         
         let category = viewModel.categories[indexPath.row]
         if category.title == NSLocalizedString("pinned", comment: "") {
-            cell.setHidden(true)
+        
+        
         }
         cell.configure(with: category.title ?? NSLocalizedString("noNameString", comment: ""))
         return cell
