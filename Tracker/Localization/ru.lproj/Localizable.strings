@@ -65,4 +65,24 @@
 //FiltersVC
 "filterOptions" = "Все трекеры, Трекеры на сегодня, Завершённые, Не завершённые";
 
+//EditHabitVC
+"habitEditingTitle" = "Редактирование привычки";
+"irregularEventEditing" = "Редактирование нерегулярного события";
+"ok" = "OK";
+"colorCollectionViewTitle" = "Цвет";
+//"characterLimitLabel"
+//"trackerNameTextField" = "Введите название трекера";
+//"doneButton" = "Готово";
+//"save" = "Сохранить";
+//"cancel" = "Отменить";
+//"tableViewOptionCategory" = "Категория";
+//"tableViewOptionSchedule" = "Расписание";
+//"alertTrackerNotCreated" = "Привычка не создана";
+//"alertFieldsMissed" = "Не все данные выбраны!";
+//"everyday" = "Ежедневно";
+//"shortWeekDaysSymbols" = "Пн, Вт, Ср, Чт, Пт, Сб, Вс";
+
+
+
 // NSLocalizedString("", comment: "")
+

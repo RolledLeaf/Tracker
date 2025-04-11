@@ -6,7 +6,7 @@ final class EditHabitViewController: UIViewController, UITableViewDelegate, UITa
     
     private lazy var titleLabel: UILabel = {
         let label = UILabel()
-        label.text = "Редактирование привычки"
+        label.text = NSLocalizedString("habitEditingTitle", comment: "")
         label.font = .systemFont(ofSize: 16, weight: .medium)
         label.textColor = UIColor.custom(.createButtonColor)
         label.textAlignment = .center
@@ -24,7 +24,7 @@ final class EditHabitViewController: UIViewController, UITableViewDelegate, UITa
     
     private lazy var characterLimitLabel: UILabel = {
         let label = UILabel()
-        label.text = "Ограничение 38 символов"
+        label.text = NSLocalizedString("characterLimitLabel", comment: "")
         label.font = .systemFont(ofSize: 14)
         label.textColor = UIColor.custom(.cancelButtonRed)
         label.isHidden = true
@@ -34,7 +34,7 @@ final class EditHabitViewController: UIViewController, UITableViewDelegate, UITa
     
     private lazy var trackerNameTextField: UITextField = {
         let textField = UITextField()
-        textField.placeholder = "Введите название трекера"
+        textField.placeholder = NSLocalizedString("trackerNameTextField", comment: "")
         textField.layer.cornerRadius = 16
         textField.font = .systemFont(ofSize: 17, weight: .regular)
         textField.textColor = UIColor.custom(.createButtonColor)
@@ -48,7 +48,7 @@ final class EditHabitViewController: UIViewController, UITableViewDelegate, UITa
         toolbar.sizeToFit()
         
         let flexSpace = UIBarButtonItem(barButtonSystemItem: .flexibleSpace, target: nil, action: nil)
-        let doneButton = UIBarButtonItem(title: "Готово", style: .done, target: textField, action: #selector(UIResponder.resignFirstResponder))
+        let doneButton = UIBarButtonItem(title: NSLocalizedString("doneButton", comment: ""), style: .done, target: textField, action: #selector(UIResponder.resignFirstResponder))
         toolbar.items = [flexSpace, doneButton]
         
         textField.inputAccessoryView = toolbar
@@ -97,10 +97,9 @@ final class EditHabitViewController: UIViewController, UITableViewDelegate, UITa
     
     private lazy var saveTrackerButton: UIButton = {
         let button = UIButton()
-        button.setTitle("Сохранить", for: .normal)
+        button.setTitle(NSLocalizedString("save", comment: ""), for: .normal)
         button.titleLabel?.font = UIFont.systemFont(ofSize: 16, weight: .medium)
-        button.setTitleColor(.white, for: .normal)
-        
+        button.setTitleColor(UIColor.custom(.createButtonTextColor), for: .normal)
         button.backgroundColor = UIColor.custom(.textFieldGray)
         button.layer.cornerRadius = 16
         button.addTarget(self, action: #selector(saveTrackerButtonTapped), for: .touchUpInside)
@@ -109,7 +108,7 @@ final class EditHabitViewController: UIViewController, UITableViewDelegate, UITa
     
     private lazy var cancelButton: UIButton = {
         let button = UIButton()
-        button.setTitle("Отменить", for: .normal)
+        button.setTitle(NSLocalizedString("cancel", comment: ""), for: .normal)
         button.titleLabel?.font = UIFont.systemFont(ofSize: 16, weight: .medium)
         button.setTitleColor(UIColor.custom(.cancelButtonRed), for: .normal)
         button.backgroundColor = .clear
@@ -126,8 +125,8 @@ final class EditHabitViewController: UIViewController, UITableViewDelegate, UITa
     let contentView = UIView()
     
     var tableViewOptions: [(title: String, subtitle: String?)] = [
-        (title: "Категория", subtitle: nil),
-        (title: "Расписание", subtitle: nil)
+        (title: NSLocalizedString("tableViewOptionCategory", comment: ""), subtitle: nil),
+        (title: NSLocalizedString("tableViewOptionSchedule", comment: ""), subtitle: nil)
     ]
     
     var selectedWeekDays: [String]? {
@@ -262,33 +261,35 @@ final class EditHabitViewController: UIViewController, UITableViewDelegate, UITa
     }
     
     private func showAlert(message: String) {
-        let alert = UIAlertController(title: "Привычка не создана", message: message, preferredStyle: .alert)
-        alert.addAction(UIAlertAction(title: "OK", style: .default))
+        let alert = UIAlertController(title: NSLocalizedString("alertTrackerNotCreated", comment: ""), message: message, preferredStyle: .alert)
+        alert.addAction(UIAlertAction(title: NSLocalizedString("ok", comment: ""), style: .default))
         present(alert, animated: true)
     }
     
     private func updateCreateCategoryButtonColor() {
-        if let name = trackerNameTextField.text, !name.isEmpty,
+        if let name = trackerNameTextField.text, !name.isEmpty, !name.isBlank,
            selectedColor != nil,
            selectedEmoji != nil,
            let selectedWeekDays = selectedWeekDays, !selectedWeekDays.isEmpty,
            selectedCategory != nil {
-            saveTrackerButton.backgroundColor = UIColor.custom(.createButtonColor)  // Активный цвет
+            saveTrackerButton.titleLabel?.textColor = UIColor.custom(.createButtonTextColor)
+            saveTrackerButton.backgroundColor = UIColor.custom(.createButtonColor)
             print("Условия выполнены, кнопка Сохранить перекрашена в \(UIColor.custom(.createButtonColor))")
         } else {
             saveTrackerButton.backgroundColor = UIColor.custom(.textFieldGray)  // Неактивный цвет
+            saveTrackerButton.titleLabel?.textColor = UIColor.custom(.textColor)
             print("Условия не выполнены, кнопка Сохранить снова \(UIColor.custom(.textFieldGray)) цвета")
         }
     }
     
     @objc private func saveTrackerButtonTapped(_ sender: UIButton) {
-        guard let name = trackerNameTextField.text,
+        guard let name = trackerNameTextField.text, !name.isEmpty, !name.isBlank,
               let selectedColor = selectedColor,
               let selectedEmoji = selectedEmoji,
               let selectedWeekDays = selectedWeekDays,
               let selectedCategory = selectedCategory
         else {
-            showAlert(message: "Не все данные выбраны!")
+            showAlert(message: NSLocalizedString("alertFieldsMissed", comment: ""))
             print("Не все данные выбраны!")
             return
         }
@@ -370,7 +371,7 @@ final class EditHabitViewController: UIViewController, UITableViewDelegate, UITa
         if collectionView == emojiCollectionView {
             header.configure(with: "Emoji")
         } else if collectionView == colorsCollectionView {
-            header.configure(with: "Цвет")
+            header.configure(with: NSLocalizedString("colorCollectionViewTitle", comment: ""))
         }
         
         return header
@@ -536,9 +537,9 @@ extension EditHabitViewController: ScheduleViewControllerDelegate {
             tableViewOptions[index].subtitle = subtitle
             categoryAndScheduleTableView.reloadData()
         }
-        if title == "Расписание", let subtitle = subtitle {
-            if subtitle == "Ежедневно" {
-                selectedWeekDays = ["Пн", "Вт", "Ср", "Чт", "Пт", "Сб", "Вс"]
+        if title ==  NSLocalizedString("tableViewOptionSchedule", comment: ""), let subtitle = subtitle {
+            if subtitle == NSLocalizedString("everyday", comment: "") {
+                selectedWeekDays = NSLocalizedString("shortWeekDaysSymbols", comment: "").components(separatedBy: ", ")
             } else {
                 selectedWeekDays = subtitle.split(separator: ",").map { $0.trimmingCharacters(in: .whitespaces) }
             }
@@ -548,7 +549,7 @@ extension EditHabitViewController: ScheduleViewControllerDelegate {
 
 extension EditHabitViewController: CategoriesListViewControllerDelegate {
     func updateCategory(with category: TrackerCategoryCoreData) {
-        if let index = tableViewOptions.firstIndex(where: { $0.title == "Категория" }) {
+        if let index = tableViewOptions.firstIndex(where: { $0.title == NSLocalizedString("tableViewOptionCategory", comment: "") }) {
             tableViewOptions[index].subtitle = category.title
         }
         selectedCategory = category
