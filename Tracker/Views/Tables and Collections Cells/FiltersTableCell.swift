@@ -30,7 +30,6 @@ final class FiltersTableCell: UITableViewCell {
     }()
     
     // MARK: - Init
-    
     override init(style: UITableViewCell.CellStyle, reuseIdentifier: String?) {
         super.init(style: style, reuseIdentifier: reuseIdentifier)
         setupUI()
@@ -42,9 +41,6 @@ final class FiltersTableCell: UITableViewCell {
     }
     
     // MARK: - UI Setup
-    
-  
-    
     private func setupUI() {
         contentView.addSubview(categoryNameLabel)
         contentView.addSubview(checkMark)
@@ -72,8 +68,6 @@ final class FiltersTableCell: UITableViewCell {
     func showCheckmark(_ visible: Bool) {
         checkMark.isHidden = !visible
     }
-    
-   
     
     // MARK: - Configuration Method
     func configure(with title: String){
