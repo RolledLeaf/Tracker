@@ -88,8 +88,6 @@ final class NewCategoryViewController: UIViewController {
         }
     }
     
-    
-    
     private func saveCategoryToCoreData(_ categoryName: String) {
         let context = CoreDataStack.shared.context
         let newCategory = TrackerCategoryCoreData(context: context)
