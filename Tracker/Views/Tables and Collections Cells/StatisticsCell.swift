@@ -4,7 +4,7 @@ final class StatisticsCell: UITableViewCell {
     
     static let identifier = "StatisticsCell"
     
-    private lazy var titleLabel: UILabel = {
+     lazy var titleLabel: UILabel = {
         let label = UILabel()
         label.font = .systemFont(ofSize: 34, weight: .medium)
         label.textColor = UIColor.custom(.textColor)
@@ -13,7 +13,7 @@ final class StatisticsCell: UITableViewCell {
         return label
     }()
     
-    private lazy var detailedTextLabel: UILabel = {
+     lazy var detailedTextLabel: UILabel = {
         let label = UILabel()
         label.font = .systemFont(ofSize: 12, weight: .medium)
         label.textColor = UIColor.custom(.textColor)
