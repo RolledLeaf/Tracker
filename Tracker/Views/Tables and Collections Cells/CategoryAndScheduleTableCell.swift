@@ -4,7 +4,7 @@ final class CategoryAndScheduleTableViewCell: UITableViewCell {
     
     static let identifier = "CategoryAndScheduleTableViewCell"
     
-    private lazy var titleLabel: UILabel = {
+     lazy var titleLabel: UILabel = {
         let label = UILabel()
         label.font = .systemFont(ofSize: 17, weight: .regular)
         label.textColor = UIColor.custom(.createButtonColor)
@@ -13,7 +13,7 @@ final class CategoryAndScheduleTableViewCell: UITableViewCell {
         return label
     }()
     
-    private lazy var detailedTextLabel: UILabel = {
+    lazy var detailedTextLabel: UILabel = {
         let label = UILabel()
         label.font = .systemFont(ofSize: 17, weight: .regular)
         label.textColor = UIColor.custom(.textFieldGray)
@@ -32,7 +32,7 @@ final class CategoryAndScheduleTableViewCell: UITableViewCell {
     
     private var subtitleConstraints: [NSLayoutConstraint] = []
     private var noSubtitleConstraints: [NSLayoutConstraint] = []
-    private var hasSubtitle: Bool = false {
+     var hasSubtitle: Bool = false {
         didSet {
             updateConstraintsForSubtitle()
         }
