@@ -10,7 +10,7 @@ final class ScheduleTableCell: UITableViewCell {
     
     static let identifier = "ScheduleTableCell"
     
-    private lazy var titleLabel: UILabel = {
+     lazy var titleLabel: UILabel = {
         let label = UILabel()
         label.font = .systemFont(ofSize: 17, weight: .regular)
         label.textColor = UIColor.custom(.textColor)
@@ -20,7 +20,7 @@ final class ScheduleTableCell: UITableViewCell {
         return label
     }()
     
-    private lazy var toggleSwitch: UISwitch = {
+     lazy var toggleSwitch: UISwitch = {
         let toggle = UISwitch()
         toggle.onTintColor = UIColor.custom(.toggleSwitchBlue)
         toggle.tintColor = UIColor.custom(.toggleSwitchGray)
