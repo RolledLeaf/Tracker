@@ -15,7 +15,7 @@ final class TrackerCell: UICollectionViewCell {
     private var currentDate: Date = Date()
     private var selectedIndexPaths: Set<IndexPath> = []
     
-    private lazy var habbitLabel: UILabel = {
+     lazy var habitLabel: UILabel = {
         let label = UILabel()
         label.font = .systemFont(ofSize: 14, weight: .regular)
         label.textColor = UIColor.custom(.createButtonTextColor)
@@ -36,7 +36,7 @@ final class TrackerCell: UICollectionViewCell {
         return button
     }()
     
-    private lazy var emojiLabel: UILabel = {
+     lazy var emojiLabel: UILabel = {
         let label = UILabel()
         label.font = UIFont.systemFont(ofSize: 16)
         label.textAlignment = .center
@@ -74,7 +74,7 @@ final class TrackerCell: UICollectionViewCell {
         return view
     }()
     
-    private lazy var pinImageView: UIImageView = {
+     lazy var pinImageView: UIImageView = {
         let imageView = UIImageView(image: UIImage(systemName: "pin.fill"))
         imageView.tintColor = .white
         imageView.translatesAutoresizingMaskIntoConstraints = false
@@ -111,7 +111,7 @@ final class TrackerCell: UICollectionViewCell {
         doneButtonContainer.addGestureRecognizer(tapGesture)
         doneButton.isUserInteractionEnabled = false
         
-        let backgroundContainerElements: [UIView] = [habbitLabel, emojiContainer, emojiLabel]
+        let backgroundContainerElements: [UIView] = [habitLabel, emojiContainer, emojiLabel]
         backgroundContainerElements.forEach { $0.translatesAutoresizingMaskIntoConstraints = false }
         backgroundContainerElements.forEach { backgroundContainer.addSubview($0) }
         
@@ -146,16 +146,15 @@ final class TrackerCell: UICollectionViewCell {
             emojiContainer.heightAnchor.constraint(equalToConstant: 24),
             emojiContainer.widthAnchor.constraint(equalToConstant: 24),
             
-            habbitLabel.topAnchor.constraint(equalTo: backgroundContainer.topAnchor, constant: 44),
-            habbitLabel.leadingAnchor.constraint(equalTo: backgroundContainer.leadingAnchor, constant: 12),
-            habbitLabel.trailingAnchor.constraint(equalTo: backgroundContainer.trailingAnchor, constant: -12)
+            habitLabel.topAnchor.constraint(equalTo: backgroundContainer.topAnchor, constant: 44),
+            habitLabel.leadingAnchor.constraint(equalTo: backgroundContainer.leadingAnchor, constant: 12),
+            habitLabel.trailingAnchor.constraint(equalTo: backgroundContainer.trailingAnchor, constant: -12)
         ])
     }
     
-    
-    
-    private func getDayWord(for count: Int16) -> String {
+     func getDayWord(for count: Int16) -> String {
         let format = NSLocalizedString("daysCount", comment: "Количество дней")
+// let format = localizedString(forKey: "daysCount", locale: "ru")
         return String.localizedStringWithFormat(format, count)
     }
     
@@ -163,7 +162,7 @@ final class TrackerCell: UICollectionViewCell {
         currentSelectedTracker = tracker
         trackerID = tracker.id
         emojiLabel.text = tracker.emoji
-        habbitLabel.text = tracker.name
+        habitLabel.text = tracker.name
         
         let defaultColor = "collectionPalePurple17"
         let trackerColor = UIColor.fromCollectionColor(tracker.color as? String ?? defaultColor) ?? .clear
