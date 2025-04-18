@@ -8,8 +8,6 @@ enum UserDefaultsKeys {
     static let selectedFilter = "selectedFilter"
 }
 
-
-
 enum TrackerFilterType: String {
     case all
     case today

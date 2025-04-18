@@ -1,10 +1,15 @@
 import CoreData
 
-final class TrackerCategoryStore: NSObject, NSFetchedResultsControllerDelegate {
+protocol TrackerCategoryStoreProtocol {
+    func fetchAllTrackerCategories() -> [TrackerCategoryCoreData]
+    func saveCategory(name: String)
+    func deleteTrackerCategory(_ category: TrackerCategoryCoreData)
+    func saveChanges()
+}
+
+ class TrackerCategoryStore: NSObject, NSFetchedResultsControllerDelegate, TrackerCategoryStoreProtocol {
     
     private let context: NSManagedObjectContext
-    
-   
     
     init(context: NSManagedObjectContext = CoreDataStack.shared.context) {
         self.context = context
@@ -48,8 +53,6 @@ final class TrackerCategoryStore: NSObject, NSFetchedResultsControllerDelegate {
         }
     }
     
-   
-    
     func deleteTrackerCategory(_ category: TrackerCategoryCoreData) {
         context.delete(category)
         do {
@@ -58,16 +61,6 @@ final class TrackerCategoryStore: NSObject, NSFetchedResultsControllerDelegate {
             print("Failed to delete category: \(error)")
         }
     }
-    
-//    func fetchCategories() -> [TrackerCategoryCoreData] {
-//        let request: NSFetchRequest<TrackerCategoryCoreData> = TrackerCategoryCoreData.fetchRequest()
-//        do {
-//            return try context.fetch(request)
-//        } catch {
-//            print("Failed to fetch categories: \(error)")
-//            return []
-//        }
-//    }
     
     func saveCategory(name: String) {
         let newCategory = TrackerCategoryCoreData(context: context)
@@ -86,5 +79,4 @@ final class TrackerCategoryStore: NSObject, NSFetchedResultsControllerDelegate {
             print("Failed to save changes: \(error)")
         }
     }
-    
 }

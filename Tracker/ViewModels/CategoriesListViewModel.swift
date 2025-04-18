@@ -1,5 +1,5 @@
 class CategoriesViewModel {
-    private let categoryStore: TrackerCategoryStore
+    private let categoryStore: TrackerCategoryStoreProtocol
     
     private(set) var categories: [TrackerCategoryCoreData] = [] {
         didSet {
@@ -11,7 +11,7 @@ class CategoriesViewModel {
     var onCategorySelected: ((TrackerCategoryCoreData) -> Void)?
     var onEditCategoryRequest: ((TrackerCategoryCoreData, String) -> Void)?
 
-    init(categoryStore: TrackerCategoryStore) {
+    init(categoryStore: TrackerCategoryStoreProtocol) {
         self.categoryStore = categoryStore
         fetchCategories()
     }

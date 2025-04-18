@@ -1,10 +1,7 @@
 import XCTest
 @testable import Tracker
 
-
 class CalculatorTests: XCTestCase {
-    
-    
     
     func testAdd() {
         //Arrange - входные параметры и ожидаемый результат
@@ -17,11 +14,10 @@ class CalculatorTests: XCTestCase {
         
         //Assert - проверка соответствия результата ожидаемому
         XCTAssertEqual(result, expectedResult)
-        
     }
     
     func testSubtrack() {
-        //Assert
+        //Arrange
         let calculator = Calculator()
         let a = 8
         let b = 5
@@ -30,6 +26,7 @@ class CalculatorTests: XCTestCase {
         //Act
         let result = calculator.subtract(a: a, b: b)
         
+        //Assert
         XCTAssertEqual(result, expectedResult)
     }
     
