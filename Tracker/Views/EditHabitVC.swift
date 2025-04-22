@@ -274,11 +274,11 @@ final class EditHabitViewController: UIViewController, UITableViewDelegate, UITa
            selectedCategory != nil {
             saveTrackerButton.titleLabel?.textColor = UIColor.custom(.createButtonTextColor)
             saveTrackerButton.backgroundColor = UIColor.custom(.createButtonColor)
-            print("Условия выполнены, кнопка Сохранить перекрашена в \(UIColor.custom(.createButtonColor))")
+            print("Условия выполнены, кнопка Сохранить перекрашена в \(String(describing: UIColor.custom(.createButtonColor)))")
         } else {
             saveTrackerButton.backgroundColor = UIColor.custom(.textFieldGray)  // Неактивный цвет
             saveTrackerButton.titleLabel?.textColor = UIColor.custom(.textColor)
-            print("Условия не выполнены, кнопка Сохранить снова \(UIColor.custom(.textFieldGray)) цвета")
+            print("Условия не выполнены, кнопка Сохранить снова \(String(describing: UIColor.custom(.textFieldGray))) цвета")
         }
     }
     
@@ -490,6 +490,10 @@ final class EditHabitViewController: UIViewController, UITableViewDelegate, UITa
         return String.localizedStringWithFormat(format, count)
     }
     
+    func runPopulateTracker() {
+        populateTrackerData()
+    }
+    
     private func populateTrackerData() {
         print("Вызван метод populateTrackerData")
         guard let tracker = trackerToEdit else { return }
@@ -525,8 +529,6 @@ final class EditHabitViewController: UIViewController, UITableViewDelegate, UITa
                 colorsCollectionView.selectItem(at: indexPath, animated: false, scrollPosition: .top)
             }
         }
-        
-       
     }
 }
 
