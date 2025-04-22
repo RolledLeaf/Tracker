@@ -61,6 +61,24 @@ final class MockingTrackerStore: TrackerStoreMethodsProtocol {
             XCTAssertEqual(mockTrackerStore.deletedTracker, dummyTracker)
             XCTAssertEqual(mockTrackerStore.mockTrackers.count, 0)
         }
+        
+        func testTrackersCountChanged() {
+            let container = makeInMemoryContainer()
+            let context = container.viewContext
+            
+            let dummyTracker1 = TrackerCoreData(context: context)
+            dummyTracker1.name = "Test1"
+            let dummyTracker2 = TrackerCoreData(context: context)
+            dummyTracker2.name = "Test2"
+            let mockTrackerStore = MockingTrackerStore()
+            mockTrackerStore.mockTrackers = [dummyTracker1, dummyTracker2]
+            
+         
+            let newTracker1 = TrackerCoreData(context: context)
+            mockTrackerStore.mockTrackers.append(newTracker1)
+            
+            XCTAssertEqual(mockTrackerStore.mockTrackers.count, 3)
+        }
     }
     
 
