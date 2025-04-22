@@ -16,7 +16,11 @@ protocol TrackerStoreProtocol {
     func getSectionTitle(for section: Int) -> String
 }
 
-final class TrackerStore: NSObject, NSFetchedResultsControllerDelegate {
+protocol TrackerStoreMethodsProtocol {
+    func deleteTracker(at indexPath: IndexPath)
+}
+
+final class TrackerStore: NSObject, NSFetchedResultsControllerDelegate, TrackerStoreMethodsProtocol {
     
     enum TrackerStoreError: Error {
         case failedToInitializeContext

@@ -1,7 +1,7 @@
 import Foundation
 
 final class TrackersViewModel {
-    private var trackerStore = TrackerStore()
+    private var trackerStore: TrackerStoreMethodsProtocol
     
     private(set) var trackers: [TrackerCoreData] = [] {
         didSet {
@@ -10,7 +10,6 @@ final class TrackersViewModel {
     }
     
     var onTrackersUpdate: (([TrackerCoreData]) -> Void)?
-    
     var onFilterChanged: ((TrackerFilterType) -> Void)?
     var selectedFilter: TrackerFilterType = .all {
         didSet {
@@ -18,7 +17,7 @@ final class TrackersViewModel {
         }
     }
     
-    init(trackerStore: TrackerStore) {
+    init(trackerStore: TrackerStoreMethodsProtocol) {
         self.trackerStore = trackerStore
         loadUserDefaultsFilter()
     }
