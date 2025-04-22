@@ -62,7 +62,7 @@ final class MockingTrackerStore: TrackerStoreMethodsProtocol {
             XCTAssertEqual(mockTrackerStore.mockTrackers.count, 0)
         }
         
-        func testTrackersCountChanged() {
+        func testAddTracker() {
             let container = makeInMemoryContainer()
             let context = container.viewContext
             
