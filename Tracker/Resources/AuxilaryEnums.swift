@@ -9,9 +9,9 @@ enum UserDefaultsKeys {
 }
 
 enum TrackerFilterType: String {
-    case all
-    case today
-    case completed
-    case uncompleted
+    case all = "all"
+    case today = "today"
+    case completed = "completed"
+    case uncompleted = "uncompleted"
 }
 
