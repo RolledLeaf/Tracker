@@ -154,7 +154,6 @@ final class TrackerCell: UICollectionViewCell {
     
      func getDayWord(for count: Int16) -> String {
         let format = NSLocalizedString("daysCount", comment: "Количество дней")
-// let format = localizedString(forKey: "daysCount", locale: "ru")
         return String.localizedStringWithFormat(format, count)
     }
     
@@ -171,7 +170,7 @@ final class TrackerCell: UICollectionViewCell {
         doneButtonContainer.backgroundColor = trackerColor
         emojiContainer.backgroundColor = lightenColor(trackerColor, by: 0.3)
         
-        pinImageView.isHidden = tracker.category?.title != "Закреплённые"
+        pinImageView.isHidden = tracker.category?.title != NSLocalizedString("pinned", comment: "")
         
         let currentDate = Date()
         let isCompleted = trackerRecords.contains { $0.trackerID == tracker.id && Calendar.current.isDate($0.date ?? currentDate, inSameDayAs: viewController?.selectedDate ?? currentDate) }

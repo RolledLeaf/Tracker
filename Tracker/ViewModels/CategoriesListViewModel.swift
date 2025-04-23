@@ -6,7 +6,12 @@ class CategoriesViewModel {
             onCategoriesUpdate?(categories)
         }
     }
-
+    var selectedFilter: TrackerFilterType = .all {
+        didSet {
+            onFilterChanged?(selectedFilter)
+        }
+    }
+    var onFilterChanged: ((TrackerFilterType) -> Void)?
     var onCategoriesUpdate: (([TrackerCategoryCoreData]) -> Void)?
     var onCategorySelected: ((TrackerCategoryCoreData) -> Void)?
     var onEditCategoryRequest: ((TrackerCategoryCoreData, String) -> Void)?

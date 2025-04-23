@@ -22,9 +22,10 @@ protocol TrackerCategoryStoreProtocol {
     }
     
     func fetchAllTrackerCategories() -> [TrackerCategoryCoreData] {
+        print("Fetching all categories")
         let fetchRequest: NSFetchRequest<TrackerCategoryCoreData> = TrackerCategoryCoreData.fetchRequest()
         fetchRequest.sortDescriptors = [NSSortDescriptor(key: "sortOrder", ascending: true)]
-        fetchRequest.predicate = NSPredicate(format: "title != %@", NSLocalizedString("pinned", comment: "")) // исключаем
+        fetchRequest.predicate = NSPredicate(format: "title != %@", NSLocalizedString("pinned", comment: "")) 
         do {
             return try context.fetch(fetchRequest)
         } catch {

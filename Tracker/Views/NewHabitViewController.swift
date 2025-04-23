@@ -301,6 +301,8 @@ final class NewHabitViewController: UIViewController, UITableViewDelegate, UITab
         do {
             try context.save()
             print("📌 Создаём трекер '\(tracker.name)' для категории '\(category.title ?? "Без названия")'")
+            print("Контекст перед сохранением трекера: \(context)")
+            print("Контекст категории: \(selectedCategory.managedObjectContext)")
             delegate?.didCreateTracker(tracker, category)
             presentingViewController?.presentingViewController?.dismiss(animated: true)
         } catch {

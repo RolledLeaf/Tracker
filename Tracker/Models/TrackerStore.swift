@@ -43,7 +43,7 @@ final class TrackerStore: NSObject, NSFetchedResultsControllerDelegate, TrackerS
         let controller = NSFetchedResultsController(
             fetchRequest: fetchRequest,
             managedObjectContext: context,
-            sectionNameKeyPath: "category.title",
+            sectionNameKeyPath: "category.sortOrder",
             cacheName: nil
         )
         
@@ -98,25 +98,26 @@ final class TrackerStore: NSObject, NSFetchedResultsControllerDelegate, TrackerS
         }
     }
     
-   func controller(_ controller: NSFetchedResultsController<NSFetchRequestResult>, didChange anObject: Any, at indexPath: IndexPath?, for type: NSFetchedResultsChangeType, newIndexPath: IndexPath?) {
-        switch type {
-        case .insert:
-            if let newIndexPath = newIndexPath {
-                insertedIndexes?.insert(newIndexPath.item)
-            }
-        case .delete:
-            if let indexPath = indexPath {
-                deletedIndexes?.insert(indexPath.item)
-            }
-        default:
-            break
-        }
-        
-        guard let inserted = insertedIndexes, let deleted = deletedIndexes else { return }
-        
-    }
+//   func controller(_ controller: NSFetchedResultsController<NSFetchRequestResult>, didChange anObject: Any, at indexPath: IndexPath?, for type: NSFetchedResultsChangeType, newIndexPath: IndexPath?) {
+//        switch type {
+//        case .insert:
+//            if let newIndexPath = newIndexPath {
+//                insertedIndexes?.insert(newIndexPath.item)
+//            }
+//        case .delete:
+//            if let indexPath = indexPath {
+//                deletedIndexes?.insert(indexPath.item)
+//            }
+//        default:
+//            break
+//        }
+//        
+//        guard let inserted = insertedIndexes, let deleted = deletedIndexes else { return }
+//        
+//    }
     
     func controllerWillChangeContent(_ controller: NSFetchedResultsController<NSFetchRequestResult>) {
+        print("ControllerWillChangeContent вызван")
         insertedIndexes = IndexSet()
         deletedIndexes = IndexSet()
     }

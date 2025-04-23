@@ -4,6 +4,7 @@ import AppMetricaCore
 
 final class TrackersViewController: UIViewController, UICollectionViewDataSource, UICollectionViewDelegateFlowLayout, UICollectionViewDelegate {
     
+    private var allCategories: [TrackerCategoryCoreData] = []
     private var categories: [TrackerCategoryCoreData] = []
     private var filteredCategories: [TrackerCategoryCoreData] = []
     private var trackerRecords: [TrackerRecordCoreData] = []
@@ -14,7 +15,6 @@ final class TrackersViewController: UIViewController, UICollectionViewDataSource
     private var filterButtonLeadingConstraint: NSLayoutConstraint!
     private var filterButtonTrailingConstraint: NSLayoutConstraint!
     private var filterButtonWidthConstraint: NSLayoutConstraint!
-    
     
     private let addTrackerButton = UIButton()
     private let emptyFieldStarImage = UIImageView()
@@ -127,6 +127,7 @@ final class TrackersViewController: UIViewController, UICollectionViewDataSource
     override func viewDidLoad() {
         super.viewDidLoad()
         setupInitialUI()
+        allCategories = trackerCategoryStore.fetchAllTrackerCategories()
         loadCategories()
         loadTrackerRecords()
         reloadCategoryData()
@@ -248,17 +249,10 @@ final class TrackersViewController: UIViewController, UICollectionViewDataSource
         searchBar.delegate = self
     }
     
-
-    
     private func loadCategories() {
         categories = trackerCategoryStore.fetchAllTrackerCategories()
         filteredCategories = categories
     }
-    
-    private func reloadCategoryData() {
-        categoriesCollectionView.reloadData()
-    }
-    
     
     private func fetchAllCategories() {
         let fetchedCategories = trackerCategoryStore.fetchAllTrackerCategories()
@@ -266,9 +260,9 @@ final class TrackersViewController: UIViewController, UICollectionViewDataSource
         filteredCategories = fetchedCategories
     }
     
-    private func loadCategoriesAndTrackers() {
-        categories = trackerCategoryStore.fetchAllTrackerCategories()
-        print("Fetched categories: \(categories.count)")
+    private func reloadCategoryData() {
+        categoriesCollectionView.reloadData()
+        print("CollectionView reloaded")
     }
     
     private func loadTrackerRecords() {
@@ -283,7 +277,10 @@ final class TrackersViewController: UIViewController, UICollectionViewDataSource
         }
     }
     
+    
+   
     private func updateVisibleTrackers(for selectedDate: Date) {
+       
         print("UpdateVisibleTrackers method called")
         let formatter = DateFormatter()
         formatter.locale = locale
@@ -300,28 +297,28 @@ final class TrackersViewController: UIViewController, UICollectionViewDataSource
                 guard let weekDays = tracker.weekDays as? [String] else { return false }
                 let isCompleted = trackerRecords.contains { $0.trackerID == tracker.id && $0.date?.isSameDay(as: selectedDate) == true }
                 let hasEverBeenCompleted = trackerRecords.contains { $0.trackerID == tracker.id }
-              
+
                 print("called isCollectionVisible method for all trackers")
                 return weekDays.contains(" ") ? !hasEverBeenCompleted || isCompleted : weekDays.contains(selectedWeekday)
-                
+
             }
-            
+
         case .today:
             filteredTrackers = allTrackers.filter { tracker in
                 guard let weekDays = tracker.weekDays as? [String] else { return false }
                 let isCompleted = trackerRecords.contains { $0.trackerID == tracker.id && $0.date?.isSameDay(as: selectedDate) == true }
                 let hasEverBeenCompleted = trackerRecords.contains { $0.trackerID == tracker.id }
-                
+
                 print("called filteredCollectionVisible method for today trackers")
                 return weekDays.contains(" ") ? !hasEverBeenCompleted || isCompleted : weekDays.contains(selectedWeekday)
             }
-            
+
         case .completed:
             Analytics.logEvent(.filterCompletedActive)
             filteredTrackers = allTrackers.filter { tracker in
                 trackerRecords.contains { $0.trackerID == tracker.id && $0.date?.isSameDay(as: selectedDate) == true }
             }
-           
+
             print("called filteredCollectionVisible method for completed trackers")
 
         case .uncompleted:
@@ -329,7 +326,7 @@ final class TrackersViewController: UIViewController, UICollectionViewDataSource
                 guard let weekDays = tracker.weekDays as? [String] else { return false }
                 let isCompleted = trackerRecords.contains { $0.trackerID == tracker.id && $0.date?.isSameDay(as: selectedDate) == true }
                 let hasEverBeenCompleted = trackerRecords.contains { $0.trackerID == tracker.id }
-                
+
                 print("called filteredCollectionVisible method for uncompleted trackers")
                 if weekDays.contains(" ") {
                     return !hasEverBeenCompleted
@@ -346,7 +343,7 @@ final class TrackersViewController: UIViewController, UICollectionViewDataSource
 
         do {
             try trackerStore.fetchedResultsController.performFetch()
-            categoriesCollectionView.reloadData()
+            reloadCategoryData()
             isCollectionVisible()
             print("📌 Трекеры отфильтрованы через FRC")
         } catch {
@@ -375,7 +372,7 @@ final class TrackersViewController: UIViewController, UICollectionViewDataSource
         
         let formattedDate = formatter.string(from: sender.date)
         dateButton.setTitle(formattedDate, for: .normal)
-        reloadCategoryData()
+        //reloadCategoryData()
     }
     
     @objc private func datePickerValueChanged(_ sender: UIDatePicker) {
@@ -469,12 +466,9 @@ final class TrackersViewController: UIViewController, UICollectionViewDataSource
             nothingFoundImage.isHidden = hasVisibleTrackers
             filterButton.isHidden = false
         }
-
-        
         categoriesCollectionView.isHidden = !hasVisibleTrackers
     }
     
-   
     func getSelectedDate() -> Date {
          selectedDate
     }
@@ -502,7 +496,7 @@ final class TrackersViewController: UIViewController, UICollectionViewDataSource
 
             do {
                 try CoreDataStack.shared.context.save()
-                self.reloadCategoryData()
+                
             } catch {
                 print("❌ Ошибка при закреплении/откреплении трекера: \(error)")
             }
@@ -563,7 +557,7 @@ extension TrackersViewController: TrackerCategoryCellDelegate {
         
         do {
             try context.save()
-          updateVisibleTrackers(for: selectedDate)
+          //updateVisibleTrackers(for: selectedDate)
         } catch {
             print("❌ Ошибка при обновлении записи выполнения: \(error)")
         }
@@ -640,18 +634,26 @@ extension TrackersViewController {
     
     
     
-    func collectionView(_ collectionView: UICollectionView, viewForSupplementaryElementOfKind kind: String, at indexPath: IndexPath) -> UICollectionReusableView {
+    func collectionView(_ collectionView: UICollectionView,
+                        viewForSupplementaryElementOfKind kind: String,
+                        at indexPath: IndexPath) -> UICollectionReusableView {
+        
         guard kind == UICollectionView.elementKindSectionHeader,
               let header = collectionView.dequeueReusableSupplementaryView(
-                ofKind: kind,
-                withReuseIdentifier: CategoriesCollectionHeaderView.identifier,
-                for: indexPath
+                  ofKind: kind,
+                  withReuseIdentifier: CategoriesCollectionHeaderView.identifier,
+                  for: indexPath
               ) as? CategoriesCollectionHeaderView else {
             return UICollectionReusableView()
         }
 
-        let sectionTitle = trackerStore.getSectionTitle(for: indexPath.section)
-        header.configure(with: sectionTitle)
+        let sectionInfo = trackerStore.fetchedResultsController.sections?[indexPath.section]
+        
+        if let sortOrderString = sectionInfo?.name,
+           let sortOrder = Int16(sortOrderString) {
+            let categoryTitle = allCategories.first(where: { $0.sortOrder == sortOrder })?.title ?? "Без категории"
+            header.configure(with: categoryTitle)
+        }
 
         return header
     }
@@ -681,8 +683,9 @@ extension Date {
 
 extension TrackersViewController: TrackerStoreDelegate {
     func didUpdate(_ update: TrackerStoreUpdate) {
+        print("Did update called")
         updateVisibleTrackers(for: selectedDate)
-       
+   
     }
 }
 
@@ -690,9 +693,10 @@ extension TrackersViewController: NewTrackerDelegate {
     func didCreateTracker(_ tracker: TrackerCoreData, _ category: TrackerCategoryCoreData) {
        
         updateVisibleTrackers(for: currentDate)
-        reloadCategoryData()
+       
         print("Tracker \(tracker.name ?? "unnamed") created with categorySortOrder \(category.sortOrder)")
     }
+    
 }
 
 extension TrackersViewController: UISearchBarDelegate {
