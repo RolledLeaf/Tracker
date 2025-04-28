@@ -132,7 +132,7 @@ final class TrackersViewController: UIViewController, UICollectionViewDataSource
         loadCategories()
         loadTrackerRecords()
         reloadCategoryData()
-        notification.scheduleNotification(notificationType: .tips, body: "Посетите категории", target: .categories)
+       // notification.scheduleNotification(notificationType: .tips, target: .categories)
         
         updateVisibleTrackers(for: datePicker.date)
         viewModel.onTrackersUpdate = { [weak self] trackers in
@@ -389,7 +389,7 @@ final class TrackersViewController: UIViewController, UICollectionViewDataSource
         navigationController.modalPresentationStyle = .automatic
         present(navigationController, animated: true)
         Analytics.logEvent(.addTrackerButtonTapped)
-        notification.scheduleNotification(notificationType: .statistics, body: "Посетите экран статистики", target: .statistics)
+     //   notification.scheduleNotification(notificationType: .statistics, target: .statistics)
     }
     
     @objc private func filterButtonTapped() {

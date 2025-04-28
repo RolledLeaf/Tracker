@@ -12,11 +12,53 @@ final class Notifications: NSObject,  UNUserNotificationCenterDelegate {
         
         notificationCenter.requestAuthorization(options: notificationOptions) { granted, error in
             if granted {
+                self.setupNotificationCategories()
                 print("Notifications granted")
             } else {
                 print("Notifications not granted")
             }
         }
+    }
+    
+    func scheduleNotification(notificationType: NotificationType,  target: NotificationTarget) {
+        let content = UNMutableNotificationContent()
+        content.title = notificationType.title
+        content.subtitle = "subtitle"
+        content.body = notificationType.body
+        content.badge = 1
+        content.sound = .default
+        content.userInfo = ["target": target.rawValue]
+        content.categoryIdentifier = "category"
+        
+        //Настройка триггера
+        let trigger = UNTimeIntervalNotificationTrigger(timeInterval: 4, repeats: false)
+        
+        let request = UNNotificationRequest(identifier: "welcome notification", content: content, trigger: trigger)
+        
+        UNUserNotificationCenter.current().add(request) { error in
+            if let error = error {
+                print("Error adding notification \(error)")
+            } else {
+                print("Notification scheduled")
+            }
+        }
+    }
+    
+    private func setupNotificationCategories() {
+        let openAction = UNNotificationAction(identifier: "open",
+                                              title: "Open",
+                                              options: [.foreground])
+        
+        let dismissAcion = UNNotificationAction(identifier: "dissmiss_action",
+                                                title: "Dismiss",
+                                                options: [])
+        
+        let category = UNNotificationCategory(identifier: "category",
+                                              actions: [openAction, dismissAcion],
+                                              intentIdentifiers: [],
+                                              options: [])
+        
+        notificationCenter.setNotificationCategories([category])
     }
     
     private func handleNtification(response: UNNotificationResponse) {
@@ -50,34 +92,23 @@ final class Notifications: NSObject,  UNUserNotificationCenterDelegate {
             }
         }
     }
-    
-    func scheduleNotification(notificationType: NotificationType, body: String, target: NotificationTarget) {
-        let content = UNMutableNotificationContent()
-        content.title = notificationType.title
-        content.subtitle = "subtitle"
-        content.body = body
-        content.badge = 1
-        content.sound = .default
-        content.userInfo = ["target": target.rawValue]
-        
-        //Настройка триггера
-        let trigger = UNTimeIntervalNotificationTrigger(timeInterval: 4, repeats: false)
-        
-        let request = UNNotificationRequest(identifier: "welcome notification", content: content, trigger: trigger)
-        
-        UNUserNotificationCenter.current().add(request) { error in
-            if let error = error {
-                print("Error adding notification \(error)")
-            } else {
-                print("Notification scheduled")
-            }
-        }
-    }
 }
 
 extension Notifications {
     func userNotificationCenter(_ center: UNUserNotificationCenter, didReceive response: UNNotificationResponse, withCompletionHandler completionHandler: @escaping () -> Void) {
         handleNtification(response: response)
+        if response.actionIdentifier == "Open" {
+            print("Пользователь нажал Открыть")
+            // Здесь можно сделать переход
+        } else if response.actionIdentifier == "Dismiss" {
+            print("Пользователь нажал Отменить")
+            // Можно ничего не делать или что-то отменить
+        } else {
+            handleNtification(response: response)
+        }
+    
+        //Очищение бейджа количества уведомлений при его прочтении
+        UIApplication.shared.applicationIconBadgeNumber = 0
         completionHandler()
     }
 }
@@ -102,6 +133,15 @@ enum NotificationType {
             return "Статистика"
         case .tips:
             return "Советы"
+        }
+    }
+    
+    var body: String {
+        switch self {
+        case .statistics:
+            return "Нажмите, чтобы посмотреть статистику"
+        case .tips:
+            return "Нажмите, чтобы получить советы"
         }
     }
 }

@@ -14,4 +14,3 @@ enum TrackerFilterType: String {
     case completed = "completed"
     case uncompleted = "uncompleted"
 }
-
