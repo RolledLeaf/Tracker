@@ -1,11 +1,6 @@
-//
-//  SceneDelegate.swift
-//  Tracker
-//
-//  Created by Vitaly Wexler on 29.12.2024.
-//
 
 import UIKit
+
 
 final class SceneDelegate: UIResponder, UIWindowSceneDelegate {
 
@@ -25,7 +20,9 @@ final class SceneDelegate: UIResponder, UIWindowSceneDelegate {
         let hasSeenOnboarding = UserDefaults.standard.bool(forKey: UserDefaultsKeys.hasSeenOnboarding)
         
         if hasSeenOnboarding {
-            window?.rootViewController = TabBarController()
+            let tabBar = TabBarController()
+            window?.rootViewController = tabBar
+
             } else {
                 window?.rootViewController = OnboardingViewController(transitionStyle: .scroll, navigationOrientation: .horizontal, options: nil)
             }

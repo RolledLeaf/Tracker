@@ -24,6 +24,7 @@ final class TrackersViewController: UIViewController, UICollectionViewDataSource
     private let emptyFieldLabel = UILabel()
     private let locale = Locale.current
     private let context = CoreDataStack.shared.persistentContainer.viewContext
+    private let notification = Notifications()
     
     
      var ifTrackerPinned: Bool = false
@@ -131,6 +132,7 @@ final class TrackersViewController: UIViewController, UICollectionViewDataSource
         loadCategories()
         loadTrackerRecords()
         reloadCategoryData()
+        notification.scheduleNotification(notificationType: .tips, body: "Посетите категории", target: .categories)
         
         updateVisibleTrackers(for: datePicker.date)
         viewModel.onTrackersUpdate = { [weak self] trackers in
@@ -387,6 +389,7 @@ final class TrackersViewController: UIViewController, UICollectionViewDataSource
         navigationController.modalPresentationStyle = .automatic
         present(navigationController, animated: true)
         Analytics.logEvent(.addTrackerButtonTapped)
+        notification.scheduleNotification(notificationType: .statistics, body: "Посетите экран статистики", target: .statistics)
     }
     
     @objc private func filterButtonTapped() {
