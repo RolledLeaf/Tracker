@@ -153,7 +153,7 @@ extension TrackerStore: TrackerStoreProtocol {
     }
     
     func getSectionTitle(for section: Int) -> String {
-        return fetchedResultsController.sections?[section].name ?? "Без категории"
+        return fetchedResultsController.sections?[section].name ?? NSLocalizedString("noCategory", comment: "")
     }
 }
 

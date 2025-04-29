@@ -82,3 +82,5 @@
 //"shortWeekDaysSymbols" = "Пн, Вт, Ср, Чт, Пт, Сб, Вс";
 
 // NSLocalizedString("", comment: "")
+
+"noCategory" = "No category";

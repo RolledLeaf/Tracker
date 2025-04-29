@@ -24,8 +24,9 @@ protocol TrackerCategoryStoreProtocol {
     func fetchAllTrackerCategories() -> [TrackerCategoryCoreData] {
         print("Fetching all categories")
         let fetchRequest: NSFetchRequest<TrackerCategoryCoreData> = TrackerCategoryCoreData.fetchRequest()
+        let excludedTitles = [NSLocalizedString("pinned", comment: ""), "0"]
         fetchRequest.sortDescriptors = [NSSortDescriptor(key: "sortOrder", ascending: true)]
-        fetchRequest.predicate = NSPredicate(format: "title != %@", NSLocalizedString("pinned", comment: "")) 
+        fetchRequest.predicate = NSPredicate(format: "NOT (title IN %@)", excludedTitles)
         do {
             return try context.fetch(fetchRequest)
         } catch {
@@ -35,6 +36,7 @@ protocol TrackerCategoryStoreProtocol {
     }
     
     func getOrCreatePinnedCategory() -> TrackerCategoryCoreData? {
+        print("get or create pinned category called")
         let fetchRequest: NSFetchRequest<TrackerCategoryCoreData> = TrackerCategoryCoreData.fetchRequest()
         fetchRequest.predicate = NSPredicate(format: "title == %@", NSLocalizedString("pinned", comment: ""))
         fetchRequest.fetchLimit = 1
@@ -46,6 +48,7 @@ protocol TrackerCategoryStoreProtocol {
                 newCategory.title = NSLocalizedString("pinned", comment: "")
                 newCategory.sortOrder = 0
                 try context.save()
+                print("Category \(String(describing: newCategory.title)) created")
                 return newCategory
             }
         } catch {

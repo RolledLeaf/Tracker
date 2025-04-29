@@ -654,7 +654,7 @@ extension TrackersViewController {
         
         if let sortOrderString = sectionInfo?.name,
            let sortOrder = Int16(sortOrderString) {
-            let categoryTitle = allCategories.first(where: { $0.sortOrder == sortOrder })?.title ?? "Без категории"
+            let categoryTitle = allCategories.first(where: { $0.sortOrder == sortOrder })?.title ?? NSLocalizedString("pinned", comment: "")
             header.configure(with: categoryTitle)
         }
 
@@ -687,6 +687,7 @@ extension Date {
 extension TrackersViewController: TrackerStoreDelegate {
     func didUpdate(_ update: TrackerStoreUpdate) {
         print("Did update called")
+        allCategories = trackerCategoryStore.fetchAllTrackerCategories()
         updateVisibleTrackers(for: selectedDate)
    
     }
@@ -694,7 +695,7 @@ extension TrackersViewController: TrackerStoreDelegate {
 
 extension TrackersViewController: NewTrackerDelegate {
     func didCreateTracker(_ tracker: TrackerCoreData, _ category: TrackerCategoryCoreData) {
-       
+        allCategories = trackerCategoryStore.fetchAllTrackerCategories()
         updateVisibleTrackers(for: currentDate)
        
         print("Tracker \(tracker.name ?? "unnamed") created with categorySortOrder \(category.sortOrder)")
