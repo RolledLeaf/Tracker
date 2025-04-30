@@ -117,10 +117,10 @@ final class TrackersViewController: UIViewController, UICollectionViewDataSource
         let button = UIButton(type: .system)
         button.tintColor = UIColor.custom(.textColor)
         button.layer.cornerRadius = 16
-        button.setTitle(NSLocalizedString("filtersButtonTitle", comment: ""), for: .normal)
-        button.titleLabel?.font = UIFont.systemFont(ofSize: 17, weight: .regular)
-        button.setTitleColor(.white, for: .normal)
-        button.backgroundColor = UIColor.custom(.toggleSwitchBlue)
+        button.setImage(UIImage(systemName: "line.3.horizontal.decrease.circle"), for: .normal)
+        button.tintColor = UIColor.custom(.createButtonColor)
+       
+        button.backgroundColor = .clear
         button.addTarget(self, action: #selector(filterButtonTapped), for: .touchUpInside)
         return button
     }()
@@ -170,10 +170,6 @@ final class TrackersViewController: UIViewController, UICollectionViewDataSource
         emptyFieldStarImage.image = UIImage(named: "dizzyStar")
         nothingFoundImage.image = UIImage(named: "nothingFound")
         datePicker.addTarget(self, action: #selector(datePickerValueChanged), for: .valueChanged)
-        
-        let swipeRight = UISwipeGestureRecognizer(target: self, action: #selector(handleSwipeRight(_:)))
-        swipeRight.direction = .right
-        view.addGestureRecognizer(swipeRight)
         
         filterButtonTrailingConstraint = filterButton.trailingAnchor.constraint(equalTo: view.safeAreaLayoutGuide.trailingAnchor, constant: -130)
        
@@ -226,21 +222,12 @@ final class TrackersViewController: UIViewController, UICollectionViewDataSource
             nothingFoundLabel.centerXAnchor.constraint(equalTo: view.centerXAnchor),
             nothingFoundLabel.topAnchor.constraint(equalTo: nothingFoundImage.bottomAnchor, constant: 8),
             
-            filterButton.bottomAnchor.constraint(equalTo: view.bottomAnchor, constant: -100),
+            filterButton.topAnchor.constraint(equalTo: dateButton.bottomAnchor, constant: 5),
             
-            filterButton.heightAnchor.constraint(equalToConstant: 50),
+            filterButton.heightAnchor.constraint(equalToConstant: 30),
+            filterButton.widthAnchor.constraint(equalToConstant: 30),
+            filterButton.trailingAnchor.constraint(equalTo: view.safeAreaLayoutGuide.trailingAnchor, constant: -16)
         ])
-        
-        filterButtonWidthConstraint = filterButton.widthAnchor.constraint(equalToConstant: 260)
-        filterButtonWidthConstraint.isActive = false
-        
-        filterButtonLeadingConstraint = filterButton.leadingAnchor.constraint(equalTo: view.safeAreaLayoutGuide.leadingAnchor, constant: 130)
-        filterButtonLeadingConstraint.isActive = true
-        
-        filterButtonTrailingConstraint =
-        filterButton.trailingAnchor.constraint(equalTo: view.safeAreaLayoutGuide.trailingAnchor, constant: -130)
-        filterButtonTrailingConstraint.isActive = true
-        
         
         categoriesCollectionView.dataSource = self
         categoriesCollectionView.register(CategoriesCollectionHeaderView.self, forSupplementaryViewOfKind: UICollectionView.elementKindSectionHeader, withReuseIdentifier: CategoriesCollectionHeaderView.identifier)
@@ -374,7 +361,6 @@ final class TrackersViewController: UIViewController, UICollectionViewDataSource
         
         let formattedDate = formatter.string(from: sender.date)
         dateButton.setTitle(formattedDate, for: .normal)
-        //reloadCategoryData()
     }
     
     @objc private func datePickerValueChanged(_ sender: UIDatePicker) {
@@ -386,7 +372,7 @@ final class TrackersViewController: UIViewController, UICollectionViewDataSource
         let createHabitVC = CreateHabitTypeViewController()
         createHabitVC.delegate = self
         let navigationController = UINavigationController(rootViewController: createHabitVC)
-        navigationController.modalPresentationStyle = .automatic
+        navigationController.modalPresentationStyle = .popover
         present(navigationController, animated: true)
         Analytics.logEvent(.addTrackerButtonTapped)
      //   notification.scheduleNotification(notificationType: .statistics, target: .statistics)
@@ -420,26 +406,7 @@ final class TrackersViewController: UIViewController, UICollectionViewDataSource
         }
     }
     
-    @objc private func handleSwipeRight(_ gesture: UISwipeGestureRecognizer) {
-        guard !isFilterButtonMinimized else { return }
-
-        isFilterButtonMinimized = true
-
-        UIView.animate(withDuration: 0.3) {
-            self.filterButton.setTitle("", for: .normal)
-            self.filterButton.setImage(UIImage(systemName: "chevron.left"), for: .normal)
-            self.filterButton.imageEdgeInsets = UIEdgeInsets(top: 0, left: -15, bottom: 0, right: 0)
     
-            self.filterButtonTrailingConstraint.constant = 20
-            self.filterButtonLeadingConstraint.isActive = false
-            self.filterButtonWidthConstraint.isActive = true
-            self.filterButtonWidthConstraint.constant = 40
-            
-            
-            
-            self.view.layoutIfNeeded()
-        }
-    }
     
     private func configureLabel(_ label: UILabel, text: String, fontSize: CGFloat, weight: UIFont.Weight, color: CustomColor) {
         label.text = text
