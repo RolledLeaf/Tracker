@@ -23,6 +23,7 @@ final class NewHabitViewController: UIViewController, UITableViewDelegate, UITab
         label.font = .systemFont(ofSize: 14)
         label.textColor = UIColor.custom(.cancelButtonRed)
         label.alpha = 0
+        label.isHidden = false
         label.textAlignment = .center
         return label
     }()
@@ -488,7 +489,9 @@ extension NewHabitViewController: UITextFieldDelegate {
        let shouldHide = updatedText.count < 38
         
         UIView.animate(withDuration: 0.25) {
+            self.characterLimitLabel.isHidden = false
             self.characterLimitLabel.alpha = shouldHide ? 0 : 1
+            
         }
         return shouldHide
     }
@@ -496,6 +499,7 @@ extension NewHabitViewController: UITextFieldDelegate {
     func textFieldShouldClear(_ textField: UITextField) -> Bool {
         UIView.animate(withDuration: 0.25) {
             self.characterLimitLabel.alpha = 0
+            self.characterLimitLabel.isHidden = true
         }
         return true
     }

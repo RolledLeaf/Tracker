@@ -35,6 +35,17 @@ final class NewCategoryViewController: UIViewController {
         return textField
     }()
     
+    private lazy var characterLimitLabel: UILabel = {
+        let label = UILabel()
+        label.text = NSLocalizedString("categoryCharacterLimitLabel", comment: "")
+        label.font = .systemFont(ofSize: 14)
+        label.textColor = UIColor.custom(.cancelButtonRed)
+        label.isHidden = false
+        label.textAlignment = .center
+        label.alpha = 0
+        return label
+    }()
+    
     private lazy var doneButton: UIButton = {
         let button = UIButton()
         button.setTitle(NSLocalizedString("doneButton", comment: ""), for: .normal)
@@ -55,9 +66,11 @@ final class NewCategoryViewController: UIViewController {
     }
     
     private func setupViews() {
-        let uiElements = [titleLabel, categoryNameTextField, doneButton]
+        let uiElements = [titleLabel, categoryNameTextField, characterLimitLabel, doneButton]
         uiElements.forEach { view.addSubview($0) }
         uiElements.forEach { $0.translatesAutoresizingMaskIntoConstraints = false }
+        
+        categoryNameTextField.delegate = self
         
         NSLayoutConstraint.activate([
             titleLabel.centerXAnchor.constraint(equalTo: view.centerXAnchor),
@@ -70,6 +83,11 @@ final class NewCategoryViewController: UIViewController {
             categoryNameTextField.topAnchor.constraint(equalTo: titleLabel.bottomAnchor, constant: 24),
             categoryNameTextField.widthAnchor.constraint(equalToConstant: 343),
             categoryNameTextField.heightAnchor.constraint(equalToConstant: 75),
+            
+            characterLimitLabel.heightAnchor.constraint(equalToConstant: 20),
+            characterLimitLabel.leadingAnchor.constraint(equalTo: view.leadingAnchor, constant: 44),
+            characterLimitLabel.trailingAnchor.constraint(equalTo: view.trailingAnchor, constant: -44),
+            characterLimitLabel.topAnchor.constraint(equalTo: categoryNameTextField.bottomAnchor, constant: 2),
             
             doneButton.leadingAnchor.constraint(equalTo: view.leadingAnchor, constant: 20),
             doneButton.trailingAnchor.constraint(equalTo: view.trailingAnchor, constant: -20),
@@ -112,5 +130,30 @@ final class NewCategoryViewController: UIViewController {
         saveCategoryToCoreData(categoryName)
         dismiss(animated: true, completion: nil)
         
+    }
+}
+
+extension NewCategoryViewController: UITextFieldDelegate {
+    func textField(_ textField: UITextField, shouldChangeCharactersIn range: NSRange, replacementString string: String) -> Bool {
+        guard let currentText = textField.text, let textRange = Range(range, in: currentText) else {
+            return true
+        }
+        let updatedText = currentText.replacingCharacters(in: textRange, with: string)
+       let shouldHide = updatedText.count < 35
+        
+        UIView.animate(withDuration: 0.25) {
+            self.characterLimitLabel.isHidden = false
+            self.characterLimitLabel.alpha = shouldHide ? 0 : 1
+            
+        }
+        return shouldHide
+    }
+    
+    func textFieldShouldClear(_ textField: UITextField) -> Bool {
+        UIView.animate(withDuration: 0.25) {
+            self.characterLimitLabel.alpha = 0
+            self.characterLimitLabel.isHidden = true
+        }
+        return true
     }
 }

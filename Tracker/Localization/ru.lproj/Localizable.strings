@@ -26,6 +26,7 @@
 "newHabitTitleLabel" = "Новая привычка";
 "newIrregularEvent" = "Новое нерегулярное событие";
 "characterLimitLabel" = "Ограничение 38 символов";
+"categoryCharacterLimitLabel" = "Ограничение 35 символов";
 "trackerNameTextField" = "Введите название трекера";
 "doneButton" = "Готово";
 "createTrackerButton" = "Создать";

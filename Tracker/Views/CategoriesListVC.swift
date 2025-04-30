@@ -81,8 +81,32 @@ final class CategoriesListViewController: UIViewController, UITableViewDataSourc
         
         viewModel.onEditCategoryRequest = { [weak self] category, currentText in
             let alert = UIAlertController(title: NSLocalizedString("contextMenuEdit", comment: ""), message: NSLocalizedString("newCategoryNameAlert", comment: ""), preferredStyle: .alert)
+           
+            //Вводим ограничение количества символов для редактируемой категории
+            let characterLimit = 35
+            
+            class TextLimitDelegate: NSObject, UITextFieldDelegate {
+                let limit: Int
+                init(limit: Int) {
+                    self.limit = limit
+                }
+                func textField(_ textField: UITextField, shouldChangeCharactersIn range: NSRange, replacementString string: String) -> Bool {
+                    guard let currentText = textField.text,
+                            let textRange = Range(range, in: currentText) else {
+                        return true
+                    }
+                    
+                    let updatedText = currentText.replacingCharacters(in: textRange, with: string)
+                    return updatedText.count <= limit
+                }
+            }
+            
+            let delegate = TextLimitDelegate(limit: characterLimit)
+            
             alert.addTextField { textField in
                 textField.text = currentText
+                textField.delegate = delegate
+                objc_setAssociatedObject(textField, "textLimitDelegate", delegate, .OBJC_ASSOCIATION_RETAIN_NONATOMIC)
             }
             
             let saveAction = UIAlertAction(title: NSLocalizedString(NSLocalizedString("save", comment: ""), comment: ""), style: .default) { _ in
@@ -280,3 +304,4 @@ final class CategoriesListViewController: UIViewController, UITableViewDataSourc
         present(navigationController, animated: true)
     }
 }
+

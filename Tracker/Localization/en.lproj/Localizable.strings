@@ -26,6 +26,7 @@
 "newHabitTitleLabel" = "New tracker";
 "newIrregularEvent" = "New event";
 "characterLimitLabel" = "38 characters limit";
+"categoryCharacterLimitLabel" = "35 characters limit";
 "trackerNameTextField" = "Input tracker name";
 "doneButton" = "Done";
 "createTrackerButton" = "Create";
