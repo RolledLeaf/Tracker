@@ -4,7 +4,7 @@ protocol NewTrackerDelegate: AnyObject {
     func didCreateTracker(_ tracker: TrackerCoreData,_ category: TrackerCategoryCoreData)
 }
 
-final class NewHabitViewController: UIViewController, UITableViewDelegate, UITableViewDataSource, UICollectionViewDataSource, UICollectionViewDelegateFlowLayout, UITextFieldDelegate {
+final class NewHabitViewController: UIViewController, UITableViewDelegate, UITableViewDataSource, UICollectionViewDataSource, UICollectionViewDelegateFlowLayout {
     
     weak var delegate: NewTrackerDelegate?
     
@@ -22,7 +22,7 @@ final class NewHabitViewController: UIViewController, UITableViewDelegate, UITab
         label.text = NSLocalizedString("characterLimitLabel", comment: "")
         label.font = .systemFont(ofSize: 14)
         label.textColor = UIColor.custom(.cancelButtonRed)
-        label.isHidden = true
+        label.alpha = 0
         label.textAlignment = .center
         return label
     }()
@@ -264,11 +264,11 @@ final class NewHabitViewController: UIViewController, UITableViewDelegate, UITab
            selectedCategory != nil {
             createTrackerButton.titleLabel?.textColor = UIColor.custom(.createButtonTextColor)
             createTrackerButton.backgroundColor = UIColor.custom(.createButtonColor)
-            print("Условия выполнены, кнопка Создать перекрашена в \(UIColor.custom(.createButtonColor))")
+            print("Условия выполнены, кнопка Создать перекрашена в \(String(describing: UIColor.custom(.createButtonColor)))")
         } else {
             createTrackerButton.backgroundColor = UIColor.custom(.textFieldGray)  // Неактивный цвет
             createTrackerButton.titleLabel?.textColor = UIColor.custom(.textColor)
-            print("Условия не выполнены, кнопка Создать снова \(UIColor.custom(.textFieldGray)) цвета")
+            print("Условия не выполнены, кнопка Создать снова \(String(describing: UIColor.custom(.textFieldGray))) цвета")
         }
     }
     
@@ -300,9 +300,9 @@ final class NewHabitViewController: UIViewController, UITableViewDelegate, UITab
         
         do {
             try context.save()
-            print("📌 Создаём трекер '\(tracker.name)' для категории '\(category.title ?? "Без названия")'")
+            print("📌 Создаём трекер '\(String(describing: tracker.name))' для категории '\(category.title ?? "Без названия")'")
             print("Контекст перед сохранением трекера: \(context)")
-            print("Контекст категории: \(selectedCategory.managedObjectContext)")
+            print("Контекст категории: \(String(describing: selectedCategory.managedObjectContext))")
             delegate?.didCreateTracker(tracker, category)
             presentingViewController?.presentingViewController?.dismiss(animated: true)
         } catch {
@@ -314,19 +314,6 @@ final class NewHabitViewController: UIViewController, UITableViewDelegate, UITab
         dismiss(animated: true, completion: nil)
     }
     
-    func textField(_ textField: UITextField, shouldChangeCharactersIn range: NSRange, replacementString string: String) -> Bool {
-        guard let currentText = textField.text, let textRange = Range(range, in: currentText) else {
-            return true
-        }
-        let updatedText = currentText.replacingCharacters(in: textRange, with: string)
-        if updatedText.count > 38 {
-            characterLimitLabel.isHidden = false
-            return false
-        } else {
-            characterLimitLabel.isHidden = true
-            return true
-        }
-    }
     
     func collectionView(_ collectionView: UICollectionView, viewForSupplementaryElementOfKind kind: String, at indexPath: IndexPath) -> UICollectionReusableView {
         print("Requested supplementary view for kind: \(kind), section: \(indexPath.section)")
@@ -492,3 +479,24 @@ extension NewHabitViewController: CategoriesListViewControllerDelegate {
     }
 }
 
+extension NewHabitViewController: UITextFieldDelegate {
+    func textField(_ textField: UITextField, shouldChangeCharactersIn range: NSRange, replacementString string: String) -> Bool {
+        guard let currentText = textField.text, let textRange = Range(range, in: currentText) else {
+            return true
+        }
+        let updatedText = currentText.replacingCharacters(in: textRange, with: string)
+       let shouldHide = updatedText.count < 38
+        
+        UIView.animate(withDuration: 0.25) {
+            self.characterLimitLabel.alpha = shouldHide ? 0 : 1
+        }
+        return shouldHide
+    }
+    
+    func textFieldShouldClear(_ textField: UITextField) -> Bool {
+        UIView.animate(withDuration: 0.25) {
+            self.characterLimitLabel.alpha = 0
+        }
+        return true
+    }
+}
