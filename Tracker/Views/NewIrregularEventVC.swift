@@ -1,7 +1,5 @@
 import UIKit
 
-
-
 final class NewIrregularEventViewController: UIViewController, UITableViewDelegate, UITableViewDataSource, UICollectionViewDataSource, UICollectionViewDelegateFlowLayout {
     
     weak var delegate: NewTrackerDelegate?
@@ -111,27 +109,26 @@ final class NewIrregularEventViewController: UIViewController, UITableViewDelega
         return button
     }()
     
-    let scrollView = UIScrollView()
-    let contentView = UIView()
-    let selectedWeekDays: String = " "
+    private let scrollView = UIScrollView()
+    private let contentView = UIView()
+    private let selectedWeekDays: String = " "
     
-    
-    var tableViewOptions: [(title: String, subtitle: String?)] = [
+    private var tableViewOptions: [(title: String, subtitle: String?)] = [
         (title: NSLocalizedString("tableViewOptionCategory", comment: ""), subtitle: nil)
     ]
     
-    var selectedColor: CollectionColors? {
+    private var selectedColor: CollectionColors? {
         didSet {
             updateCreateCategoryButtonColor()
         }
     }
-    var selectedEmoji: String? {
+    private var selectedEmoji: String? {
         didSet {
             updateCreateCategoryButtonColor()
         }
     }
     
-    var selectedCategory: TrackerCategoryCoreData? {
+    private var selectedCategory: TrackerCategoryCoreData? {
         didSet {
             updateCreateCategoryButtonColor()
         }
@@ -181,7 +178,6 @@ final class NewIrregularEventViewController: UIViewController, UITableViewDelega
             contentView.widthAnchor.constraint(equalTo: scrollView.widthAnchor),
             contentView.heightAnchor.constraint(equalToConstant: 887),
             
-            
             titleLabel.topAnchor.constraint(equalTo: contentView.topAnchor, constant: -33),
             titleLabel.centerXAnchor.constraint(equalTo: contentView.centerXAnchor),
             
@@ -189,7 +185,6 @@ final class NewIrregularEventViewController: UIViewController, UITableViewDelega
             trackerNameTextField.topAnchor.constraint(equalTo: titleLabel.bottomAnchor, constant: 38),
             trackerNameTextField.leadingAnchor.constraint(equalTo: contentView.leadingAnchor, constant: 16),
             trackerNameTextField.trailingAnchor.constraint(equalTo: contentView.trailingAnchor, constant: -16),
-            
             
             characterLimitLabel.heightAnchor.constraint(equalToConstant: 20),
             characterLimitLabel.leadingAnchor.constraint(equalTo: view.leadingAnchor, constant: 44),
@@ -207,7 +202,6 @@ final class NewIrregularEventViewController: UIViewController, UITableViewDelega
             collectionsStackView.trailingAnchor.constraint(equalTo: contentView.trailingAnchor, constant: -23),
             
             buttonsStackView.topAnchor.constraint(equalTo: collectionsStackView.bottomAnchor, constant: 46),
-            
             buttonsStackView.heightAnchor.constraint(equalToConstant: 60),
             buttonsStackView.leadingAnchor.constraint(equalTo: contentView.leadingAnchor, constant: 20),
             buttonsStackView.trailingAnchor.constraint(equalTo: contentView.trailingAnchor, constant: -20)])
@@ -301,7 +295,6 @@ final class NewIrregularEventViewController: UIViewController, UITableViewDelega
         dismiss(animated: true, completion: nil)
     }
     
-    
     func collectionView(_ collectionView: UICollectionView, viewForSupplementaryElementOfKind kind: String, at indexPath: IndexPath) -> UICollectionReusableView {
         print("Requested supplementary view for kind: \(kind), section: \(indexPath.section)")
         
@@ -338,7 +331,6 @@ final class NewIrregularEventViewController: UIViewController, UITableViewDelega
     func numberOfSections(in collectionView: UICollectionView) -> Int {
         1
     }
-    
     
     func collectionView(_ collectionView: UICollectionView, numberOfItemsInSection section: Int) -> Int {
         if collectionView == emojiCollectionView {
@@ -439,7 +431,7 @@ extension NewIrregularEventViewController: UITextFieldDelegate {
             return true
         }
         let updatedText = currentText.replacingCharacters(in: textRange, with: string)
-       let shouldHide = updatedText.count < 38
+        let shouldHide = updatedText.count < 38
         
         UIView.animate(withDuration: 0.25) {
             self.characterLimitLabel.isHidden = false

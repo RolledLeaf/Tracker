@@ -10,7 +10,7 @@ final class ScheduleTableCell: UITableViewCell {
     
     static let identifier = "ScheduleTableCell"
     
-     lazy var titleLabel: UILabel = {
+    lazy var titleLabel: UILabel = {
         let label = UILabel()
         label.font = .systemFont(ofSize: 17, weight: .regular)
         label.textColor = UIColor.custom(.textColor)
@@ -20,7 +20,7 @@ final class ScheduleTableCell: UITableViewCell {
         return label
     }()
     
-     lazy var toggleSwitch: UISwitch = {
+    lazy var toggleSwitch: UISwitch = {
         let toggle = UISwitch()
         toggle.onTintColor = UIColor.custom(.toggleSwitchBlue)
         toggle.tintColor = UIColor.custom(.toggleSwitchGray)
@@ -38,7 +38,6 @@ final class ScheduleTableCell: UITableViewCell {
     var onToggle: ((Bool) -> Void)?
     
     // MARK: - Init
-    
     override init(style: UITableViewCell.CellStyle, reuseIdentifier: String?) {
         super.init(style: style, reuseIdentifier: reuseIdentifier)
         setupUI()
@@ -50,18 +49,15 @@ final class ScheduleTableCell: UITableViewCell {
     }
     
     // MARK: - UI Setup
-    
     private func setupUI() {
         contentView.addSubview(titleLabel)
         contentView.addSubview(toggleSwitch)
         contentView.backgroundColor = UIColor.custom(.tablesColor)
         
         NSLayoutConstraint.activate([
-            // Расположение titleLabel
             titleLabel.leadingAnchor.constraint(equalTo: contentView.leadingAnchor, constant: 16),
             titleLabel.centerYAnchor.constraint(equalTo: contentView.centerYAnchor),
             
-            // Расположение toggleButton
             toggleSwitch.trailingAnchor.constraint(equalTo: contentView.trailingAnchor, constant: -16),
             toggleSwitch.centerYAnchor.constraint(equalTo: contentView.centerYAnchor),
             toggleSwitch.widthAnchor.constraint(equalToConstant: 51),

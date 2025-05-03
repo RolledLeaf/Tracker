@@ -15,7 +15,7 @@ final class TrackerCell: UICollectionViewCell {
     private var currentDate: Date = Date()
     private var selectedIndexPaths: Set<IndexPath> = []
     
-     lazy var habitLabel: UILabel = {
+    private lazy var habitLabel: UILabel = {
         let label = UILabel()
         label.font = .systemFont(ofSize: 14, weight: .regular)
         label.textColor = UIColor.custom(.createButtonTextColor)
@@ -25,7 +25,7 @@ final class TrackerCell: UICollectionViewCell {
         return label
     }()
     
-    lazy var doneButton: UIButton = {
+    private lazy var doneButton: UIButton = {
         let button = UIButton(type: .custom)
         button.setImage(UIImage(systemName: "plus"), for: .normal)
         button.tintColor = .black
@@ -36,14 +36,14 @@ final class TrackerCell: UICollectionViewCell {
         return button
     }()
     
-     lazy var emojiLabel: UILabel = {
+    private lazy var emojiLabel: UILabel = {
         let label = UILabel()
         label.font = UIFont.systemFont(ofSize: 16)
         label.textAlignment = .center
         return label
     }()
     
-    lazy var daysCountLabel: UILabel = {
+    private lazy var daysCountLabel: UILabel = {
         let label = UILabel()
         label.font = .systemFont(ofSize: 12, weight: .regular)
         label.textColor = UIColor.custom(.textColor)
@@ -58,7 +58,7 @@ final class TrackerCell: UICollectionViewCell {
         return view
     }()
     
-    lazy var doneButtonContainer: UIView = {
+    private lazy var doneButtonContainer: UIView = {
         let view = UIView()
         view.layer.cornerRadius = 17
         view.layer.masksToBounds = true
@@ -66,7 +66,7 @@ final class TrackerCell: UICollectionViewCell {
         return view
     }()
     
-     lazy var backgroundContainer: UIView = {
+    lazy var backgroundContainer: UIView = {
         let view = UIView()
         view.layer.cornerRadius = 16
         view.layer.masksToBounds = true
@@ -74,7 +74,7 @@ final class TrackerCell: UICollectionViewCell {
         return view
     }()
     
-     lazy var pinImageView: UIImageView = {
+    private lazy var pinImageView: UIImageView = {
         let imageView = UIImageView(image: UIImage(systemName: "pin.fill"))
         imageView.tintColor = .white
         imageView.translatesAutoresizingMaskIntoConstraints = false
@@ -101,8 +101,6 @@ final class TrackerCell: UICollectionViewCell {
     private func setupUI() {
         backgroundColor = .clear
         
-       
-
         let uiElements: [UIView] = [backgroundContainer, daysCountLabel, doneButtonContainer, doneButton]
         uiElements.forEach { $0.translatesAutoresizingMaskIntoConstraints = false }
         uiElements.forEach { contentView.addSubview($0) }
@@ -150,11 +148,6 @@ final class TrackerCell: UICollectionViewCell {
             habitLabel.leadingAnchor.constraint(equalTo: backgroundContainer.leadingAnchor, constant: 12),
             habitLabel.trailingAnchor.constraint(equalTo: backgroundContainer.trailingAnchor, constant: -12)
         ])
-    }
-    
-     func getDayWord(for count: Int16) -> String {
-        let format = NSLocalizedString("daysCount", comment: "Количество дней")
-        return String.localizedStringWithFormat(format, count)
     }
     
     func configure(with tracker: TrackerCoreData, trackerRecords: [TrackerRecordCoreData]) {

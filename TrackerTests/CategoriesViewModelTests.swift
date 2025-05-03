@@ -35,7 +35,6 @@ final class MockingCategoryStore: TrackerCategoryStoreProtocol {
 }
 
 final class CategoriesViewModelTests: XCTestCase {
-    
     func makeInMemoryContainer() -> NSPersistentContainer {
         guard let modelURL = Bundle.main.url(forResource: "TrackerDB", withExtension: "momd"),
               let model = NSManagedObjectModel(contentsOf: modelURL) else {

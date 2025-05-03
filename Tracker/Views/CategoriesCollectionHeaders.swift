@@ -3,7 +3,7 @@ import UIKit
 final class CategoriesCollectionHeaderView: UICollectionReusableView {
     static let identifier = "CategoriesCollectionHeaderView"
     
-    lazy var titleLabel: UILabel = {
+    private lazy var titleLabel: UILabel = {
         let label = UILabel()
         label.font = .systemFont(ofSize: 19, weight: .bold)
         label.textColor = UIColor.custom(.textColor)

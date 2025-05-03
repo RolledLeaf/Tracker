@@ -1,4 +1,4 @@
-class CategoriesViewModel {
+final class CategoriesViewModel {
     private let categoryStore: TrackerCategoryStoreProtocol
     
     private(set) var categories: [TrackerCategoryCoreData] = [] {

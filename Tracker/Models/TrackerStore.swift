@@ -22,10 +22,6 @@ protocol TrackerStoreMethodsProtocol {
 
 final class TrackerStore: NSObject, NSFetchedResultsControllerDelegate, TrackerStoreMethodsProtocol {
     
-    enum TrackerStoreError: Error {
-        case failedToInitializeContext
-    }
-    
     weak var delegate: TrackerStoreDelegate?
     private let context: NSManagedObjectContext
     private let trackerCategoryStore = TrackerCategoryStore()
@@ -68,7 +64,6 @@ final class TrackerStore: NSObject, NSFetchedResultsControllerDelegate, TrackerS
     
     // MARK: - NSFetchedResultsControllerDelegate
     
-   
     func editTracker(at indexPath: IndexPath, with newData: TrackerEditData) {
         let tracker = fetchedResultsController.object(at: indexPath)
         tracker.name = newData.name
@@ -98,24 +93,6 @@ final class TrackerStore: NSObject, NSFetchedResultsControllerDelegate, TrackerS
         }
     }
     
-//   func controller(_ controller: NSFetchedResultsController<NSFetchRequestResult>, didChange anObject: Any, at indexPath: IndexPath?, for type: NSFetchedResultsChangeType, newIndexPath: IndexPath?) {
-//        switch type {
-//        case .insert:
-//            if let newIndexPath = newIndexPath {
-//                insertedIndexes?.insert(newIndexPath.item)
-//            }
-//        case .delete:
-//            if let indexPath = indexPath {
-//                deletedIndexes?.insert(indexPath.item)
-//            }
-//        default:
-//            break
-//        }
-//        
-//        guard let inserted = insertedIndexes, let deleted = deletedIndexes else { return }
-//        
-//    }
-    
     func controllerWillChangeContent(_ controller: NSFetchedResultsController<NSFetchRequestResult>) {
         print("ControllerWillChangeContent вызван")
         insertedIndexes = IndexSet()
@@ -138,7 +115,6 @@ final class TrackerStore: NSObject, NSFetchedResultsControllerDelegate, TrackerS
 }
 
 // MARK: - TrackerStoreProtocol
-
 extension TrackerStore: TrackerStoreProtocol {
     var numberOfSections: Int {
         return fetchedResultsController.sections?.count ?? 0
@@ -156,7 +132,6 @@ extension TrackerStore: TrackerStoreProtocol {
         return fetchedResultsController.sections?[section].name ?? NSLocalizedString("noCategory", comment: "")
     }
 }
-
 
 struct TrackerEditData {
     let name: String

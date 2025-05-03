@@ -119,16 +119,14 @@ final class EditIrregularEventViewController: UIViewController, UITableViewDeleg
         return button
     }()
     
+    private let scrollView = UIScrollView()
+    private let contentView = UIView()
     
-    let scrollView = UIScrollView()
     var trackerToEdit: TrackerCoreData?
-    let contentView = UIView()
-    
     var tableViewOption: [(title: String, subtitle: String?)] = [
         (title: "Категория", subtitle: nil)
     ]
     
-   
     var selectedColor: CollectionColors? {
         didSet {
             updateCreateCategoryButtonColor()
@@ -266,10 +264,10 @@ final class EditIrregularEventViewController: UIViewController, UITableViewDeleg
            selectedEmoji != nil,
            selectedCategory != nil {
             saveTrackerButton.backgroundColor = UIColor.custom(.createButtonColor)  // Активный цвет
-            print("Условия выполнены, кнопка Сохранить перекрашена в \(UIColor.custom(.createButtonColor))")
+            print("Условия выполнены, кнопка Сохранить перекрашена в \(String(describing: UIColor.custom(.createButtonColor)))")
         } else {
             saveTrackerButton.backgroundColor = UIColor.custom(.textFieldGray)  // Неактивный цвет
-            print("Условия не выполнены, кнопка Сохранить снова \(UIColor.custom(.textFieldGray)) цвета")
+            print("Условия не выполнены, кнопка Сохранить снова \(String(describing: UIColor.custom(.textFieldGray))) цвета")
         }
     }
     
@@ -283,15 +281,15 @@ final class EditIrregularEventViewController: UIViewController, UITableViewDeleg
             print("Не все данные выбраны!")
             return
         }
-
+        
         let context = CoreDataStack.shared.context
-
+        
         if let tracker = trackerToEdit {
             tracker.name = name
             tracker.color = selectedColor.rawValue as NSString
             tracker.emoji = selectedEmoji
             tracker.category = selectedCategory
-
+            
             do {
                 try context.save()
                 print("✏️ Отредактирован трекер '\(tracker.name ?? "Без имени")'")
@@ -308,10 +306,10 @@ final class EditIrregularEventViewController: UIViewController, UITableViewDeleg
             tracker.daysCount = 0
             tracker.category = selectedCategory
             selectedCategory.addToTracker(tracker)
-
+            
             do {
                 try context.save()
-                print("📌 Создаём трекер '\(tracker.name)' для категории '\(selectedCategory.title ?? "Без названия")'")
+                print("📌 Создаём трекер '\(String(describing: tracker.name))' для категории '\(selectedCategory.title ?? "Без названия")'")
                 presentingViewController?.presentingViewController?.dismiss(animated: true)
             } catch {
                 print("Ошибка при сохранении трекера: \(error)")
@@ -361,7 +359,6 @@ final class EditIrregularEventViewController: UIViewController, UITableViewDeleg
         } else if collectionView == colorsCollectionView {
             header.configure(with: NSLocalizedString("colorCollectionViewTitle", comment: ""))
         }
-        
         return header
     }
     
@@ -429,17 +426,16 @@ final class EditIrregularEventViewController: UIViewController, UITableViewDeleg
         }
         cell.configure(with: tableViewOption[indexPath.row])
         return cell
-        
     }
     
     func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
         tableView.deselectRow(at: indexPath, animated: true)
-            view.endEditing(true)
-            let categoryListVC = CategoriesListViewController()
-            categoryListVC.delegate = self
-            let navigationController = UINavigationController(rootViewController: categoryListVC)
-            navigationController.modalPresentationStyle = .automatic
-            present(navigationController, animated: true)
+        view.endEditing(true)
+        let categoryListVC = CategoriesListViewController()
+        categoryListVC.delegate = self
+        let navigationController = UINavigationController(rootViewController: categoryListVC)
+        navigationController.modalPresentationStyle = .automatic
+        present(navigationController, animated: true)
     }
     
     func tableView(_ tableView: UITableView, willDisplay cell: UITableViewCell, forRowAt indexPath: IndexPath) {
@@ -463,36 +459,24 @@ final class EditIrregularEventViewController: UIViewController, UITableViewDeleg
         }
     }
     
-    
-    private func getDayWord(for count: Int16) -> String {
-        let format = NSLocalizedString("daysCount", comment: "Количество дней")
-        return String.localizedStringWithFormat(format, count)
-    }
-    
     private func populateTrackerData() {
         print("Вызван метод populateTrackerData")
         guard let tracker = trackerToEdit else { return }
         
-        // Название и количество дней
         trackerNameTextField.text = tracker.name
         daysCountLabel.text = getDayWord(for: tracker.daysCount)
         
-        // Категория
         if let category = tracker.category {
             selectedCategory = category
             tableViewOption[0].subtitle = category.title
         }
         
-        // WeekDays
-       //no weekDays
-        
-        // Emoji
         selectedEmoji = tracker.emoji
         if let emoji = tracker.emoji, let index = emojis.firstIndex(of: emoji) {
             let indexPath = IndexPath(item: index, section: 0)
             emojiCollectionView.selectItem(at: indexPath, animated: false, scrollPosition: .top)
         }
-        // Цвет
+        
         if let colorRaw = tracker.color as? String?,
            let colorEnum = CollectionColors(rawValue: colorRaw ?? "no color") {
             selectedColor = colorEnum
@@ -501,12 +485,8 @@ final class EditIrregularEventViewController: UIViewController, UITableViewDeleg
                 colorsCollectionView.selectItem(at: indexPath, animated: false, scrollPosition: .top)
             }
         }
-        
-       
     }
 }
-
-
 
 extension EditIrregularEventViewController: CategoriesListViewControllerDelegate {
     func updateCategory(with category: TrackerCategoryCoreData) {

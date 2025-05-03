@@ -30,7 +30,6 @@ final class TrackerTests: XCTestCase {
         XCTAssertTrue(cell.isHidden)
         XCTAssertFalse(cell.isUserInteractionEnabled)
         XCTAssertTrue(cell.contentView.isHidden)
-        
     }
     
     func testSetHiddenShowsCellCorrectly() {
@@ -46,5 +45,4 @@ final class TrackerTests: XCTestCase {
         XCTAssertTrue(cell.isUserInteractionEnabled)
         XCTAssertFalse(cell.contentView.isHidden)
     }
-    
 }

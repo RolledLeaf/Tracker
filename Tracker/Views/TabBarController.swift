@@ -38,11 +38,9 @@ final class TabBarController: UITabBarController {
         ])
     }
 }
-    
+
 extension TabBarController: UITabBarControllerDelegate {
     func tabBarController(_ tabBarController: UITabBarController, didSelect viewController: UIViewController) {
-        // Получаем корневой контроллер из UINavigationController,
-        // так как viewController — это UINavigationController
         if let nav = viewController as? UINavigationController,
            let root = nav.viewControllers.first {
             

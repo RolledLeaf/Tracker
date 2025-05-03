@@ -4,11 +4,11 @@ final class FiltersTableCell: UITableViewCell {
     
     static let identifier = "FiltersTableCell"
     
-     lazy var categoryNameLabel: UILabel = {
+    lazy var categoryNameLabel: UILabel = {
         let label = UILabel()
         label.font = .systemFont(ofSize: 17, weight: .regular)
         label.textColor = UIColor.custom(.createButtonColor)
-         label.backgroundColor = .clear
+        label.backgroundColor = .clear
         label.textAlignment = .left
         label.translatesAutoresizingMaskIntoConstraints = false
         return label
@@ -22,9 +22,9 @@ final class FiltersTableCell: UITableViewCell {
         return imageView
     }()
     
-     let customSeparator: UIView = {
+    let customSeparator: UIView = {
         let view = UIView()
-         view.backgroundColor = UIColor.custom(.textFieldGray)
+        view.backgroundColor = UIColor.custom(.textFieldGray)
         view.translatesAutoresizingMaskIntoConstraints = false
         return view
     }()
@@ -33,7 +33,6 @@ final class FiltersTableCell: UITableViewCell {
     override init(style: UITableViewCell.CellStyle, reuseIdentifier: String?) {
         super.init(style: style, reuseIdentifier: reuseIdentifier)
         setupUI()
-        
     }
     
     required init?(coder: NSCoder) {
@@ -48,15 +47,14 @@ final class FiltersTableCell: UITableViewCell {
         contentView.addSubview(customSeparator)
         
         NSLayoutConstraint.activate([
-         
             categoryNameLabel.leadingAnchor.constraint(equalTo: contentView.leadingAnchor, constant: 16),
             categoryNameLabel.centerYAnchor.constraint(equalTo: contentView.centerYAnchor),
             
             customSeparator.heightAnchor.constraint(equalToConstant: 0.5),
-                customSeparator.leadingAnchor.constraint(equalTo: contentView.leadingAnchor, constant: 16),
-                customSeparator.trailingAnchor.constraint(equalTo: contentView.trailingAnchor, constant: -16),
-                customSeparator.bottomAnchor.constraint(equalTo: contentView.bottomAnchor),
-      
+            customSeparator.leadingAnchor.constraint(equalTo: contentView.leadingAnchor, constant: 16),
+            customSeparator.trailingAnchor.constraint(equalTo: contentView.trailingAnchor, constant: -16),
+            customSeparator.bottomAnchor.constraint(equalTo: contentView.bottomAnchor),
+            
             checkMark.trailingAnchor.constraint(equalTo: contentView.trailingAnchor, constant: -16),
             checkMark.centerYAnchor.constraint(equalTo: contentView.centerYAnchor),
             checkMark.widthAnchor.constraint(equalToConstant: 15),

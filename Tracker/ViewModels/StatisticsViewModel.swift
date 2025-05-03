@@ -46,12 +46,9 @@ final class StatisticsViewModel {
             completedTrackers: completedTrackers,
             averageValue: averageValue
         )
-        
-      
         onStatisticsCalculated?(result)
     }
 }
-
 
 extension Date {
     var startOfDay: Date {

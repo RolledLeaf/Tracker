@@ -116,34 +116,33 @@ final class NewHabitViewController: UIViewController, UITableViewDelegate, UITab
         return button
     }()
     
+    private let scrollView = UIScrollView()
+    private let contentView = UIView()
     
-    let scrollView = UIScrollView()
-    let contentView = UIView()
-    
-    var tableViewOptions: [(title: String, subtitle: String?)] = [
+    private var tableViewOptions: [(title: String, subtitle: String?)] = [
         (title: NSLocalizedString("tableViewOptionCategory", comment: ""), subtitle: nil),
         (title: NSLocalizedString("tableViewOptionSchedule", comment: ""), subtitle: nil)
     ]
     
     
-    var selectedWeekDays: [String]? {
+    private var selectedWeekDays: [String]? {
         didSet {
             updateCreateCategoryButtonColor()
         }
     }
     
-    var selectedColor: CollectionColors? {
+    private var selectedColor: CollectionColors? {
         didSet {
             updateCreateCategoryButtonColor()
         }
     }
-    var selectedEmoji: String? {
+    private var selectedEmoji: String? {
         didSet {
             updateCreateCategoryButtonColor()
         }
     }
     
-    var selectedCategory: TrackerCategoryCoreData? {
+    private var selectedCategory: TrackerCategoryCoreData? {
         didSet {
             updateCreateCategoryButtonColor()
         }
@@ -315,7 +314,6 @@ final class NewHabitViewController: UIViewController, UITableViewDelegate, UITab
         dismiss(animated: true, completion: nil)
     }
     
-    
     func collectionView(_ collectionView: UICollectionView, viewForSupplementaryElementOfKind kind: String, at indexPath: IndexPath) -> UICollectionReusableView {
         print("Requested supplementary view for kind: \(kind), section: \(indexPath.section)")
         
@@ -408,7 +406,6 @@ final class NewHabitViewController: UIViewController, UITableViewDelegate, UITab
         }
         cell.configure(with: tableViewOptions[indexPath.row])
         return cell
-        
     }
     
     func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
@@ -475,7 +472,7 @@ extension NewHabitViewController: CategoriesListViewControllerDelegate {
         if let index = tableViewOptions.firstIndex(where: { $0.title == NSLocalizedString("tableViewOptionCategory", comment: "") }) {
             tableViewOptions[index].subtitle = category.title
         }
-        selectedCategory = category 
+        selectedCategory = category
         categoryAndScheduleTableView.reloadData()
     }
 }
@@ -486,7 +483,7 @@ extension NewHabitViewController: UITextFieldDelegate {
             return true
         }
         let updatedText = currentText.replacingCharacters(in: textRange, with: string)
-       let shouldHide = updatedText.count < 38
+        let shouldHide = updatedText.count < 38
         
         UIView.animate(withDuration: 0.25) {
             self.characterLimitLabel.isHidden = false

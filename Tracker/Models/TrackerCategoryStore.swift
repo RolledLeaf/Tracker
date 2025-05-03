@@ -7,7 +7,7 @@ protocol TrackerCategoryStoreProtocol {
     func saveChanges()
 }
 
- class TrackerCategoryStore: NSObject, NSFetchedResultsControllerDelegate, TrackerCategoryStoreProtocol {
+ final class TrackerCategoryStore: NSObject, NSFetchedResultsControllerDelegate, TrackerCategoryStoreProtocol {
     
     private let context: NSManagedObjectContext
     

@@ -7,14 +7,14 @@ final class FiltersViewController: UIViewController, UITableViewDelegate, UITabl
         return TrackerFilterType(rawValue: rawValue ?? "") ?? .all
     }
     
-    lazy var titleLabel: UILabel = {
+    private lazy var titleLabel: UILabel = {
         let label = UILabel()
-        label.text = NSLocalizedString("Фильтры", comment: "")
+        label.text = NSLocalizedString("filtersButtonTitle", comment: "")
         label.font = UIFont.systemFont(ofSize: 16, weight: .medium)
         return label
     }()
     
-    lazy var filtersTableView: UITableView = {
+    private lazy var filtersTableView: UITableView = {
         let tableView = UITableView()
         tableView.separatorStyle = .none
         tableView.backgroundColor = .clear
@@ -32,7 +32,6 @@ final class FiltersViewController: UIViewController, UITableViewDelegate, UITabl
     
     override func viewDidLoad() {
         super.viewDidLoad()
-        
         setupUI()
     }
     
@@ -141,4 +140,11 @@ extension FiltersViewController {
             cell.contentView.clipsToBounds = false
         }
     }
+}
+
+enum TrackerFilterType: String {
+    case all = "all"
+    case today = "today"
+    case completed = "completed"
+    case uncompleted = "uncompleted"
 }

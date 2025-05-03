@@ -3,7 +3,7 @@ import UIKit
 
 final class Notifications: NSObject,  UNUserNotificationCenterDelegate {
     
-    let notificationCenter = UNUserNotificationCenter.current()
+    private let notificationCenter = UNUserNotificationCenter.current()
     
     func registerNotifications() {
         notificationCenter.delegate = self

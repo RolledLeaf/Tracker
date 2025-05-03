@@ -1,6 +1,5 @@
 import Foundation
 
-
 final class TrackerIdGenerator {
     private static let trackerIdKey = "trackerIdKey"
     
@@ -11,3 +10,7 @@ final class TrackerIdGenerator {
     }
 }
 
+func getDayWord(for count: Int16) -> String {
+   let format = NSLocalizedString("daysCount", comment: "Количество дней")
+   return String.localizedStringWithFormat(format, count)
+}

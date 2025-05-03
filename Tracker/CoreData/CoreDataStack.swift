@@ -20,7 +20,7 @@ final class CoreDataStack {
         persistentContainer.viewContext
     }
     
-    func saveContext() {
+    private func saveContext() {
         let context = persistentContainer.viewContext
         if context.hasChanges {
             do {
@@ -31,15 +31,13 @@ final class CoreDataStack {
         }
     }
     
-    func registerColorValueTransformers() {
+    private func registerColorValueTransformers() {
         let transformer = CollectionColorsTransformer()
         ValueTransformer.setValueTransformer(transformer, forName: NSValueTransformerName(rawValue: "CollectionColorsTransformer"))
     }
     
-    func registerStringArrayTransformers() {
+    private func registerStringArrayTransformers() {
         let stringArrayTransformer = StringArrayTransformer()
         ValueTransformer.setValueTransformer(stringArrayTransformer, forName: NSValueTransformerName(rawValue: "StringArrayTransformer"))
     }
 }
-
-

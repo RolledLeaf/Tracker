@@ -99,10 +99,10 @@ final class NewCategoryViewController: UIViewController {
     private func updateDoneButtonColor() {
         if let name = categoryNameTextField.text, !name.isEmpty {
             doneButton.backgroundColor =  UIColor.custom(.createButtonColor)
-            print("Условия выполнены, кнопка Готово перекрашена в \(UIColor.custom(.createButtonColor))")
+            print("Условия выполнены, кнопка Готово перекрашена в \(String(describing: UIColor.custom(.createButtonColor)))")
         } else {
             doneButton.backgroundColor = UIColor.custom(.textFieldGray)
-            print("Условия не выполнены, кнопка Готово снова \(UIColor.custom(.textFieldGray)) цвета")
+            print("Условия не выполнены, кнопка Готово снова \(String(describing: UIColor.custom(.textFieldGray))) цвета")
         }
     }
     
@@ -139,7 +139,7 @@ extension NewCategoryViewController: UITextFieldDelegate {
             return true
         }
         let updatedText = currentText.replacingCharacters(in: textRange, with: string)
-       let shouldHide = updatedText.count < 35
+        let shouldHide = updatedText.count < 35
         
         UIView.animate(withDuration: 0.25) {
             self.characterLimitLabel.isHidden = false

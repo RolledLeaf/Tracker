@@ -1,7 +1,6 @@
 import UIKit
 
 protocol ScheduleViewControllerDelegate: AnyObject {
-    
     func updateSchedule(for title: String, with subtitle: String?)
 }
 
@@ -41,22 +40,21 @@ final class ScheduleViewController: UIViewController, UITableViewDelegate, UITab
     }()
     
     private let sWeekDaysString = NSLocalizedString("shortWeekDaysSymbols", comment: "Week days short symbols")
-
+    
     private var weekDays: [String] {
         return NSLocalizedString("weekDays", comment: "").components(separatedBy: ", ")
     }
     
-
     private var weekDayOrder: [String] {
         return NSLocalizedString("shortWeekDaysSymbols", comment: "").components(separatedBy: ", ")
     }
-
+    
     private var weekDayAbbreviations: [String: String] {
         let fullDays = weekDays
         let shortDays = weekDayOrder
         return Dictionary(uniqueKeysWithValues: zip(fullDays, shortDays))
     }
-  
+    
     private var selectedWeekDays: [String] = []
     private var tempSelectedWeekDays: [String] = []
     
@@ -112,7 +110,6 @@ final class ScheduleViewController: UIViewController, UITableViewDelegate, UITab
                 let index2 = weekDayOrder.firstIndex(of: weekDayAbbreviations[$1] ?? "") ?? 0
                 return index1 < index2
             }.compactMap { weekDayAbbreviations[$0] }
-            
             return sortedAbbreviations.joined(separator: ", ")
         }
     }

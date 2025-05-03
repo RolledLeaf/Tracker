@@ -34,11 +34,9 @@ final class CategoryAndScheduleCellTests: XCTestCase {
         
         let exampleTiltle = "Example Title"
         
-        
         //When
         cell.configure(with: (title: exampleTiltle, subtitle: nil))
         
         XCTAssertFalse(cell.hasSubtitle)
     }
-    
 }

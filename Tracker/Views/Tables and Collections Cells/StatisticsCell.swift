@@ -4,7 +4,7 @@ final class StatisticsCell: UITableViewCell {
     
     static let identifier = "StatisticsCell"
     
-     lazy var titleLabel: UILabel = {
+    lazy var titleLabel: UILabel = {
         let label = UILabel()
         label.font = .systemFont(ofSize: 34, weight: .medium)
         label.textColor = UIColor.custom(.textColor)
@@ -13,7 +13,7 @@ final class StatisticsCell: UITableViewCell {
         return label
     }()
     
-     lazy var detailedTextLabel: UILabel = {
+    lazy var detailedTextLabel: UILabel = {
         let label = UILabel()
         label.font = .systemFont(ofSize: 12, weight: .medium)
         label.textColor = UIColor.custom(.textColor)
@@ -21,10 +21,9 @@ final class StatisticsCell: UITableViewCell {
         label.translatesAutoresizingMaskIntoConstraints = false
         return label
     }()
-  
+    
     
     // MARK: - Init
-    
     override init(style: UITableViewCell.CellStyle, reuseIdentifier: String?) {
         super.init(style: style, reuseIdentifier: reuseIdentifier)
         setupUI()
@@ -35,7 +34,6 @@ final class StatisticsCell: UITableViewCell {
     }
     
     // MARK: - UI Setup
-    
     private func setupUI() {
         contentView.addSubview(titleLabel)
         contentView.addSubview(detailedTextLabel)
@@ -50,8 +48,6 @@ final class StatisticsCell: UITableViewCell {
             detailedTextLabel.widthAnchor.constraint(equalToConstant: 271),
             detailedTextLabel.heightAnchor.constraint(equalToConstant: 22),
         ])
-        
-       
     }
     
     // MARK: - Configuration Method
@@ -59,6 +55,5 @@ final class StatisticsCell: UITableViewCell {
         // Устанавливаем текст для заголовка
         titleLabel.text = "\(option.title)"
         detailedTextLabel.text = option.subtitle
-        
     }
 }

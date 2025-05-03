@@ -57,15 +57,15 @@ final class CategoriesListViewController: UIViewController, UITableViewDataSourc
         return button
     }()
     
-    let scrollView = UIScrollView()
-    let contentView = UIView()
+    private lazy var viewModel = CategoriesViewModel(categoryStore: trackerCategoryStore)
     
+    private let scrollView = UIScrollView()
+    private let contentView = UIView()
     private let trackerCategoryStore = TrackerCategoryStore()
     private let notificationKey = "NewCategoryAdded"
+    
     private var tableHeightConstraint: NSLayoutConstraint?
     private var contentViewHeightConstraint: NSLayoutConstraint?
-    
-    private lazy var viewModel = CategoriesViewModel(categoryStore: trackerCategoryStore)
     
     override func viewDidLoad() {
         super.viewDidLoad()
@@ -81,8 +81,7 @@ final class CategoriesListViewController: UIViewController, UITableViewDataSourc
         
         viewModel.onEditCategoryRequest = { [weak self] category, currentText in
             let alert = UIAlertController(title: NSLocalizedString("contextMenuEdit", comment: ""), message: NSLocalizedString("newCategoryNameAlert", comment: ""), preferredStyle: .alert)
-           
-            //Вводим ограничение количества символов для редактируемой категории
+            
             let characterLimit = 35
             
             class TextLimitDelegate: NSObject, UITextFieldDelegate {
@@ -92,7 +91,7 @@ final class CategoriesListViewController: UIViewController, UITableViewDataSourc
                 }
                 func textField(_ textField: UITextField, shouldChangeCharactersIn range: NSRange, replacementString string: String) -> Bool {
                     guard let currentText = textField.text,
-                            let textRange = Range(range, in: currentText) else {
+                          let textRange = Range(range, in: currentText) else {
                         return true
                     }
                     
@@ -247,8 +246,8 @@ final class CategoriesListViewController: UIViewController, UITableViewDataSourc
         
         let category = viewModel.categories[indexPath.row]
         if category.title == NSLocalizedString("pinned", comment: "") {
-        
-        
+            
+            
         }
         cell.configure(with: category.title ?? NSLocalizedString("noNameString", comment: ""))
         return cell

@@ -2,7 +2,6 @@ import UIKit
 
 final class ColorsCollectionViewCell: UICollectionViewCell {
     
-    // MARK: - Identifier
     static let identifier = "ColorsCollectionViewCell"
     
     lazy var colorBlockImage: UIImageView = {
@@ -24,7 +23,6 @@ final class ColorsCollectionViewCell: UICollectionViewCell {
     }
     
     // MARK: - UI Setup
-    
     override init(frame: CGRect) {
         super.init(frame: frame)
         setupUI()
@@ -35,7 +33,6 @@ final class ColorsCollectionViewCell: UICollectionViewCell {
     }
     
     // MARK: - UI Setup
-    
     private func setupUI() {
         contentView.layer.cornerRadius = 8
         contentView.layer.masksToBounds = true
@@ -62,7 +59,6 @@ final class ColorsCollectionViewCell: UICollectionViewCell {
     }
     
     // MARK: - Configuration Method
-    
     func configure(with color: CollectionColors) {
         let colorValue = color.uiColor
         baseColor = colorValue ?? .gray

@@ -1,6 +1,5 @@
 import UIKit
 
-
 final class OnboardingViewController: UIPageViewController, UIPageViewControllerDataSource, UIPageViewControllerDelegate  {
     
     private lazy var pages: [UIViewController] = {
@@ -18,7 +17,7 @@ final class OnboardingViewController: UIPageViewController, UIPageViewController
         
         let textLabel: UILabel = {
             let label = UILabel()
-            label.text = "Отслеживайте только \n то, что хотите"
+            label.text = "Отслеживайте привычки и события"
             label.numberOfLines = 0
             label.textColor = UIColor.custom(.pitchBlack)
             label.textAlignment = .center
@@ -54,7 +53,7 @@ final class OnboardingViewController: UIPageViewController, UIPageViewController
         
         let textLabel2: UILabel = {
             let label = UILabel()
-            label.text = "Даже если это \n не литры воды и йога"
+            label.text = "Наблюдайте за прогрессом"
             label.numberOfLines = 0
             label.textColor = UIColor.custom(.pitchBlack)
             label.textAlignment = .center
@@ -75,7 +74,6 @@ final class OnboardingViewController: UIPageViewController, UIPageViewController
             textLabel2.leadingAnchor.constraint(equalTo: secondPage.view.safeAreaLayoutGuide.leadingAnchor, constant: 16),
             textLabel2.bottomAnchor.constraint(equalTo: secondPage.view.bottomAnchor, constant: -270)
         ])
-        
         return [firstPage, secondPage]
     }()
     
@@ -83,7 +81,6 @@ final class OnboardingViewController: UIPageViewController, UIPageViewController
         let pageControl = UIPageControl()
         pageControl.numberOfPages = pages.count
         pageControl.currentPage = 0
-        
         pageControl.currentPageIndicatorTintColor = UIColor.custom(.pitchBlack)
         pageControl.pageIndicatorTintColor = adjustAlpha(UIColor.custom(.thumbTintColor) ?? .backgroundGray, to: 0.3)
         pageControl.translatesAutoresizingMaskIntoConstraints = false
@@ -176,3 +173,7 @@ final class OnboardingViewController: UIPageViewController, UIPageViewController
     }
 }
 
+enum OnboardingImage: String {
+    case firstPage = "firstPage"
+    case secondPage = "secondPage"
+}

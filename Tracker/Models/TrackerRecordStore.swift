@@ -20,8 +20,4 @@ final class TrackerRecordStore: NSObject, NSFetchedResultsControllerDelegate {
         }
         return []
     }
-
 }
-
-
-

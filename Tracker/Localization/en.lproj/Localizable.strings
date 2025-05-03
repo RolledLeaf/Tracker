@@ -1,5 +1,4 @@
 
-
 "shortWeekDaysSymbols" = "Mon, Tue, Wed, Thu, Fri, Sat, Sun";
 "weekDays" = "Monday, Tuesday, Wednesday, Thursday, Friday, Saturday, Sunday";
 
@@ -71,17 +70,7 @@
 "irregularEventEditing" = "Event editing";
 "ok" = "OK";
 "colorCollectionViewTitle" = "Color";
-//"characterLimitLabel"
-//"trackerNameTextField" = "Введите название трекера";
-//"doneButton" = "Готово";
-//"save" = "Сохранить";
-//"cancel" = "Отменить";
-//"tableViewOptionCategory" = "Категория";
-//"tableViewOptionSchedule" = "Расписание";
 "alertTrackerNotSaved" = "Unable to save";
-//"everyday" = "Ежедневно";
-//"shortWeekDaysSymbols" = "Пн, Вт, Ср, Чт, Пт, Сб, Вс";
+"noCategory" = "No category";
 
 // NSLocalizedString("", comment: "")
-
-"noCategory" = "No category";

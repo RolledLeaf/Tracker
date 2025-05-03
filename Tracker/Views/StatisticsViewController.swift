@@ -40,8 +40,7 @@ final class StatisticsViewController: UIViewController {
     private var perfectDays: Int?
     private var completedTrackers: Int?
     private var averageStat: Int?
-    
-    var statisticsTableParameters: [(title: Int, subtitle: String)] = [
+    private var statisticsTableParameters: [(title: Int, subtitle: String)] = [
         (title: 0, subtitle: NSLocalizedString("bestPeriod", comment: "")),
         (title: 0, subtitle: NSLocalizedString("perfectDays", comment: "")),
         (title: 0, subtitle: NSLocalizedString("completedTrackers", comment: "")),
@@ -86,7 +85,6 @@ final class StatisticsViewController: UIViewController {
     private func setupUI() {
         view.backgroundColor = UIColor(named: CustomColor.mainBackgroundColor.rawValue)
         statisticsTableView.isScrollEnabled = false
-        
         statisticsPlaceholderImage.image = UIImage(named: "statisticsPlaceholder")
         
         let uiElements = [titleLabel, statisticsPlaceholderLabel, statisticsPlaceholderImage, statisticsTableView]
@@ -115,11 +113,9 @@ final class StatisticsViewController: UIViewController {
         statisticsTableView.register(StatisticsCell.self, forCellReuseIdentifier: StatisticsCell.identifier)
         statisticsTableView.delegate = self
     }
-    
 }
 
 extension StatisticsViewController: UITableViewDataSource {
-    
     func numberOfSections(in tableView: UITableView) -> Int {
         statisticsTableParameters.count
     }
@@ -140,7 +136,6 @@ extension StatisticsViewController: UITableViewDataSource {
 }
 
 extension StatisticsViewController: UITableViewDelegate {
-    
     func tableView(_ tableView: UITableView, heightForFooterInSection section: Int) -> CGFloat {
         return 12 // отступ между ячейками
     }
@@ -174,13 +169,10 @@ extension StatisticsViewController: UITableViewDelegate {
         gradient.mask = maskLayer
         
         cell.contentView.layer.insertSublayer(gradient, at: 0)
-        
-        
         cell.layer.cornerRadius = 16
         cell.clipsToBounds = true
         cell.layer.borderWidth = 1
         cell.layer.borderColor = UIColor.systemGray6.cgColor
     }
-    
 }
 

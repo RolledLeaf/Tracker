@@ -22,8 +22,6 @@ final class TrackersViewModel {
         loadUserDefaultsFilter()
     }
     
-    
-    
     func loadUserDefaultsFilter() {
         if let savedFilter = UserDefaults.standard.string(forKey: UserDefaultsKeys.selectedFilter),
            let filter = TrackerFilterType(rawValue: savedFilter) {

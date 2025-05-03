@@ -120,10 +120,10 @@ final class EditHabitViewController: UIViewController, UITableViewDelegate, UITa
     }()
     
     
-    let scrollView = UIScrollView()
-    var trackerToEdit: TrackerCoreData?
-    let contentView = UIView()
+    private let scrollView = UIScrollView()
+    private let contentView = UIView()
     
+    var trackerToEdit: TrackerCoreData?
     var tableViewOptions: [(title: String, subtitle: String?)] = [
         (title: NSLocalizedString("tableViewOptionCategory", comment: ""), subtitle: nil),
         (title: NSLocalizedString("tableViewOptionSchedule", comment: ""), subtitle: nil)
@@ -186,7 +186,6 @@ final class EditHabitViewController: UIViewController, UITableViewDelegate, UITa
         trackerNameTextField.delegate = self
         
         NSLayoutConstraint.activate([
-            
             scrollView.topAnchor.constraint(equalTo: view.topAnchor),
             scrollView.leadingAnchor.constraint(equalTo: view.leadingAnchor),
             scrollView.trailingAnchor.constraint(equalTo: view.trailingAnchor),
@@ -293,16 +292,16 @@ final class EditHabitViewController: UIViewController, UITableViewDelegate, UITa
             print("Не все данные выбраны!")
             return
         }
-
+        
         let context = CoreDataStack.shared.context
-
+        
         if let tracker = trackerToEdit {
             tracker.name = name
             tracker.color = selectedColor.rawValue as NSString
             tracker.emoji = selectedEmoji
             tracker.weekDays = selectedWeekDays as NSObject
             tracker.category = selectedCategory
-
+            
             do {
                 try context.save()
                 print("✏️ Отредактирован трекер '\(tracker.name ?? "Без имени")'")
@@ -320,10 +319,10 @@ final class EditHabitViewController: UIViewController, UITableViewDelegate, UITa
             tracker.weekDays = selectedWeekDays as NSObject
             tracker.category = selectedCategory
             selectedCategory.addToTracker(tracker)
-
+            
             do {
                 try context.save()
-                print("📌 Создаём трекер '\(tracker.name)' для категории '\(selectedCategory.title ?? "Без названия")'")
+                print("📌 Создаём трекер '\(String(describing: tracker.name))' для категории '\(selectedCategory.title ?? "Без названия")'")
                 presentingViewController?.presentingViewController?.dismiss(animated: true)
             } catch {
                 print("Ошибка при сохранении трекера: \(error)")
@@ -402,7 +401,6 @@ final class EditHabitViewController: UIViewController, UITableViewDelegate, UITa
                 print("Collection wasn't able to dequeue cell")
                 return UICollectionViewCell()
             }
-            
             cell.configure(with: emojis[indexPath.item])
             return cell
         } else if collectionView == colorsCollectionView {
@@ -484,43 +482,29 @@ final class EditHabitViewController: UIViewController, UITableViewDelegate, UITa
         }
     }
     
-    
-    private func getDayWord(for count: Int16) -> String {
-        let format = NSLocalizedString("daysCount", comment: "Количество дней")
-        return String.localizedStringWithFormat(format, count)
-    }
-    
-    func runPopulateTracker() {
-        populateTrackerData()
-    }
-    
     private func populateTrackerData() {
         print("Вызван метод populateTrackerData")
         guard let tracker = trackerToEdit else { return }
         
-        // Название и количество дней
         trackerNameTextField.text = tracker.name
         daysCountLabel.text = getDayWord(for: tracker.daysCount)
         
-        // Категория
         if let category = tracker.category {
             selectedCategory = category
             tableViewOptions[0].subtitle = category.title
         }
         
-        // WeekDays
         if let days = tracker.weekDays as? [String] {
             selectedWeekDays = days
             tableViewOptions[1].subtitle = days.joined(separator: ", ")
         }
         
-        // Emoji
         selectedEmoji = tracker.emoji
         if let emoji = tracker.emoji, let index = emojis.firstIndex(of: emoji) {
             let indexPath = IndexPath(item: index, section: 0)
             emojiCollectionView.selectItem(at: indexPath, animated: false, scrollPosition: .top)
         }
-        // Цвет
+        
         if let colorRaw = tracker.color as? String?,
            let colorEnum = CollectionColors(rawValue: colorRaw ?? "no color") {
             selectedColor = colorEnum

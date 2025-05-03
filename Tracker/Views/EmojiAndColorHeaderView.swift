@@ -3,7 +3,7 @@ import UIKit
 final class EmojiAndColorCollectionHeaderView: UICollectionReusableView {
     static let identifier = "CollectionHeaderView"
     
-     lazy var titleLabel: UILabel = {
+    private lazy var titleLabel: UILabel = {
         let label = UILabel()
         label.font = .systemFont(ofSize: 19, weight: .bold)
         label.textColor = UIColor.custom(.textColor)
