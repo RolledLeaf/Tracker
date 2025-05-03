@@ -16,11 +16,11 @@ protocol TrackerStoreProtocol {
     func getSectionTitle(for section: Int) -> String
 }
 
-final class TrackerStore: NSObject, NSFetchedResultsControllerDelegate {
-    
-    enum TrackerStoreError: Error {
-        case failedToInitializeContext
-    }
+protocol TrackerStoreMethodsProtocol {
+    func deleteTracker(at indexPath: IndexPath)
+}
+
+final class TrackerStore: NSObject, NSFetchedResultsControllerDelegate, TrackerStoreMethodsProtocol {
     
     weak var delegate: TrackerStoreDelegate?
     private let context: NSManagedObjectContext
@@ -31,12 +31,15 @@ final class TrackerStore: NSObject, NSFetchedResultsControllerDelegate {
     
     lazy var fetchedResultsController: NSFetchedResultsController<TrackerCoreData> = {
         let fetchRequest = NSFetchRequest<TrackerCoreData>(entityName: "TrackerCoreData")
-        fetchRequest.sortDescriptors = [NSSortDescriptor(key: "name", ascending: true)]
+        fetchRequest.sortDescriptors = [
+            NSSortDescriptor(key: "category.sortOrder", ascending: true),
+            NSSortDescriptor(key: "name", ascending: true)
+        ]
         
         let controller = NSFetchedResultsController(
             fetchRequest: fetchRequest,
             managedObjectContext: context,
-            sectionNameKeyPath: "category.title",
+            sectionNameKeyPath: "category.sortOrder",
             cacheName: nil
         )
         
@@ -61,44 +64,57 @@ final class TrackerStore: NSObject, NSFetchedResultsControllerDelegate {
     
     // MARK: - NSFetchedResultsControllerDelegate
     
-    func controllerWillChangeContent(_ controller: NSFetchedResultsController<NSFetchRequestResult>) {
-        delegate?.didUpdate(TrackerStoreUpdate(insertedIndexes: IndexSet(), deletedIndexes: IndexSet()))
+    func editTracker(at indexPath: IndexPath, with newData: TrackerEditData) {
+        let tracker = fetchedResultsController.object(at: indexPath)
+        tracker.name = newData.name
+        tracker.emoji = newData.emoji
+        tracker.color = newData.color as NSString
+        tracker.daysCount = newData.daysCount
+
+        do {
+            try context.save()
+            print("✏️ Трекер отредактирован: \(tracker.name ?? "Без имени")")
+        } catch {
+            print("❌ Ошибка при редактировании трекера: \(error)")
+        }
     }
     
-   func controller(_ controller: NSFetchedResultsController<NSFetchRequestResult>, didChange anObject: Any, at indexPath: IndexPath?, for type: NSFetchedResultsChangeType, newIndexPath: IndexPath?) {
-        switch type {
-        case .insert:
-            if let newIndexPath = newIndexPath {
-                insertedIndexes?.insert(newIndexPath.item)
-            }
-        case .delete:
-            if let indexPath = indexPath {
-                deletedIndexes?.insert(indexPath.item)
-            }
-        default:
-            break
-        }
+    func deleteTracker(at indexPath: IndexPath) {
+        let tracker = fetchedResultsController.object(at: indexPath)
+        let trackerName = tracker.name ?? "Без имени"
         
-        guard let inserted = insertedIndexes, let deleted = deletedIndexes else { return }
-        delegate?.didUpdate(TrackerStoreUpdate(insertedIndexes: inserted, deletedIndexes: deleted))
+        context.delete(tracker)
+        
+        do {
+            try context.save()
+            print("🗑 Трекер '\(trackerName)' удалён через TrackerStore")
+        } catch {
+            print("❌ Ошибка удаления трекера: \(error.localizedDescription)")
+        }
+    }
+    
+    func controllerWillChangeContent(_ controller: NSFetchedResultsController<NSFetchRequestResult>) {
+        print("ControllerWillChangeContent вызван")
+        insertedIndexes = IndexSet()
+        deletedIndexes = IndexSet()
     }
     
     func controllerDidChangeContent(_ controller: NSFetchedResultsController<NSFetchRequestResult>) {
-        guard let inserted = insertedIndexes, let deleted = deletedIndexes else { return }
-        
+        let inserted = insertedIndexes ?? IndexSet()
+        let deleted = deletedIndexes ?? IndexSet()
+
         print("📌 controllerDidChangeContent вызван")
         print("🔹 Вставленные индексы: \(inserted)")
         print("🔹 Удалённые индексы: \(deleted)")
-        
+
         delegate?.didUpdate(TrackerStoreUpdate(insertedIndexes: inserted, deletedIndexes: deleted))
-        
+
         insertedIndexes = nil
         deletedIndexes = nil
     }
 }
 
 // MARK: - TrackerStoreProtocol
-
 extension TrackerStore: TrackerStoreProtocol {
     var numberOfSections: Int {
         return fetchedResultsController.sections?.count ?? 0
@@ -113,6 +129,13 @@ extension TrackerStore: TrackerStoreProtocol {
     }
     
     func getSectionTitle(for section: Int) -> String {
-        return fetchedResultsController.sections?[section].name ?? "Без категории"
+        return fetchedResultsController.sections?[section].name ?? NSLocalizedString("noCategory", comment: "")
     }
+}
+
+struct TrackerEditData {
+    let name: String
+    let emoji: String
+    let color: String
+    let daysCount: Int16
 }

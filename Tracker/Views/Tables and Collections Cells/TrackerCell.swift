@@ -15,8 +15,7 @@ final class TrackerCell: UICollectionViewCell {
     private var currentDate: Date = Date()
     private var selectedIndexPaths: Set<IndexPath> = []
     
-    
-    private lazy var habbitLabel: UILabel = {
+    private lazy var habitLabel: UILabel = {
         let label = UILabel()
         label.font = .systemFont(ofSize: 14, weight: .regular)
         label.textColor = UIColor.custom(.createButtonTextColor)
@@ -26,7 +25,7 @@ final class TrackerCell: UICollectionViewCell {
         return label
     }()
     
-    lazy var doneButton: UIButton = {
+    private lazy var doneButton: UIButton = {
         let button = UIButton(type: .custom)
         button.setImage(UIImage(systemName: "plus"), for: .normal)
         button.tintColor = .black
@@ -37,8 +36,6 @@ final class TrackerCell: UICollectionViewCell {
         return button
     }()
     
-    private var isChecked = false
-    
     private lazy var emojiLabel: UILabel = {
         let label = UILabel()
         label.font = UIFont.systemFont(ofSize: 16)
@@ -46,18 +43,10 @@ final class TrackerCell: UICollectionViewCell {
         return label
     }()
     
-    lazy var daysNumberLabel: UILabel = {
-        let label = UILabel()
-        label.font = .systemFont(ofSize: 14, weight: .bold)
-        label.textColor = .black
-        label.translatesAutoresizingMaskIntoConstraints = false
-        return label
-    }()
-    
-    lazy var daysCountLabel: UILabel = {
+    private lazy var daysCountLabel: UILabel = {
         let label = UILabel()
         label.font = .systemFont(ofSize: 12, weight: .regular)
-        label.textColor = .black
+        label.textColor = UIColor.custom(.textColor)
         label.translatesAutoresizingMaskIntoConstraints = false
         return label
     }()
@@ -69,7 +58,7 @@ final class TrackerCell: UICollectionViewCell {
         return view
     }()
     
-    lazy var doneButtonContainer: UIView = {
+    private lazy var doneButtonContainer: UIView = {
         let view = UIView()
         view.layer.cornerRadius = 17
         view.layer.masksToBounds = true
@@ -77,17 +66,32 @@ final class TrackerCell: UICollectionViewCell {
         return view
     }()
     
-    private lazy var backgroundContainer: UIView = {
+    lazy var backgroundContainer: UIView = {
         let view = UIView()
         view.layer.cornerRadius = 16
         view.layer.masksToBounds = true
-        view.backgroundColor = UIColor.systemGray5
+        view.backgroundColor = .clear
         return view
+    }()
+    
+    private lazy var pinImageView: UIImageView = {
+        let imageView = UIImageView(image: UIImage(systemName: "pin.fill"))
+        imageView.tintColor = .white
+        imageView.translatesAutoresizingMaskIntoConstraints = false
+        imageView.isHidden = true
+        return imageView
     }()
     
     override init(frame: CGRect) {
         super.init(frame: frame)
         setupUI()
+        contentView.addSubview(pinImageView)
+        NSLayoutConstraint.activate([
+            pinImageView.topAnchor.constraint(equalTo: contentView.topAnchor, constant: 12),
+            pinImageView.trailingAnchor.constraint(equalTo: contentView.trailingAnchor, constant: -12),
+            pinImageView.widthAnchor.constraint(equalToConstant: 8),
+            pinImageView.heightAnchor.constraint(equalToConstant: 12)
+        ])
     }
     
     required init?(coder: NSCoder) {
@@ -95,7 +99,9 @@ final class TrackerCell: UICollectionViewCell {
     }
     
     private func setupUI() {
-        let uiElements: [UIView] = [backgroundContainer,  habbitLabel, daysNumberLabel, daysCountLabel, emojiContainer, emojiLabel, doneButtonContainer, doneButton ]
+        backgroundColor = .clear
+        
+        let uiElements: [UIView] = [backgroundContainer, daysCountLabel, doneButtonContainer, doneButton]
         uiElements.forEach { $0.translatesAutoresizingMaskIntoConstraints = false }
         uiElements.forEach { contentView.addSubview($0) }
         
@@ -103,11 +109,12 @@ final class TrackerCell: UICollectionViewCell {
         doneButtonContainer.addGestureRecognizer(tapGesture)
         doneButton.isUserInteractionEnabled = false
         
+        let backgroundContainerElements: [UIView] = [habitLabel, emojiContainer, emojiLabel]
+        backgroundContainerElements.forEach { $0.translatesAutoresizingMaskIntoConstraints = false }
+        backgroundContainerElements.forEach { backgroundContainer.addSubview($0) }
+        
         NSLayoutConstraint.activate([
-            daysNumberLabel.leadingAnchor.constraint(equalTo: contentView.leadingAnchor, constant: 12),
-            daysNumberLabel.bottomAnchor.constraint(equalTo: contentView.bottomAnchor, constant: -24),
-            
-            daysCountLabel.leadingAnchor.constraint(equalTo: daysNumberLabel.trailingAnchor, constant: 5),
+            daysCountLabel.leadingAnchor.constraint(equalTo: contentView.leadingAnchor, constant: 12),
             daysCountLabel.bottomAnchor.constraint(equalTo: contentView.bottomAnchor, constant: -24),
             daysCountLabel.heightAnchor.constraint(equalToConstant: 18),
             daysCountLabel.widthAnchor.constraint(equalToConstant: 101),
@@ -137,30 +144,17 @@ final class TrackerCell: UICollectionViewCell {
             emojiContainer.heightAnchor.constraint(equalToConstant: 24),
             emojiContainer.widthAnchor.constraint(equalToConstant: 24),
             
-            habbitLabel.topAnchor.constraint(equalTo: backgroundContainer.topAnchor, constant: 44),
-            habbitLabel.leadingAnchor.constraint(equalTo: backgroundContainer.leadingAnchor, constant: 12),
-            habbitLabel.trailingAnchor.constraint(equalTo: backgroundContainer.trailingAnchor, constant: -12)
+            habitLabel.topAnchor.constraint(equalTo: backgroundContainer.topAnchor, constant: 44),
+            habitLabel.leadingAnchor.constraint(equalTo: backgroundContainer.leadingAnchor, constant: 12),
+            habitLabel.trailingAnchor.constraint(equalTo: backgroundContainer.trailingAnchor, constant: -12)
         ])
-    }
-    
-    private func getDayWord(for count: Int16) -> String {
-        let remainder10 = count % 10
-        let remainder100 = count % 100
-        
-        if remainder10 == 1 && remainder100 != 11 {
-            return "день"
-        } else if remainder10 >= 2 && remainder10 <= 4 && (remainder100 < 10 || remainder100 >= 20) {
-            return "дня"
-        } else {
-            return "дней"
-        }
     }
     
     func configure(with tracker: TrackerCoreData, trackerRecords: [TrackerRecordCoreData]) {
         currentSelectedTracker = tracker
         trackerID = tracker.id
         emojiLabel.text = tracker.emoji
-        habbitLabel.text = tracker.name
+        habitLabel.text = tracker.name
         
         let defaultColor = "collectionPalePurple17"
         let trackerColor = UIColor.fromCollectionColor(tracker.color as? String ?? defaultColor) ?? .clear
@@ -169,17 +163,18 @@ final class TrackerCell: UICollectionViewCell {
         doneButtonContainer.backgroundColor = trackerColor
         emojiContainer.backgroundColor = lightenColor(trackerColor, by: 0.3)
         
+        pinImageView.isHidden = tracker.category?.title != NSLocalizedString("pinned", comment: "")
+        
         let currentDate = Date()
         let isCompleted = trackerRecords.contains { $0.trackerID == tracker.id && Calendar.current.isDate($0.date ?? currentDate, inSameDayAs: viewController?.selectedDate ?? currentDate) }
-
+        
         doneButton.setImage(UIImage(systemName: isCompleted ? "checkmark" : "plus"), for: .normal)
-
+        
         let baseColor = trackerColor
         let adjustedColor = isCompleted ? lightenColor(baseColor, by: 0.3) : baseColor
         doneButtonContainer.backgroundColor = adjustedColor
         
         let daysCount = tracker.daysCount
-        daysNumberLabel.text = "\(daysCount)"
         daysCountLabel.text = getDayWord(for: daysCount)
     }
     
@@ -187,7 +182,7 @@ final class TrackerCell: UICollectionViewCell {
         guard let trackerID = trackerID else {
             return
         }
-       
+        
         guard let selectedDate = viewController?.getSelectedDate() else {
             print("Date Picker is not set!")
             return

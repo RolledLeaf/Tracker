@@ -10,20 +10,23 @@ final class ScheduleTableCell: UITableViewCell {
     
     static let identifier = "ScheduleTableCell"
     
-    private lazy var titleLabel: UILabel = {
+    lazy var titleLabel: UILabel = {
         let label = UILabel()
         label.font = .systemFont(ofSize: 17, weight: .regular)
-        label.textColor = .black
+        label.textColor = UIColor.custom(.textColor)
         label.backgroundColor = .clear
         label.textAlignment = .left
         label.translatesAutoresizingMaskIntoConstraints = false
         return label
     }()
     
-    private lazy var toggleSwitch: UISwitch = {
+    lazy var toggleSwitch: UISwitch = {
         let toggle = UISwitch()
         toggle.onTintColor = UIColor.custom(.toggleSwitchBlue)
-        toggle.thumbTintColor = .white // Цвет кружка
+        toggle.tintColor = UIColor.custom(.toggleSwitchGray)
+        toggle.thumbTintColor = UIColor.custom(.thumbTintColor) // Цвет кружка
+        toggle.backgroundColor = UIColor.custom(.toggleSwitchGray) // для iOS 13+
+        toggle.layer.cornerRadius = toggle.frame.height / 2
         toggle.translatesAutoresizingMaskIntoConstraints = false
         return toggle
     }()
@@ -35,7 +38,6 @@ final class ScheduleTableCell: UITableViewCell {
     var onToggle: ((Bool) -> Void)?
     
     // MARK: - Init
-    
     override init(style: UITableViewCell.CellStyle, reuseIdentifier: String?) {
         super.init(style: style, reuseIdentifier: reuseIdentifier)
         setupUI()
@@ -47,18 +49,15 @@ final class ScheduleTableCell: UITableViewCell {
     }
     
     // MARK: - UI Setup
-    
     private func setupUI() {
         contentView.addSubview(titleLabel)
         contentView.addSubview(toggleSwitch)
         contentView.backgroundColor = UIColor.custom(.tablesColor)
         
         NSLayoutConstraint.activate([
-            // Расположение titleLabel
             titleLabel.leadingAnchor.constraint(equalTo: contentView.leadingAnchor, constant: 16),
             titleLabel.centerYAnchor.constraint(equalTo: contentView.centerYAnchor),
             
-            // Расположение toggleButton
             toggleSwitch.trailingAnchor.constraint(equalTo: contentView.trailingAnchor, constant: -16),
             toggleSwitch.centerYAnchor.constraint(equalTo: contentView.centerYAnchor),
             toggleSwitch.widthAnchor.constraint(equalToConstant: 51),

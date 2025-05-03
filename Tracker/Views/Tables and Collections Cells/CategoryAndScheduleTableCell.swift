@@ -4,7 +4,7 @@ final class CategoryAndScheduleTableViewCell: UITableViewCell {
     
     static let identifier = "CategoryAndScheduleTableViewCell"
     
-    private lazy var titleLabel: UILabel = {
+     lazy var titleLabel: UILabel = {
         let label = UILabel()
         label.font = .systemFont(ofSize: 17, weight: .regular)
         label.textColor = UIColor.custom(.createButtonColor)
@@ -13,7 +13,7 @@ final class CategoryAndScheduleTableViewCell: UITableViewCell {
         return label
     }()
     
-    private lazy var detailedTextLabel: UILabel = {
+    lazy var detailedTextLabel: UILabel = {
         let label = UILabel()
         label.font = .systemFont(ofSize: 17, weight: .regular)
         label.textColor = UIColor.custom(.textFieldGray)
@@ -32,14 +32,13 @@ final class CategoryAndScheduleTableViewCell: UITableViewCell {
     
     private var subtitleConstraints: [NSLayoutConstraint] = []
     private var noSubtitleConstraints: [NSLayoutConstraint] = []
-    private var hasSubtitle: Bool = false {
+    var hasSubtitle: Bool = false {
         didSet {
             updateConstraintsForSubtitle()
         }
     }
     
     // MARK: - Init
-    
     override init(style: UITableViewCell.CellStyle, reuseIdentifier: String?) {
         super.init(style: style, reuseIdentifier: reuseIdentifier)
         setupUI()
@@ -50,7 +49,6 @@ final class CategoryAndScheduleTableViewCell: UITableViewCell {
     }
     
     // MARK: - UI Setup
-    
     private func setupUI() {
         contentView.addSubview(titleLabel)
         contentView.addSubview(arrowImageView)
@@ -81,7 +79,6 @@ final class CategoryAndScheduleTableViewCell: UITableViewCell {
     }
     
     // MARK: - Configuration Method
-    
     private func updateConstraintsForSubtitle() {
         if hasSubtitle {
             detailedTextLabel.isHidden = false
@@ -95,10 +92,8 @@ final class CategoryAndScheduleTableViewCell: UITableViewCell {
     }
     
     func configure(with option: (title: String, subtitle: String?)) {
-        // Устанавливаем текст для заголовка
         titleLabel.text = option.title
         
-        // Устанавливаем текст для subtitle и обновляем состояние
         if let subtitle = option.subtitle, !subtitle.isEmpty {
             detailedTextLabel.text = subtitle
             hasSubtitle = true

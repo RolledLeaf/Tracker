@@ -14,7 +14,7 @@ final class CategoriesListViewController: UIViewController, UITableViewDataSourc
         label.textColor = UIColor.custom(.textColor)
         label.font = .systemFont(ofSize: 16, weight: .medium)
         label.textAlignment = .center
-        label.text = "Категория"
+        label.text = NSLocalizedString("categoryTitleLabel", comment: "")
         return label
     }()
     
@@ -41,13 +41,13 @@ final class CategoriesListViewController: UIViewController, UITableViewDataSourc
         label.font = .systemFont(ofSize: 12, weight: .regular)
         label.textAlignment = .center
         label.numberOfLines = 2
-        label.text = "Привычки и события можно \n объединить по смыслу"
+        label.text = NSLocalizedString("emptyCategories", comment: "")
         return label
     }()
     
     private lazy var addCategoryButton: UIButton = {
         let button = UIButton()
-        button.setTitle("Добавить категорию", for: .normal)
+        button.setTitle(NSLocalizedString("addCategoryButton", comment: ""), for: .normal)
         button.titleLabel?.font = UIFont.systemFont(ofSize: 16, weight: .medium)
         button.setTitleColor(UIColor.custom(.createButtonTextColor), for: .normal)
         button.backgroundColor = UIColor.custom(.createButtonColor)
@@ -57,15 +57,15 @@ final class CategoriesListViewController: UIViewController, UITableViewDataSourc
         return button
     }()
     
-    let scrollView = UIScrollView()
-    let contentView = UIView()
+    private lazy var viewModel = CategoriesViewModel(categoryStore: trackerCategoryStore)
     
+    private let scrollView = UIScrollView()
+    private let contentView = UIView()
     private let trackerCategoryStore = TrackerCategoryStore()
     private let notificationKey = "NewCategoryAdded"
+    
     private var tableHeightConstraint: NSLayoutConstraint?
     private var contentViewHeightConstraint: NSLayoutConstraint?
-    
-    private lazy var viewModel = CategoriesViewModel(categoryStore: trackerCategoryStore)
     
     override func viewDidLoad() {
         super.viewDidLoad()
@@ -80,20 +80,42 @@ final class CategoriesListViewController: UIViewController, UITableViewDataSourc
         }
         
         viewModel.onEditCategoryRequest = { [weak self] category, currentText in
-            let alert = UIAlertController(title: "Редактировать", message: "Введите новое название категории", preferredStyle: .alert)
-            alert.addTextField { textField in
-                textField.text = currentText
-                textField.placeholder = "Название категории"
+            let alert = UIAlertController(title: NSLocalizedString("contextMenuEdit", comment: ""), message: NSLocalizedString("newCategoryNameAlert", comment: ""), preferredStyle: .alert)
+            
+            let characterLimit = 35
+            
+            class TextLimitDelegate: NSObject, UITextFieldDelegate {
+                let limit: Int
+                init(limit: Int) {
+                    self.limit = limit
+                }
+                func textField(_ textField: UITextField, shouldChangeCharactersIn range: NSRange, replacementString string: String) -> Bool {
+                    guard let currentText = textField.text,
+                          let textRange = Range(range, in: currentText) else {
+                        return true
+                    }
+                    
+                    let updatedText = currentText.replacingCharacters(in: textRange, with: string)
+                    return updatedText.count <= limit
+                }
             }
             
-            let saveAction = UIAlertAction(title: "Сохранить", style: .default) { _ in
+            let delegate = TextLimitDelegate(limit: characterLimit)
+            
+            alert.addTextField { textField in
+                textField.text = currentText
+                textField.delegate = delegate
+                objc_setAssociatedObject(textField, "textLimitDelegate", delegate, .OBJC_ASSOCIATION_RETAIN_NONATOMIC)
+            }
+            
+            let saveAction = UIAlertAction(title: NSLocalizedString(NSLocalizedString("save", comment: ""), comment: ""), style: .default) { _ in
                 guard let newText = alert.textFields?.first?.text, !newText.isEmpty else { return }
                 if let index = self?.viewModel.categories.firstIndex(where: { $0 == category }) {
                     self?.viewModel.updateCategoryName(at: index, newName: newText)
                 }
             }
             
-            let cancelAction = UIAlertAction(title: "Отменить", style: .cancel, handler: nil)
+            let cancelAction = UIAlertAction(title: NSLocalizedString("cancel", comment: ""), style: .cancel, handler: nil)
             
             alert.addAction(saveAction)
             alert.addAction(cancelAction)
@@ -200,13 +222,14 @@ final class CategoriesListViewController: UIViewController, UITableViewDataSourc
     
     private func createContextMenu(for indexPath: IndexPath) -> UIMenu {
         
-        let editAction = UIAction(title: "Редактировать", image: UIImage(systemName: "pencil")) { _ in
+        let editAction = UIAction(title: NSLocalizedString("contextMenuEdit", comment: ""), image: UIImage(systemName: "pencil")) { _ in
             self.viewModel.editCategory(at: indexPath.row, newName: self.viewModel.categories[indexPath.row].title ?? "")
         }
         
-        let deleteAction = UIAction(title: "Удалить", image: UIImage(systemName: "trash"), attributes: .destructive) { _ in
+        let deleteAction = UIAction(title: NSLocalizedString("contextMenuDelete", comment: ""), image: UIImage(systemName: "trash"), attributes: .destructive) { _ in
             self.viewModel.deleteCategory(at: indexPath.row)
-            self.updateTableHeight()
+            self.updateUI()
+            
         }
         return UIMenu(title: "", children: [editAction, deleteAction])
     }
@@ -222,7 +245,11 @@ final class CategoriesListViewController: UIViewController, UITableViewDataSourc
         }
         
         let category = viewModel.categories[indexPath.row]
-        cell.configure(with: category.title ?? "Без названия")
+        if category.title == NSLocalizedString("pinned", comment: "") {
+            
+            
+        }
+        cell.configure(with: category.title ?? NSLocalizedString("noNameString", comment: ""))
         return cell
     }
     
@@ -276,3 +303,4 @@ final class CategoriesListViewController: UIViewController, UITableViewDataSourc
         present(navigationController, animated: true)
     }
 }
+

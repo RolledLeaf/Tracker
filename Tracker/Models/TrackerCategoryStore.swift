@@ -1,43 +1,60 @@
 import CoreData
 
-final class TrackerCategoryStore: NSObject, NSFetchedResultsControllerDelegate {
+protocol TrackerCategoryStoreProtocol {
+    func fetchAllTrackerCategories() -> [TrackerCategoryCoreData]
+    func saveCategory(name: String)
+    func deleteTrackerCategory(_ category: TrackerCategoryCoreData)
+    func saveChanges()
+}
+
+ final class TrackerCategoryStore: NSObject, NSFetchedResultsControllerDelegate, TrackerCategoryStoreProtocol {
     
     private let context: NSManagedObjectContext
-    
-    lazy var fetchedResultsController: NSFetchedResultsController<TrackerCategoryCoreData> = {
-        let fetchRequest = NSFetchRequest<TrackerCategoryCoreData>(entityName: "TrackerCategoryCoreData")
-        fetchRequest.sortDescriptors = [NSSortDescriptor(key: "title", ascending: true)]
-        
-        let fetchedResultsController = NSFetchedResultsController(
-            fetchRequest: fetchRequest,
-            managedObjectContext: context,
-            sectionNameKeyPath: "title",
-            cacheName: nil
-        )
-        
-        fetchedResultsController.delegate = self
-        try? fetchedResultsController.performFetch()
-        return fetchedResultsController
-    }()
     
     init(context: NSManagedObjectContext = CoreDataStack.shared.context) {
         self.context = context
     }
     
+    func nextAvailableSortOrder() -> Int16 {
+        let categories = fetchAllTrackerCategories()
+        let maxOrder = categories.map { $0.sortOrder }.max() ?? 0
+        return maxOrder + 1
+    }
+    
     func fetchAllTrackerCategories() -> [TrackerCategoryCoreData] {
-        let request: NSFetchRequest<TrackerCategoryCoreData> = TrackerCategoryCoreData.fetchRequest()
+        print("Fetching all categories")
+        let fetchRequest: NSFetchRequest<TrackerCategoryCoreData> = TrackerCategoryCoreData.fetchRequest()
+        let excludedTitles = [NSLocalizedString("pinned", comment: ""), "0"]
+        fetchRequest.sortDescriptors = [NSSortDescriptor(key: "sortOrder", ascending: true)]
+        fetchRequest.predicate = NSPredicate(format: "NOT (title IN %@)", excludedTitles)
         do {
-            let categories = try context.fetch(request)
-            return categories
+            return try context.fetch(fetchRequest)
         } catch {
-            print("error fetching categories: \(error)")
+            print("Ошибка получения категорий: \(error)")
             return []
         }
     }
     
-    func getCategory(at indexPath: IndexPath) -> TrackerCategoryCoreData? {
-        let category = fetchedResultsController.object(at: indexPath)
-        return category
+    func getOrCreatePinnedCategory() -> TrackerCategoryCoreData? {
+        print("get or create pinned category called")
+        let fetchRequest: NSFetchRequest<TrackerCategoryCoreData> = TrackerCategoryCoreData.fetchRequest()
+        fetchRequest.predicate = NSPredicate(format: "title == %@", NSLocalizedString("pinned", comment: ""))
+        fetchRequest.fetchLimit = 1
+        do {
+            if let category = try context.fetch(fetchRequest).first {
+                return category
+            } else {
+                let newCategory = TrackerCategoryCoreData(context: context)
+                newCategory.title = NSLocalizedString("pinned", comment: "")
+                newCategory.sortOrder = 0
+                try context.save()
+                print("Category \(String(describing: newCategory.title)) created")
+                return newCategory
+            }
+        } catch {
+            print("Ошибка при получении/создании категории 'Закреплённые': \(error)")
+            return nil
+        }
     }
     
     func deleteTrackerCategory(_ category: TrackerCategoryCoreData) {
@@ -46,16 +63,6 @@ final class TrackerCategoryStore: NSObject, NSFetchedResultsControllerDelegate {
             try context.save()
         } catch {
             print("Failed to delete category: \(error)")
-        }
-    }
-    
-    func fetchCategories() -> [TrackerCategoryCoreData] {
-        let request: NSFetchRequest<TrackerCategoryCoreData> = TrackerCategoryCoreData.fetchRequest()
-        do {
-            return try context.fetch(request)
-        } catch {
-            print("Failed to fetch categories: \(error)")
-            return []
         }
     }
     
@@ -76,5 +83,4 @@ final class TrackerCategoryStore: NSObject, NSFetchedResultsControllerDelegate {
             print("Failed to save changes: \(error)")
         }
     }
-    
 }

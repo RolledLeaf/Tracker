@@ -2,12 +2,9 @@ import UIKit
 
 final class EmojiCollectionViewCell: UICollectionViewCell {
     
-    // MARK: - Identifier
-    
     static let identifier = "EmojiCollectionViewCell"
     
     // MARK: - UI Elements
-    
     lazy var emojiLabel: UILabel = {
         let label = UILabel()
         label.font = .systemFont(ofSize: 32)
@@ -25,7 +22,6 @@ final class EmojiCollectionViewCell: UICollectionViewCell {
     }
     
     // MARK: - Init
-    
     override init(frame: CGRect) {
         super.init(frame: frame)
         setupUI()
@@ -36,7 +32,6 @@ final class EmojiCollectionViewCell: UICollectionViewCell {
     }
     
     // MARK: - UI Setup
-    
     private func setupUI() {
         contentView.addSubview(emojiLabel)
         
@@ -81,7 +76,6 @@ final class EmojiCollectionViewCell: UICollectionViewCell {
     }
     
     // MARK: - Configuration Method
-    
     func configure(with emoji: String) {
         emojiLabel.text = emoji
     }

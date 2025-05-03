@@ -1,0 +1,76 @@
+
+"shortWeekDaysSymbols" = "Mon, Tue, Wed, Thu, Fri, Sat, Sun";
+"weekDays" = "Monday, Tuesday, Wednesday, Thursday, Friday, Saturday, Sunday";
+
+//TrackersVC
+"trackersLabel" = "Trackers";
+"emptyFieldLabel" = "Track anything";
+"nothingFoundLabel" = "Nothing found";
+"filtersButtonTitle" = "Filters";
+"pinned" = "Pinned";
+"pin" = "Pin";
+"unpin" = "Unpin";
+"search" = "Search";
+
+//TabBarVC
+"trackers" = "Trackers";
+"statistics" = "Statistics";
+
+//CreateHabitTypeVC
+"trackerCreationTitle" = "Tracker creation";
+"habitButton" = "Habit";
+"irregularButton" = "Event";
+
+//NewHabitViewController
+"newHabitTitleLabel" = "New tracker";
+"newIrregularEvent" = "New event";
+"characterLimitLabel" = "38 characters limit";
+"categoryCharacterLimitLabel" = "35 characters limit";
+"trackerNameTextField" = "Input tracker name";
+"doneButton" = "Done";
+"createTrackerButton" = "Create";
+"cancel" = "Cancel";
+"tableViewOptionCategory" = "Category";
+"tableViewOptionSchedule" = "Schedule";
+"alertTrackerNotCreated" = "Tracker wasn't created";
+"alertFieldsMissed" = "Missed fields!";
+"colorCollectionViewTitle" = "Color";
+"everyday" = "Daily";
+
+//CategoriesListVC
+"categoryTitleLabel" = "Category";
+"emptyTrackerCollectionPlaceholder" = "What we gonna track?";
+"emptyCategories" = "Trackers and events are mergeable \n by category";
+"addCategoryButton" = "Add category";
+"contextMenuEdit" = "Edit";
+"editingMenu" = "Input new category name";
+"categoryEditingPlaceholder" = "Category name";
+"save" = "Save";
+"contextMenuDelete" = "Delete";
+
+// NewCategoryVC
+"newCategoryTitleLabel" = "New category";
+"categoryNameTextField" = "Input category name";
+"newCategoryNameAlert" = "Input new category name";
+
+//StatisticsVC
+"statisticsTitleLabel" = "Statistics";
+"placeholderLabel" = "Nothing to analyze yet";
+"bestPeriod" = "Best period";
+"perfectDays" =  "Perfect days";
+"completedTrackers" = "Trackers completed";
+"averageValue" = "Average value";
+"noNameString" = "No name";
+
+//FiltersVC
+"filterOptions" = "All trackers, Trackers for today, Completed, Uncompleted";
+
+//EditHabitVC
+"habitEditingTitle" = "Habit editing";
+"irregularEventEditing" = "Event editing";
+"ok" = "OK";
+"colorCollectionViewTitle" = "Color";
+"alertTrackerNotSaved" = "Unable to save";
+"noCategory" = "No category";
+
+// NSLocalizedString("", comment: "")

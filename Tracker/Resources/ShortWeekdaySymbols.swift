@@ -1,2 +1,5 @@
+import Foundation
 
- var shortWeekdaySymbols: [String] = ["Пн", "Вт", "Ср", "Чт", "Пт", "Сб", "Вс"]
+ var shortWeekdaySymbols: [String] {
+    return Bundle.main.localizedString(forKey: "shortWeekDaysSymbols", value: nil, table: nil).components(separatedBy: ", ")
+}

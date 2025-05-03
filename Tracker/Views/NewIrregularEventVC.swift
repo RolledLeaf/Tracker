@@ -1,14 +1,12 @@
 import UIKit
 
-
-
-final class NewIrregularEventViewController: UIViewController, UITableViewDelegate, UITableViewDataSource, UICollectionViewDataSource, UICollectionViewDelegateFlowLayout, UITextFieldDelegate {
+final class NewIrregularEventViewController: UIViewController, UITableViewDelegate, UITableViewDataSource, UICollectionViewDataSource, UICollectionViewDelegateFlowLayout {
     
     weak var delegate: NewTrackerDelegate?
     
     private lazy var titleLabel: UILabel = {
         let label = UILabel()
-        label.text = "Новое нерегулярное событие"
+        label.text = NSLocalizedString("newIrregularEvent", comment: "")
         label.font = .systemFont(ofSize: 16, weight: .medium)
         label.textColor = UIColor.custom(.createButtonColor)
         label.textAlignment = .center
@@ -17,17 +15,18 @@ final class NewIrregularEventViewController: UIViewController, UITableViewDelega
     
     private lazy var characterLimitLabel: UILabel = {
         let label = UILabel()
-        label.text = "Ограничение 38 символов"
+        label.text = NSLocalizedString("characterLimitLabel", comment: "")
         label.font = .systemFont(ofSize: 14)
         label.textColor = UIColor.custom(.cancelButtonRed)
-        label.isHidden = true
+        label.isHidden = false
         label.textAlignment = .center
+        label.alpha = 0
         return label
     }()
     
     private lazy var trackerNameTextField: UITextField = {
         let textField = UITextField()
-        textField.placeholder = "Введите название трекера"
+        textField.placeholder = NSLocalizedString("trackerNameTextField", comment: "")
         textField.layer.cornerRadius = 16
         textField.font = .systemFont(ofSize: 17, weight: .regular)
         textField.textColor = UIColor.custom(.createButtonColor)
@@ -41,7 +40,7 @@ final class NewIrregularEventViewController: UIViewController, UITableViewDelega
         toolbar.sizeToFit()
         
         let flexSpace = UIBarButtonItem(barButtonSystemItem: .flexibleSpace, target: nil, action: nil)
-        let doneButton = UIBarButtonItem(title: "Готово", style: .done, target: textField, action: #selector(UIResponder.resignFirstResponder))
+        let doneButton = UIBarButtonItem(title: NSLocalizedString("doneButton", comment: ""), style: .done, target: textField, action: #selector(UIResponder.resignFirstResponder))
         toolbar.items = [flexSpace, doneButton]
         textField.inputAccessoryView = toolbar
         return textField
@@ -88,7 +87,7 @@ final class NewIrregularEventViewController: UIViewController, UITableViewDelega
     
     private lazy var createTrackerButton: UIButton = {
         let button = UIButton()
-        button.setTitle("Создать", for: .normal)
+        button.setTitle(NSLocalizedString("createTrackerButton", comment: ""), for: .normal)
         button.titleLabel?.font = UIFont.systemFont(ofSize: 16, weight: .medium)
         button.setTitleColor(.white, for: .normal)
         button.backgroundColor = UIColor.custom(.textFieldGray)
@@ -99,7 +98,7 @@ final class NewIrregularEventViewController: UIViewController, UITableViewDelega
     
     private lazy var cancelButton: UIButton = {
         let button = UIButton()
-        button.setTitle("Отменить", for: .normal)
+        button.setTitle(NSLocalizedString("cancel", comment: ""), for: .normal)
         button.titleLabel?.font = UIFont.systemFont(ofSize: 16, weight: .medium)
         button.setTitleColor(UIColor.custom(.cancelButtonRed), for: .normal)
         button.backgroundColor = .clear
@@ -110,27 +109,26 @@ final class NewIrregularEventViewController: UIViewController, UITableViewDelega
         return button
     }()
     
-    let scrollView = UIScrollView()
-    let contentView = UIView()
-    let selectedWeekDays: String = " "
+    private let scrollView = UIScrollView()
+    private let contentView = UIView()
+    private let selectedWeekDays: String = " "
     
-    
-    var tableViewOptions: [(title: String, subtitle: String?)] = [
-        (title: "Категория", subtitle: nil)
+    private var tableViewOptions: [(title: String, subtitle: String?)] = [
+        (title: NSLocalizedString("tableViewOptionCategory", comment: ""), subtitle: nil)
     ]
     
-    var selectedColor: CollectionColors? {
+    private var selectedColor: CollectionColors? {
         didSet {
             updateCreateCategoryButtonColor()
         }
     }
-    var selectedEmoji: String? {
+    private var selectedEmoji: String? {
         didSet {
             updateCreateCategoryButtonColor()
         }
     }
     
-    var selectedCategory: TrackerCategoryCoreData? {
+    private var selectedCategory: TrackerCategoryCoreData? {
         didSet {
             updateCreateCategoryButtonColor()
         }
@@ -180,7 +178,6 @@ final class NewIrregularEventViewController: UIViewController, UITableViewDelega
             contentView.widthAnchor.constraint(equalTo: scrollView.widthAnchor),
             contentView.heightAnchor.constraint(equalToConstant: 887),
             
-            
             titleLabel.topAnchor.constraint(equalTo: contentView.topAnchor, constant: -33),
             titleLabel.centerXAnchor.constraint(equalTo: contentView.centerXAnchor),
             
@@ -189,11 +186,10 @@ final class NewIrregularEventViewController: UIViewController, UITableViewDelega
             trackerNameTextField.leadingAnchor.constraint(equalTo: contentView.leadingAnchor, constant: 16),
             trackerNameTextField.trailingAnchor.constraint(equalTo: contentView.trailingAnchor, constant: -16),
             
-            
-            characterLimitLabel.heightAnchor.constraint(equalToConstant: 22),
+            characterLimitLabel.heightAnchor.constraint(equalToConstant: 20),
             characterLimitLabel.leadingAnchor.constraint(equalTo: view.leadingAnchor, constant: 44),
             characterLimitLabel.trailingAnchor.constraint(equalTo: view.trailingAnchor, constant: -44),
-            characterLimitLabel.topAnchor.constraint(equalTo: trackerNameTextField.bottomAnchor, constant: 8),
+            characterLimitLabel.topAnchor.constraint(equalTo: trackerNameTextField.bottomAnchor, constant: 2),
             
             categoryTableView.topAnchor.constraint(equalTo: trackerNameTextField.bottomAnchor, constant: 24),
             categoryTableView.leadingAnchor.constraint(equalTo: contentView.leadingAnchor, constant: 16),
@@ -206,7 +202,6 @@ final class NewIrregularEventViewController: UIViewController, UITableViewDelega
             collectionsStackView.trailingAnchor.constraint(equalTo: contentView.trailingAnchor, constant: -23),
             
             buttonsStackView.topAnchor.constraint(equalTo: collectionsStackView.bottomAnchor, constant: 46),
-            
             buttonsStackView.heightAnchor.constraint(equalToConstant: 60),
             buttonsStackView.leadingAnchor.constraint(equalTo: contentView.leadingAnchor, constant: 20),
             buttonsStackView.trailingAnchor.constraint(equalTo: contentView.trailingAnchor, constant: -20)])
@@ -239,32 +234,34 @@ final class NewIrregularEventViewController: UIViewController, UITableViewDelega
     }
     
     private func showAlert(message: String) {
-        let alert = UIAlertController(title: "Привычка не создана", message: message, preferredStyle: .alert)
+        let alert = UIAlertController(title: NSLocalizedString("alertTrackerNotCreated", comment: ""), message: message, preferredStyle: .alert)
         alert.addAction(UIAlertAction(title: "OK", style: .default))
         present(alert, animated: true)
     }
     
     private func updateCreateCategoryButtonColor() {
-        if let name = trackerNameTextField.text, !name.isEmpty,
+        if let name = trackerNameTextField.text, !name.isEmpty, !name.isBlank,
            selectedColor != nil,
            selectedEmoji != nil,
            selectedCategory != nil {
+            createTrackerButton.titleLabel?.textColor = UIColor.custom(.createButtonTextColor)
             createTrackerButton.backgroundColor = UIColor.custom(.createButtonColor)  // Активный цвет
-            print("Условия выполнены, кнопка Создать перекрашена в \(UIColor.custom(.createButtonColor))")
+            print("Условия выполнены, кнопка Создать перекрашена в \(String(describing: UIColor.custom(.createButtonColor)))")
         } else {
             createTrackerButton.backgroundColor = UIColor.custom(.textFieldGray)  // Неактивный цвет
-            print("Условия не выполнены, кнопка Создать снова \(UIColor.custom(.textFieldGray)) цвета")
+            createTrackerButton.titleLabel?.textColor = UIColor.custom(.textColor)
+            print("Условия не выполнены, кнопка Создать снова \(String(describing: UIColor.custom(.textFieldGray))) цвета")
         }
     }
     
     @objc private func createTrackerButtonTapped(_ sender: UIButton) {
-        guard let name = trackerNameTextField.text,
+        guard let name = trackerNameTextField.text, !name.isEmpty, !name.isBlank,
               let selectedColor = selectedColor,
               let selectedEmoji = selectedEmoji,
               
                 let selectedCategory = selectedCategory
         else {
-            showAlert(message: "Не все данные выбраны!")
+            showAlert(message: NSLocalizedString("alertFieldsMissed", comment: ""))
             print("Не все данные выбраны!")
             return
         }
@@ -298,20 +295,6 @@ final class NewIrregularEventViewController: UIViewController, UITableViewDelega
         dismiss(animated: true, completion: nil)
     }
     
-    func textField(_ textField: UITextField, shouldChangeCharactersIn range: NSRange, replacementString string: String) -> Bool {
-        guard let currentText = textField.text, let textRange = Range(range, in: currentText) else {
-            return true
-        }
-        let updatedText = currentText.replacingCharacters(in: textRange, with: string)
-        if updatedText.count > 38 {
-            characterLimitLabel.isHidden = false
-            return false
-        } else {
-            characterLimitLabel.isHidden = true
-            return true
-        }
-    }
-    
     func collectionView(_ collectionView: UICollectionView, viewForSupplementaryElementOfKind kind: String, at indexPath: IndexPath) -> UICollectionReusableView {
         print("Requested supplementary view for kind: \(kind), section: \(indexPath.section)")
         
@@ -334,7 +317,7 @@ final class NewIrregularEventViewController: UIViewController, UITableViewDelega
         if collectionView == emojiCollectionView {
             header.configure(with: "Emoji")
         } else if collectionView == colorsCollectionView {
-            header.configure(with: "Цвет")
+            header.configure(with: NSLocalizedString("colorCollectionViewTitle", comment: ""))
         }
         return header
     }
@@ -348,7 +331,6 @@ final class NewIrregularEventViewController: UIViewController, UITableViewDelega
     func numberOfSections(in collectionView: UICollectionView) -> Int {
         1
     }
-    
     
     func collectionView(_ collectionView: UICollectionView, numberOfItemsInSection section: Int) -> Int {
         if collectionView == emojiCollectionView {
@@ -435,11 +417,35 @@ final class NewIrregularEventViewController: UIViewController, UITableViewDelega
 
 extension NewIrregularEventViewController: CategoriesListViewControllerDelegate {
     func updateCategory(with category: TrackerCategoryCoreData) {
-        if let index = tableViewOptions.firstIndex(where: { $0.title == "Категория" }) {
-            tableViewOptions[index].subtitle = category.title 
+        if let index = tableViewOptions.firstIndex(where: { $0.title == NSLocalizedString("tableViewOptionCategory", comment: "") }) {
+            tableViewOptions[index].subtitle = category.title
         }
         selectedCategory = category
         categoryTableView.reloadData()
     }
 }
 
+extension NewIrregularEventViewController: UITextFieldDelegate {
+    func textField(_ textField: UITextField, shouldChangeCharactersIn range: NSRange, replacementString string: String) -> Bool {
+        guard let currentText = textField.text, let textRange = Range(range, in: currentText) else {
+            return true
+        }
+        let updatedText = currentText.replacingCharacters(in: textRange, with: string)
+        let shouldHide = updatedText.count < 38
+        
+        UIView.animate(withDuration: 0.25) {
+            self.characterLimitLabel.isHidden = false
+            self.characterLimitLabel.alpha = shouldHide ? 0 : 1
+            
+        }
+        return shouldHide
+    }
+    
+    func textFieldShouldClear(_ textField: UITextField) -> Bool {
+        UIView.animate(withDuration: 0.25) {
+            self.characterLimitLabel.alpha = 0
+            self.characterLimitLabel.isHidden = true
+        }
+        return true
+    }
+}

@@ -1,15 +1,14 @@
 import UIKit
 
-
 final class OnboardingViewController: UIPageViewController, UIPageViewControllerDataSource, UIPageViewControllerDelegate  {
     
-    lazy var pages: [UIViewController] = {
+    private lazy var pages: [UIViewController] = {
         
         let firstPage = UIViewController()
         firstPage.view.backgroundColor = .systemBlue
         
         let imageView1: UIImageView = {
-            let imageView = UIImageView(image: UIImage(named: OnbordingImage.firstPage.rawValue))
+            let imageView = UIImageView(image: UIImage(named: OnboardingImage.firstPage.rawValue))
             imageView.contentMode = .scaleAspectFill
             imageView.translatesAutoresizingMaskIntoConstraints = false
             firstPage.view.addSubview(imageView)
@@ -18,9 +17,9 @@ final class OnboardingViewController: UIPageViewController, UIPageViewController
         
         let textLabel: UILabel = {
             let label = UILabel()
-            label.text = "Отслеживайте только \n то, что хотите"
+            label.text = "Отслеживайте привычки и события"
             label.numberOfLines = 0
-            label.textColor = UIColor.custom(.createButtonColor)
+            label.textColor = UIColor.custom(.pitchBlack)
             label.textAlignment = .center
             label.font = UIFont.systemFont(ofSize: 32, weight: .bold)
             label.translatesAutoresizingMaskIntoConstraints = false
@@ -45,7 +44,7 @@ final class OnboardingViewController: UIPageViewController, UIPageViewController
         secondPage.view.backgroundColor = .systemRed
         
         let imageView2: UIImageView = {
-            let imageView = UIImageView(image: UIImage(named: OnbordingImage.secondPage.rawValue))
+            let imageView = UIImageView(image: UIImage(named: OnboardingImage.secondPage.rawValue))
             imageView.contentMode = .scaleAspectFill
             imageView.translatesAutoresizingMaskIntoConstraints = false
             secondPage.view.addSubview(imageView)
@@ -54,9 +53,9 @@ final class OnboardingViewController: UIPageViewController, UIPageViewController
         
         let textLabel2: UILabel = {
             let label = UILabel()
-            label.text = "Даже если это \n не литры воды и йога"
+            label.text = "Наблюдайте за прогрессом"
             label.numberOfLines = 0
-            label.textColor = UIColor.custom(.createButtonColor)
+            label.textColor = UIColor.custom(.pitchBlack)
             label.textAlignment = .center
             label.font = UIFont.systemFont(ofSize: 32, weight: .bold)
             label.translatesAutoresizingMaskIntoConstraints = false
@@ -75,17 +74,15 @@ final class OnboardingViewController: UIPageViewController, UIPageViewController
             textLabel2.leadingAnchor.constraint(equalTo: secondPage.view.safeAreaLayoutGuide.leadingAnchor, constant: 16),
             textLabel2.bottomAnchor.constraint(equalTo: secondPage.view.bottomAnchor, constant: -270)
         ])
-        
         return [firstPage, secondPage]
     }()
     
-    lazy var pageControl: UIPageControl = {
+    private lazy var pageControl: UIPageControl = {
         let pageControl = UIPageControl()
         pageControl.numberOfPages = pages.count
         pageControl.currentPage = 0
-        
-        pageControl.currentPageIndicatorTintColor = UIColor.custom(.createButtonColor)
-        pageControl.pageIndicatorTintColor = adjustAlpha(UIColor.custom(.createButtonColor) ?? .backgroundGray, to: 0.3)
+        pageControl.currentPageIndicatorTintColor = UIColor.custom(.pitchBlack)
+        pageControl.pageIndicatorTintColor = adjustAlpha(UIColor.custom(.thumbTintColor) ?? .backgroundGray, to: 0.3)
         pageControl.translatesAutoresizingMaskIntoConstraints = false
         return pageControl
     }()
@@ -116,8 +113,8 @@ final class OnboardingViewController: UIPageViewController, UIPageViewController
         let finishButton = UIButton(type: .system)
         finishButton.setTitle("Вот это технологии!", for: .normal)
         finishButton.titleLabel?.font = UIFont.systemFont(ofSize: 16, weight: .medium)
-        finishButton.setTitleColor(UIColor.custom(.createButtonTextColor), for: .normal)
-        finishButton.backgroundColor = UIColor.custom(.createButtonColor)
+        finishButton.setTitleColor(UIColor.custom(.thumbTintColor), for: .normal)
+        finishButton.backgroundColor = UIColor.custom(.pitchBlack)
         finishButton.layer.cornerRadius = 16
         
         finishButton.translatesAutoresizingMaskIntoConstraints = false
@@ -176,3 +173,7 @@ final class OnboardingViewController: UIPageViewController, UIPageViewController
     }
 }
 
+enum OnboardingImage: String {
+    case firstPage = "firstPage"
+    case secondPage = "secondPage"
+}

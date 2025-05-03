@@ -2,28 +2,19 @@ import UIKit
 
 final class CategoriesListTableCell: UITableViewCell {
     
-    static let identifier = "CategoriesListTableCell" //
+    static let identifier = "CategoriesListTableCell"
     
-     lazy var categoryNameLabel: UILabel = {
+    lazy var categoryNameLabel: UILabel = {
         let label = UILabel()
         label.font = .systemFont(ofSize: 17, weight: .regular)
         label.textColor = UIColor.custom(.createButtonColor)
-        label.backgroundColor = UIColor.custom(.backgroundGray)
+        label.backgroundColor = .clear
         label.textAlignment = .left
         label.translatesAutoresizingMaskIntoConstraints = false
         return label
     }()
     
-    private lazy var checkMark: UIImageView = {
-        let imageView = UIImageView()
-        imageView.image = UIImage(systemName: "checkmark")
-        imageView.tintColor = UIColor.custom(.backgroundGray)
-        imageView.translatesAutoresizingMaskIntoConstraints = false
-        return imageView
-    }()
-    
     // MARK: - Init
-    
     override init(style: UITableViewCell.CellStyle, reuseIdentifier: String?) {
         super.init(style: style, reuseIdentifier: reuseIdentifier)
         setupUI()
@@ -34,37 +25,25 @@ final class CategoriesListTableCell: UITableViewCell {
     }
     
     // MARK: - UI Setup
-    
     private func setupUI() {
         contentView.addSubview(categoryNameLabel)
-        contentView.addSubview(checkMark)
-        contentView.backgroundColor = UIColor.custom(.backgroundGray)
+        contentView.backgroundColor = UIColor.custom(.tablesColor)
         
         NSLayoutConstraint.activate([
             // Расположение titleLabel
             categoryNameLabel.leadingAnchor.constraint(equalTo: contentView.leadingAnchor, constant: 16),
             categoryNameLabel.centerYAnchor.constraint(equalTo: contentView.centerYAnchor),
-            
-            // Расположение arrowImageView
-            checkMark.trailingAnchor.constraint(equalTo: contentView.trailingAnchor, constant: -16),
-            checkMark.centerYAnchor.constraint(equalTo: contentView.centerYAnchor),
-            checkMark.widthAnchor.constraint(equalToConstant: 10),
-            checkMark.heightAnchor.constraint(equalToConstant: 15)
         ])
-    }
-    
-    override func setSelected(_ selected: Bool, animated: Bool) {
-        super.setSelected(selected, animated: animated)
-        contentView.backgroundColor = selected ? UIColor.custom(.backgroundGray) : UIColor.custom(.backgroundGray)
-        if selected {
-            checkMark.tintColor = UIColor.custom(.toggleSwitchBlue) // Цвет при выделении
-        } else {
-            checkMark.tintColor = UIColor.custom(.backgroundGray) // Цвет при отмене выделения
-        }
     }
     
     // MARK: - Configuration Method
     func configure(with title: String){
         categoryNameLabel.text = title
+    }
+    
+    func setHidden(_ hidden: Bool) {
+        self.isHidden = hidden
+        self.isUserInteractionEnabled = false
+        self.contentView.isHidden = hidden
     }
 }

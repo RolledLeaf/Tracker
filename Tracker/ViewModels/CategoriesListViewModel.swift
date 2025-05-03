@@ -1,23 +1,28 @@
-class CategoriesViewModel {
-    private let categoryStore: TrackerCategoryStore
+final class CategoriesViewModel {
+    private let categoryStore: TrackerCategoryStoreProtocol
     
     private(set) var categories: [TrackerCategoryCoreData] = [] {
         didSet {
             onCategoriesUpdate?(categories)
         }
     }
-
+    var selectedFilter: TrackerFilterType = .all {
+        didSet {
+            onFilterChanged?(selectedFilter)
+        }
+    }
+    var onFilterChanged: ((TrackerFilterType) -> Void)?
     var onCategoriesUpdate: (([TrackerCategoryCoreData]) -> Void)?
     var onCategorySelected: ((TrackerCategoryCoreData) -> Void)?
     var onEditCategoryRequest: ((TrackerCategoryCoreData, String) -> Void)?
 
-    init(categoryStore: TrackerCategoryStore) {
+    init(categoryStore: TrackerCategoryStoreProtocol) {
         self.categoryStore = categoryStore
         fetchCategories()
     }
 
     func fetchCategories() {
-        categories = categoryStore.fetchCategories()
+        categories = categoryStore.fetchAllTrackerCategories()
     }
 
     func selectCategory(at index: Int) {

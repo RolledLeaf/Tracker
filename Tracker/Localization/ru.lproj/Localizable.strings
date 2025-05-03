@@ -1,0 +1,77 @@
+
+"shortWeekDaysSymbols" = "Пн, Вт, Ср, Чт, Пт, Сб, Вс";
+"weekDays" = "Понедельник, Вторник, Среда, Четверг, Пятница, Суббота, Воскресенье";
+
+//TrackersVC
+"trackersLabel" = "Трекеры";
+"emptyFieldLabel" = "Что будем отслеживать?";
+"nothingFoundLabel" = "Ничего не найдено";
+"filtersButtonTitle" = "Фильтры";
+"pinned" = "Закреплённые";
+"pin" = "Закрепить";
+"unpin" = "Открепить";
+"search" = "Поиск";
+
+//TabBarVC
+"trackers" = "Трекеры";
+"statistics" = "Статистика";
+
+//CreateHabitTypeVC
+"trackerCreationTitle" = "Создание трекера";
+"habitButton" = "Привычка";
+"irregularButton" = "Нерегулярные событие";
+
+//NewHabitViewController
+"newHabitTitleLabel" = "Новая привычка";
+"newIrregularEvent" = "Новое нерегулярное событие";
+"characterLimitLabel" = "Ограничение 38 символов";
+"categoryCharacterLimitLabel" = "Ограничение 35 символов";
+"trackerNameTextField" = "Введите название трекера";
+"doneButton" = "Готово";
+"createTrackerButton" = "Создать";
+"cancel" = "Отменить";
+"tableViewOptionCategory" = "Категория";
+"tableViewOptionSchedule" = "Расписание";
+"alertTrackerNotCreated" = "Привычка не создана";
+"alertFieldsMissed" = "Не все данные выбраны!";
+"colorCollectionViewTitle" = "Цвет";
+"everyday" = "Ежедневно";
+
+//CategoriesListVC
+"categoryTitleLabel" = "Категория";
+"emptyTrackerCollectionPlaceholder" = "Что будем отслеживать?";
+"emptyCategories" = "Привычки и события можно \n объединить по смыслу";
+"addCategoryButton" = "Добавить категорию";
+"contextMenuEdit" = "Редактировать";
+"editingMenu" = "Введите новое название категории";
+"categoryEditingPlaceholder" = "Название категории";
+"save" = "Сохранить";
+"contextMenuDelete" = "Удалить";
+
+// NewCategoryVC
+"newCategoryTitleLabel" = "Новая категория";
+"categoryNameTextField" = "Введите название категории";
+"newCategoryNameAlert" = "Введите новое название категории";
+
+//StatisticsVC
+"statisticsTitleLabel" = "Статистика";
+"placeholderLabel" = "Анализировать пока нечего";
+"bestPeriod" = "Лучший период";
+"perfectDays" =  "Идеальные дни";
+"completedTrackers" = "Трекеров завершено";
+"averageValue" = "Среднее значение";
+"noNameString" = "Без названия";
+
+//FiltersVC
+"filterOptions" = "Все трекеры, Трекеры на сегодня, Завершённые, Не завершённые";
+
+//EditHabitVC
+"habitEditingTitle" = "Редактирование привычки";
+"irregularEventEditing" = "Редактирование нерегулярного события";
+"ok" = "OK";
+"colorCollectionViewTitle" = "Цвет";
+"alertTrackerNotSaved" = "Невозможно сохранить";
+"noCategory" = "Без категории";
+
+// NSLocalizedString("", comment: "")
+
