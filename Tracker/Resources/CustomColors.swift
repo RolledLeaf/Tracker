@@ -1,4 +1,3 @@
-
 import UIKit
 
 enum CustomColor: String {
@@ -10,9 +9,12 @@ enum CustomColor: String {
     case textFieldGray = "textFieldGray"
     case cancelButtonRed = "cancelButtonRed"
     case toggleSwitchBlue = "toggleSwitchBlue"
+    case toggleSwitchGray = "toggleSwitchGray"
     case mainBackgroundColor = "mainBackgroundColor"
     case tabBarSeparateLineColor = "tabBarSeparateLineColor"
     case tablesColor = "tablesColor"
+    case thumbTintColor = "thumbTintColor"
+    case pitchBlack = "pitchBlack"
 }
 
 enum CollectionColors: String  {
@@ -43,8 +45,6 @@ enum CollectionColors: String  {
 func adjustAlpha(_ color: UIColor, to alpha: CGFloat) -> UIColor {
     return color.withAlphaComponent(alpha)
 }
-
-
 
 func lightenColor(_ color: UIColor, by percentage: CGFloat) -> UIColor {
     // Ограничиваем процент в пределах от 0 до 1
