@@ -12,9 +12,14 @@ final class TrackersViewController: UIViewController, UICollectionViewDataSource
     private var currentDate: Date = Date()
     private var selectedIndexPath: IndexPath?
     private var isFilterButtonMinimized = false
+    private var isChecked = false
+    private var ifTrackerPinned: Bool = false
     private var filterButtonLeadingConstraint: NSLayoutConstraint!
     private var filterButtonTrailingConstraint: NSLayoutConstraint!
     private var filterButtonWidthConstraint: NSLayoutConstraint!
+
+    private var datePickerHeightConstraint: NSLayoutConstraint?
+    private var categoriesCollectionViewHeight: NSLayoutConstraint?
     
     private let addTrackerButton = UIButton()
     private let emptyFieldStarImage = UIImageView()
@@ -26,10 +31,7 @@ final class TrackersViewController: UIViewController, UICollectionViewDataSource
     private let context = CoreDataStack.shared.persistentContainer.viewContext
     private let notification = Notifications()
     
-    private var isChecked = false
-    private var ifTrackerPinned: Bool = false
-    private var datePickerHeightConstraint: NSLayoutConstraint?
-    private var categoriesCollectionViewHeight: NSLayoutConstraint?
+   
     private let dateFormatter: DateFormatter = {
         let formatter = DateFormatter()
         formatter.dateFormat = "dd.MM.YY"
@@ -129,7 +131,7 @@ final class TrackersViewController: UIViewController, UICollectionViewDataSource
         loadCategories()
         loadTrackerRecords()
         reloadCategoryData()
-        //notification.scheduleNotification(notificationType: .tips, target: .categories)
+        scheduleNotificationIfNeeded(notificationType: .statistics, target: .statistics)
         updateVisibleTrackers(for: datePicker.date)
         viewModel.onTrackersUpdate = { [weak self] trackers in
             self?.categoriesCollectionView.reloadData()
@@ -226,6 +228,19 @@ final class TrackersViewController: UIViewController, UICollectionViewDataSource
         
         categoriesCollectionView.delegate = self
         searchBar.delegate = self
+    }
+    
+    func scheduleNotificationIfNeeded(notificationType: NotificationType, target: NotificationTarget) {
+        let key = "hasScheduled_\(notificationType)"
+        
+        if UserDefaults.standard.bool(forKey: key) {
+            print("Уведомление уже было показано, не планируем повторно.")
+            return
+        }
+        
+        notification.scheduleNotification(notificationType: notificationType,  target: target)
+        
+        UserDefaults.standard.set(true, forKey: key)
     }
     
     private func loadCategories() {

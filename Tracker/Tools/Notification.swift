@@ -20,10 +20,9 @@ final class Notifications: NSObject,  UNUserNotificationCenterDelegate {
         }
     }
     
-    func scheduleNotification(notificationType: NotificationType,  target: NotificationTarget) {
+    func scheduleNotification(notificationType: NotificationType, target: NotificationTarget) {
         let content = UNMutableNotificationContent()
         content.title = notificationType.title
-        content.subtitle = "subtitle"
         content.body = notificationType.body
         content.badge = 1
         content.sound = .default
@@ -130,18 +129,18 @@ enum NotificationType {
     var title: String {
         switch self {
         case .statistics:
-            return "Статистика"
+            return NSLocalizedString("tips", comment: "")
         case .tips:
-            return "Советы"
+            return NSLocalizedString("tips", comment: "")
         }
     }
     
     var body: String {
         switch self {
         case .statistics:
-            return "Нажмите, чтобы посмотреть статистику"
+            return NSLocalizedString("pressToSeeStatistics", comment: "")
         case .tips:
-            return "Нажмите, чтобы получить советы"
+            return NSLocalizedString("pressToGetTips", comment: "")
         }
     }
 }

@@ -78,4 +78,9 @@
 "watchForProgress" = "Watch your progress";
 "begin" = "Let's start";
 
+//Notifications
+"tips" = "Tips";
+"pressToSeeStatistics" = "Tap to see statistics";
+"pressToGetTips" = "Tap to see tips";
+
 // NSLocalizedString("", comment: "")

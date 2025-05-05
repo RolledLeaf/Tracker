@@ -78,5 +78,10 @@
 "watchForProgress" = "Наблюдайте за прогрессом";
 "begin" = "Начнём";
 
+//Notifications
+"tips" = "Советы";
+"pressToSeeStatistics" = "Нажмите, чтобы посмотреть статистику";
+"pressToGetTips" = "Нажмите, чтобы получить советы";
+
 // NSLocalizedString("", comment: "")
 
