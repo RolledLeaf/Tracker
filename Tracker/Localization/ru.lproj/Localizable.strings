@@ -73,5 +73,10 @@
 "alertTrackerNotSaved" = "Невозможно сохранить";
 "noCategory" = "Без категории";
 
+//Onboarding
+"trackHabitsAndEvents" = "Отслеживайте привычки и события";
+"watchForProgress" = "Наблюдайте за прогрессом";
+"begin" = "Начнём";
+
 // NSLocalizedString("", comment: "")
 

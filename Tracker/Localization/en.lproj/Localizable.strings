@@ -73,4 +73,9 @@
 "alertTrackerNotSaved" = "Unable to save";
 "noCategory" = "No category";
 
+//Onboarding
+"trackHabitsAndEvents" = "Track habits and events";
+"watchForProgress" = "Watch your progress";
+"begin" = "Let's start";
+
 // NSLocalizedString("", comment: "")

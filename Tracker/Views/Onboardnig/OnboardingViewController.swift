@@ -17,7 +17,7 @@ final class OnboardingViewController: UIPageViewController, UIPageViewController
         
         let textLabel: UILabel = {
             let label = UILabel()
-            label.text = "Отслеживайте привычки и события"
+            label.text = NSLocalizedString("trackHabitsAndEvents", comment: "")
             label.numberOfLines = 0
             label.textColor = UIColor.custom(.pitchBlack)
             label.textAlignment = .center
@@ -53,7 +53,7 @@ final class OnboardingViewController: UIPageViewController, UIPageViewController
         
         let textLabel2: UILabel = {
             let label = UILabel()
-            label.text = "Наблюдайте за прогрессом"
+            label.text = NSLocalizedString("watchForProgress", comment: "")
             label.numberOfLines = 0
             label.textColor = UIColor.custom(.pitchBlack)
             label.textAlignment = .center
@@ -111,7 +111,7 @@ final class OnboardingViewController: UIPageViewController, UIPageViewController
     
     private func setupFinishButton() {
         let finishButton = UIButton(type: .system)
-        finishButton.setTitle("Вот это технологии!", for: .normal)
+        finishButton.setTitle(NSLocalizedString("begin", comment: ""), for: .normal)
         finishButton.titleLabel?.font = UIFont.systemFont(ofSize: 16, weight: .medium)
         finishButton.setTitleColor(UIColor.custom(.thumbTintColor), for: .normal)
         finishButton.backgroundColor = UIColor.custom(.pitchBlack)
