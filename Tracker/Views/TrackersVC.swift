@@ -114,7 +114,7 @@ final class TrackersViewController: UIViewController, UICollectionViewDataSource
         let button = UIButton(type: .system)
         button.tintColor = UIColor.custom(.textColor)
         button.layer.cornerRadius = 16
-        button.setImage(UIImage(systemName: "line.3.horizontal.decrease.circle"), for: .normal)
+        button.setImage(UIImage(named: "filterIcon"), for: .normal)
         button.tintColor = UIColor.custom(.createButtonColor)
         
         button.backgroundColor = .clear
